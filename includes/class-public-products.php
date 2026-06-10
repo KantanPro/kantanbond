@@ -262,7 +262,7 @@ class KantanBond_Public_Products {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( self::NONCE_ACTION ),
 				'i18n'    => array(
-					'orderTitle'        => __( 'お申し込み', 'kantanbond' ),
+					'orderTitle'        => __( 'お問い合わせ', 'kantanbond' ),
 					'submit'            => __( '送信する', 'kantanbond' ),
 					'submitting'        => __( '送信中…', 'kantanbond' ),
 					'close'             => __( '閉じる', 'kantanbond' ),
@@ -519,7 +519,7 @@ class KantanBond_Public_Products {
 				<button type="button" class="kantanbond-public-product-detail__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
 				<div class="kantanbond-public-product-detail__content"></div>
 				<form class="kantanbond-public-product-order-form" novalidate>
-					<h4 class="kantanbond-public-product-order-form__title" id="kantanbond-public-product-detail-title"><?php echo esc_html__( 'お申し込み', 'kantanbond' ); ?></h4>
+					<h4 class="kantanbond-public-product-order-form__title" id="kantanbond-public-product-detail-title"><?php echo esc_html__( 'お問い合わせ', 'kantanbond' ); ?></h4>
 					<input type="hidden" name="service_id" value="" />
 					<p class="kantanbond-public-product-order-form__field">
 						<label for="kantanbond-pp-company"><?php echo esc_html__( '会社名', 'kantanbond' ); ?></label>
