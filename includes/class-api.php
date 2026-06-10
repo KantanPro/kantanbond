@@ -191,6 +191,41 @@ class KantanBond_API {
 	}
 
 	/**
+	 * レポート集計・グラフデータを取得する。
+	 *
+	 * @param string   $type     レポート種別。
+	 * @param string   $period   集計期間。
+	 * @param int|null $tax_year 確定申告用の年（tax_return 時）。
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function get_report( string $type = 'sales', string $period = 'all_time', ?int $tax_year = null ) {
+		$query = array(
+			'type'   => $type,
+			'period' => $period,
+		);
+
+		if ( $tax_year !== null ) {
+			$query['tax_year'] = $tax_year;
+		}
+
+		$endpoint = '/api/v1/reports?' . http_build_query( $query, '', '&', PHP_QUERY_RFC3986 );
+		$response = $this->request( 'GET', $endpoint );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+			return new WP_Error(
+				'kantanbond_invalid_report_response',
+				__( 'レポート API の応答形式が不正です。', 'kantanbond' )
+			);
+		}
+
+		return $response['data'];
+	}
+
+	/**
 	 * 商品（services）一覧を取得する。
 	 *
 	 * @return array<int, array<string, mixed>>|WP_Error

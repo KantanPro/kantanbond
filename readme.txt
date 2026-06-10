@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.9
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ KantanBond は WordPress サイトと KantanBiz アプリ（https://kantanbiz.cl
 * 管理画面ダッシュボード
 * API 設定（Base URL / API アクセストークン / API Secret）
 * 同期ログの記録・閲覧
-* ショートコードによる顧客・案件・商品データの表示
+* ショートコードによる顧客・案件・商品・レポートデータの表示
 
 将来的な拡張予定:
 
@@ -47,9 +47,15 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 = ショートコードはどう使いますか？ =
 
-固定ページや投稿に `[kantanbond_customers]`、`[kantanbond_projects]`、または `[kantanbond_products]` を記述してください。`[kantanbond_services]` は `[kantanbond_products]` の別名です。
+固定ページや投稿に `[kantanbond_customers]`、`[kantanbond_projects]`、`[kantanbond_products]`、または `[kantanbond_reports]` を記述してください。`[kantanbond_services]` は `[kantanbond_products]` の別名です。
+
+レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.1.0 =
+* レポートショートコード `[kantanbond_reports]` を追加（KantanBiz Report API 連携、Chart.js グラフ表示）
+* 確定申告用売上台帳（type=tax_return）の表表示に対応
 
 = 1.0.9 =
 * API Base URL の初期値を https://kantanbiz.cloud に設定

@@ -252,7 +252,8 @@ class KantanBond_Admin {
 						<strong><?php echo esc_html__( 'ショートコード', 'kantanbond' ); ?>:</strong>
 						<code>[kantanbond_customers]</code>,
 						<code>[kantanbond_projects]</code>,
-						<code>[kantanbond_products]</code>
+						<code>[kantanbond_products]</code>,
+						<code>[kantanbond_reports]</code>
 					</li>
 				</ul>
 			</div>

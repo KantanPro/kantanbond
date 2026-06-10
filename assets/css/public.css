@@ -50,3 +50,163 @@
 .kantanbond-empty {
 	color: #646970;
 }
+
+/* レポート */
+.kantanbond-reports {
+	margin: 1.5em 0;
+}
+
+.kantanbond-report-meta {
+	color: #1d2327;
+	font-size: 1.05rem;
+	font-weight: 600;
+	margin: 0 0 1rem;
+}
+
+.kantanbond-report-summary {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	margin-bottom: 1.5rem;
+}
+
+.kantanbond-report-summary-card {
+	background: linear-gradient(135deg, #4f46e5, #7c3aed);
+	border-radius: 8px;
+	color: #fff;
+	padding: 16px;
+	text-align: center;
+}
+
+.kantanbond-report-summary-card--plain {
+	background: #fff;
+	border: 1px solid #ddd;
+	color: #1d2327;
+}
+
+.kantanbond-report-summary--tax .kantanbond-report-summary-card:first-child {
+	background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.kantanbond-report-summary--tax .kantanbond-report-summary-card:last-child {
+	background: linear-gradient(135deg, #475569, #64748b);
+}
+
+.kantanbond-report-summary-label {
+	font-size: 0.85rem;
+	opacity: 0.9;
+}
+
+.kantanbond-report-summary-value {
+	font-size: 1.35rem;
+	font-weight: 700;
+	margin-top: 4px;
+}
+
+.kantanbond-report-panel {
+	background: #f6f7f7;
+	border: 1px solid #e2e4e7;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	padding: 16px;
+}
+
+.kantanbond-report-panel-title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0 0 12px;
+}
+
+.kantanbond-report-rank-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.kantanbond-report-rank-item {
+	align-items: center;
+	background: #fff;
+	border: 1px solid #e2e4e7;
+	border-radius: 6px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: space-between;
+	margin-bottom: 8px;
+	padding: 10px 12px;
+}
+
+.kantanbond-report-rank-name {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+}
+
+.kantanbond-report-rank-badge {
+	align-items: center;
+	background: #4f46e5;
+	border-radius: 999px;
+	color: #fff;
+	display: inline-flex;
+	font-size: 0.75rem;
+	font-weight: 700;
+	height: 24px;
+	justify-content: center;
+	width: 24px;
+}
+
+.kantanbond-report-rank-stats {
+	font-size: 0.9rem;
+	text-align: right;
+}
+
+.kantanbond-report-rank-amount {
+	color: #3730a3;
+	font-weight: 600;
+}
+
+.kantanbond-report-rank-count {
+	color: #646970;
+	margin-left: 8px;
+}
+
+.kantanbond-report-charts-grid {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	margin-top: 1rem;
+}
+
+.kantanbond-report-charts-grid--single {
+	grid-template-columns: 1fr;
+}
+
+.kantanbond-report-chart-item {
+	background: #f6f7f7;
+	border: 1px solid #e2e4e7;
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.kantanbond-report-chart-title {
+	font-size: 0.95rem;
+	font-weight: 600;
+	margin: 0 0 12px;
+}
+
+.kantanbond-chart-canvas-wrap {
+	height: 280px;
+	position: relative;
+	width: 100%;
+}
+
+.kantanbond-chart-canvas-wrap canvas {
+	height: 100% !important;
+	width: 100% !important;
+}
+
+.kantanbond-tax-ledger .kantanbond-report-amount-cell {
+	font-weight: 600;
+	text-align: right;
+	white-space: nowrap;
+}
