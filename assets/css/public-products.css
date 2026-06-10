@@ -122,6 +122,7 @@
 }
 
 .kantanbond-public-products-grid__image {
+	cursor: zoom-in;
 	display: block;
 	height: 100%;
 	max-height: 200px;
@@ -218,6 +219,7 @@
 }
 
 .kantanbond-public-products-card__image {
+	cursor: zoom-in;
 	display: inline-block;
 	height: auto;
 	max-height: 160px;
@@ -273,6 +275,7 @@
 }
 
 .kantanbond-public-products-thumb {
+	cursor: zoom-in;
 	display: block;
 	height: auto;
 	max-height: 48px;
@@ -369,9 +372,82 @@ body.kantanbond-public-product-modal-open {
 
 .kantanbond-public-product-detail__image {
 	border-radius: 8px;
+	cursor: zoom-in;
 	max-height: 160px;
 	max-width: 200px;
 	object-fit: contain;
+}
+
+/* 画像拡大（ライトボックス） */
+.kantanbond-public-product-lightbox {
+	align-items: center;
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: 1.5rem;
+	position: fixed;
+	z-index: 100001;
+}
+
+.kantanbond-public-product-lightbox[hidden] {
+	display: none !important;
+}
+
+.kantanbond-public-product-lightbox.is-open {
+	display: flex;
+}
+
+body.kantanbond-public-product-lightbox-open {
+	overflow: hidden;
+}
+
+.kantanbond-public-product-lightbox__backdrop {
+	background: rgba(15, 23, 42, 0.85);
+	border: 0;
+	cursor: zoom-out;
+	inset: 0;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+}
+
+.kantanbond-public-product-lightbox__figure {
+	margin: 0;
+	max-height: 90vh;
+	max-width: min(92vw, 1200px);
+	position: relative;
+	z-index: 1;
+}
+
+.kantanbond-public-product-lightbox__image {
+	display: block;
+	height: auto;
+	max-height: 90vh;
+	max-width: min(92vw, 1200px);
+	object-fit: contain;
+	width: auto;
+}
+
+.kantanbond-public-product-lightbox__close {
+	background: rgba(255, 255, 255, 0.95);
+	border: 0;
+	border-radius: 999px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+	color: #1d2327;
+	cursor: pointer;
+	font-size: 1.5rem;
+	height: 2.25rem;
+	line-height: 1;
+	padding: 0;
+	position: absolute;
+	right: -0.5rem;
+	top: -0.5rem;
+	width: 2.25rem;
+	z-index: 2;
+}
+
+.kantanbond-public-product-lightbox__close:hover {
+	background: #fff;
 }
 
 .kantanbond-public-product-detail__name {

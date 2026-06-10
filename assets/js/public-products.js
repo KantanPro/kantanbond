@@ -8,6 +8,16 @@
 	var config = window.kantanbondPublicProducts;
 	var i18n = config.i18n || {};
 	var openModalCount = 0;
+	var openLightboxCount = 0;
+	var lightboxEl = null;
+	var lightboxImageEl = null;
+	var lightboxLastActive = null;
+
+	var ZOOMABLE_IMAGE_SELECTOR =
+		'.kantanbond-public-products-grid__image,' +
+		'.kantanbond-public-products-card__image,' +
+		'.kantanbond-public-products-thumb,' +
+		'.kantanbond-public-product-detail__image';
 
 	function qs(root, selector) {
 		return (root || document).querySelector(selector);
@@ -47,6 +57,141 @@
 		if (openModalCount === 0) {
 			document.body.classList.remove('kantanbond-public-product-modal-open');
 		}
+	}
+
+	function lockLightboxScroll() {
+		openLightboxCount += 1;
+		if (openLightboxCount === 1) {
+			document.body.classList.add('kantanbond-public-product-lightbox-open');
+		}
+	}
+
+	function unlockLightboxScroll() {
+		openLightboxCount = Math.max(0, openLightboxCount - 1);
+		if (openLightboxCount === 0) {
+			document.body.classList.remove('kantanbond-public-product-lightbox-open');
+		}
+	}
+
+	function ensureLightbox() {
+		if (lightboxEl) {
+			return;
+		}
+
+		lightboxEl = document.createElement('div');
+		lightboxEl.id = 'kantanbond-public-product-lightbox';
+		lightboxEl.className = 'kantanbond-public-product-lightbox';
+		lightboxEl.hidden = true;
+		lightboxEl.innerHTML =
+			'<button type="button" class="kantanbond-public-product-lightbox__backdrop" aria-label="' +
+			escapeHtml(i18n.close || '閉じる') +
+			'"></button>' +
+			'<figure class="kantanbond-public-product-lightbox__figure">' +
+			'<button type="button" class="kantanbond-public-product-lightbox__close" aria-label="' +
+			escapeHtml(i18n.close || '閉じる') +
+			'">&times;</button>' +
+			'<img class="kantanbond-public-product-lightbox__image" alt="" decoding="async" />' +
+			'</figure>';
+
+		document.body.appendChild(lightboxEl);
+		lightboxImageEl = qs(lightboxEl, '.kantanbond-public-product-lightbox__image');
+
+		var backdrop = qs(lightboxEl, '.kantanbond-public-product-lightbox__backdrop');
+		var closeBtn = qs(lightboxEl, '.kantanbond-public-product-lightbox__close');
+		var figure = qs(lightboxEl, '.kantanbond-public-product-lightbox__figure');
+
+		function onLightboxEscape(event) {
+			if (event.key === 'Escape') {
+				event.stopImmediatePropagation();
+				closeImageLightbox();
+			}
+		}
+
+		function closeImageLightbox() {
+			if (!lightboxEl || lightboxEl.hidden) {
+				return;
+			}
+
+			lightboxEl.hidden = true;
+			lightboxEl.classList.remove('is-open');
+			unlockLightboxScroll();
+			document.removeEventListener('keydown', onLightboxEscape, true);
+
+			if (lightboxImageEl) {
+				lightboxImageEl.removeAttribute('src');
+				lightboxImageEl.alt = '';
+			}
+
+			if (lightboxLastActive && typeof lightboxLastActive.focus === 'function') {
+				lightboxLastActive.focus();
+			}
+			lightboxLastActive = null;
+		}
+
+		function openImageLightbox(src, alt) {
+			if (!src || !lightboxImageEl) {
+				return;
+			}
+
+			lightboxLastActive = document.activeElement;
+			lightboxImageEl.src = src;
+			lightboxImageEl.alt = alt || '';
+			lightboxEl.hidden = false;
+			lightboxEl.classList.add('is-open');
+			lockLightboxScroll();
+			document.addEventListener('keydown', onLightboxEscape, true);
+
+			window.requestAnimationFrame(function () {
+				if (closeBtn) {
+					closeBtn.focus();
+				}
+			});
+		}
+
+		if (backdrop) {
+			backdrop.addEventListener('click', closeImageLightbox);
+		}
+		if (closeBtn) {
+			closeBtn.addEventListener('click', closeImageLightbox);
+		}
+		if (figure) {
+			figure.addEventListener('click', function (event) {
+				event.stopPropagation();
+			});
+		}
+
+		lightboxEl._open = openImageLightbox;
+		lightboxEl._close = closeImageLightbox;
+	}
+
+	function openImageLightbox(src, alt) {
+		ensureLightbox();
+		if (lightboxEl && typeof lightboxEl._open === 'function') {
+			lightboxEl._open(src, alt);
+		}
+	}
+
+	function initImageZoom() {
+		document.addEventListener(
+			'click',
+			function (event) {
+				var img = event.target.closest(ZOOMABLE_IMAGE_SELECTOR);
+				if (!img || img.tagName !== 'IMG' || !img.src) {
+					return;
+				}
+
+				var inList = img.closest('.kantanbond-public-products');
+				var inDetail = img.closest('#kantanbond-public-product-detail');
+				if (!inList && !inDetail) {
+					return;
+				}
+
+				event.preventDefault();
+				event.stopPropagation();
+				openImageLightbox(img.src, img.alt || img.getAttribute('alt') || '');
+			},
+			true
+		);
 	}
 
 	function buildDetailHtml(product) {
@@ -327,6 +472,7 @@
 	}
 
 	function boot() {
+		initImageZoom();
 		qsa(document, '.kantanbond-public-products').forEach(initWrapper);
 	}
 
