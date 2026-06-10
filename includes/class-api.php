@@ -65,9 +65,8 @@ class KantanBond_API {
 
 		$headers = array(
 			'Accept'        => 'application/json',
-			'Authorization' => 'Bearer ' . $this->settings->get_api_key(),
-			'X-Api-Key'     => $this->settings->get_api_key(),
-			'X-Api-Secret'  => $this->settings->get_api_secret(),
+			'Authorization' => 'Bearer ' . $this->settings->get_api_token(),
+			'X-Tenant-Id'   => $this->settings->get_api_secret(),
 		);
 
 		$default_args = array(
@@ -97,7 +96,7 @@ class KantanBond_API {
 				sprintf(
 					/* translators: 1: HTTP method, 2: endpoint, 3: error message */
 					__( 'API 通信エラー [%1$s %2$s]: %3$s', 'kantanbond' ),
-					$request_args['method'],
+					$http_method,
 					$endpoint,
 					$response->get_error_message()
 				)
@@ -130,7 +129,7 @@ class KantanBond_API {
 				sprintf(
 					/* translators: 1: HTTP method, 2: endpoint, 3: status code, 4: message */
 					__( 'API エラー [%1$s %2$s] HTTP %3$d: %4$s', 'kantanbond' ),
-					$request_args['method'],
+					$http_method,
 					$endpoint,
 					$status_code,
 					$error_message
@@ -152,7 +151,7 @@ class KantanBond_API {
 			sprintf(
 				/* translators: 1: HTTP method, 2: endpoint, 3: status code */
 				__( 'API 成功 [%1$s %2$s] HTTP %3$d', 'kantanbond' ),
-				$request_args['method'],
+				$http_method,
 				$endpoint,
 				$status_code
 			)
@@ -192,6 +191,21 @@ class KantanBond_API {
 	}
 
 	/**
+	 * 商品（services）一覧を取得する。
+	 *
+	 * @return array<int, array<string, mixed>>|WP_Error
+	 */
+	public function get_products() {
+		$response = $this->request( 'GET', '/api/v1/services' );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $this->extract_data_rows( $response );
+	}
+
+	/**
 	 * 売上（orders の amount 情報）一覧を取得する。
 	 *
 	 * @return array<int, array<string, mixed>>|WP_Error
@@ -220,6 +234,74 @@ class KantanBond_API {
 		}
 
 		return $sales;
+	}
+
+	/**
+	 * KantanBiz 上のアセット URL を絶対 URL に解決する。
+	 *
+	 * @param string $url 画像 URL またはパス。
+	 * @return string
+	 */
+	public function resolve_asset_url( string $url ): string {
+		return $this->settings->resolve_app_asset_url( $url );
+	}
+
+	/**
+	 * KantanBiz アプリ上の URL を組み立てる。
+	 *
+	 * @param string $path パス（clients/1 等）。
+	 * @return string
+	 */
+	public function build_app_url( string $path ): string {
+		$base = $this->settings->get_normalized_base_url();
+
+		if ( $base === '' ) {
+			return '';
+		}
+
+		return $base . '/' . ltrim( $path, '/' );
+	}
+
+	/**
+	 * 顧客詳細 URL を返す。
+	 *
+	 * @param int $client_id 顧客 ID。
+	 * @return string
+	 */
+	public function get_client_url( int $client_id ): string {
+		if ( $client_id <= 0 ) {
+			return '';
+		}
+
+		return $this->build_app_url( 'clients/' . $client_id );
+	}
+
+	/**
+	 * 案件詳細 URL を返す。
+	 *
+	 * @param int $order_id 案件 ID。
+	 * @return string
+	 */
+	public function get_order_url( int $order_id ): string {
+		if ( $order_id <= 0 ) {
+			return '';
+		}
+
+		return $this->build_app_url( 'orders/' . $order_id );
+	}
+
+	/**
+	 * 商品詳細 URL を返す。
+	 *
+	 * @param int $service_id 商品 ID。
+	 * @return string
+	 */
+	public function get_service_url( int $service_id ): string {
+		if ( $service_id <= 0 ) {
+			return '';
+		}
+
+		return $this->build_app_url( 'services/' . $service_id );
 	}
 
 	/**

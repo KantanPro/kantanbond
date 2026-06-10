@@ -25,8 +25,26 @@
 	background: #f6f7f7;
 }
 
+.kantanbond-table .kantanbond-id-link {
+	color: #2271b1;
+	text-decoration: underline;
+}
+
+.kantanbond-table .kantanbond-id-link:hover,
+.kantanbond-table .kantanbond-id-link:focus {
+	color: #135e96;
+}
+
 .kantanbond-error {
 	color: #b32d2e;
+}
+
+.kantanbond-product-image {
+	display: block;
+	height: auto;
+	max-height: 48px;
+	max-width: 48px;
+	object-fit: contain;
 }
 
 .kantanbond-empty {

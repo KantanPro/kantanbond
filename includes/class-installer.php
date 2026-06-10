@@ -35,6 +35,11 @@ class KantanBond_Installer {
 	 */
 	public static function activate(): void {
 		self::create_logs_table();
+
+		if ( get_option( KantanBond_Settings::OPTION_BASE_URL, '' ) === '' ) {
+			update_option( KantanBond_Settings::OPTION_BASE_URL, KantanBond_Settings::KANTANBIZ_APP_URL );
+		}
+
 		update_option( 'kantanbond_version', KANTANBOND_VERSION );
 	}
 
@@ -61,8 +66,10 @@ class KantanBond_Installer {
 		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
 
 		delete_option( 'kantanbond_api_base_url' );
-		delete_option( 'kantanbond_api_key' );
+		delete_option( 'kantanbond_api_token' );
 		delete_option( 'kantanbond_api_secret' );
+		delete_option( 'kantanbond_tenant_id' );
+		delete_option( 'kantanbond_api_key' );
 		delete_option( 'kantanbond_version' );
 	}
 

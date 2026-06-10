@@ -41,6 +41,41 @@
 	color: #614200;
 }
 
+.kantanbond-notice-card h2 {
+	margin-top: 0;
+}
+
+.kantanbond-notice {
+	margin: 0 0 12px;
+}
+
+.kantanbond-notice-warning {
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	color: #614200;
+	font-weight: 600;
+	padding: 12px 16px;
+	border-radius: 4px;
+}
+
+.kantanbond-help-card h3 {
+	font-size: 14px;
+	margin: 16px 0 8px;
+}
+
+.kantanbond-help-card h3:first-of-type {
+	margin-top: 0;
+}
+
+.kantanbond-help-list {
+	list-style: decimal;
+	margin: 0 0 12px 20px;
+}
+
+.kantanbond-help-list li {
+	margin-bottom: 6px;
+}
+
 .kantanbond-overview-list {
 	list-style: disc;
 	margin-left: 20px;

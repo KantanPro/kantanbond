@@ -149,8 +149,8 @@ class KantanBond_Admin {
 			'api_base_url' => isset( $_POST['kantanbond_api_base_url'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_base_url'] ) )
 				: '',
-			'api_key'      => isset( $_POST['kantanbond_api_key'] )
-				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_key'] ) )
+			'api_token'    => isset( $_POST['kantanbond_api_token'] )
+				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_token'] ) )
 				: '',
 			'api_secret'   => isset( $_POST['kantanbond_api_secret'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_secret'] ) )
@@ -225,6 +225,25 @@ class KantanBond_Admin {
 						?>
 					</li>
 					<li>
+						<strong><?php echo esc_html__( 'API Secret', 'kantanbond' ); ?>:</strong>
+						<?php
+						$api_secret = $this->settings->get_api_secret();
+						if ( $api_secret !== '' ) {
+							echo '<code>' . esc_html( $api_secret ) . '</code>';
+						} else {
+							echo esc_html__( '未設定', 'kantanbond' );
+						}
+						?>
+					</li>
+					<li>
+						<strong><?php echo esc_html__( 'API アクセストークン', 'kantanbond' ); ?>:</strong>
+						<?php
+						echo $this->settings->get_api_token() !== ''
+							? esc_html__( '設定済み', 'kantanbond' )
+							: esc_html__( '未設定', 'kantanbond' );
+						?>
+					</li>
+					<li>
 						<strong><?php echo esc_html__( '同期ログ件数', 'kantanbond' ); ?>:</strong>
 						<?php echo esc_html( (string) $log_count ); ?>
 						<a href="<?php echo esc_url( $logs_url ); ?>"><?php echo esc_html__( 'ログを見る', 'kantanbond' ); ?></a>
@@ -232,10 +251,13 @@ class KantanBond_Admin {
 					<li>
 						<strong><?php echo esc_html__( 'ショートコード', 'kantanbond' ); ?>:</strong>
 						<code>[kantanbond_customers]</code>,
-						<code>[kantanbond_projects]</code>
+						<code>[kantanbond_projects]</code>,
+						<code>[kantanbond_products]</code>
 					</li>
 				</ul>
 			</div>
+
+			<?php $this->render_public_access_notice(); ?>
 		</div>
 		<?php
 	}
@@ -252,13 +274,63 @@ class KantanBond_Admin {
 
 		settings_errors( 'kantanbond_messages' );
 
-		$base_url   = $this->settings->get_base_url();
-		$api_key    = $this->settings->get_api_key();
-		$api_secret = $this->settings->get_api_secret();
+		$base_url    = $this->settings->get_base_url();
+		$api_token   = $this->settings->get_api_token();
+		$api_secret  = $this->settings->get_api_secret();
+		$profile_url = KantanBond_Settings::KANTANBIZ_PROFILE_URL;
 
 		?>
 		<div class="wrap kantanbond-wrap">
 			<h1><?php echo esc_html__( 'API設定', 'kantanbond' ); ?></h1>
+
+			<div class="kantanbond-card kantanbond-help-card">
+				<h2><?php echo esc_html__( '設定値の取得方法（KantanBizの場合）', 'kantanbond' ); ?></h2>
+				<p class="description">
+					<?php
+					echo esc_html__(
+						'API Base URL には KantanBiz アプリ本体（https://kantanbiz.cloud）を指定してください。https://www.kantanbiz.cloud は WordPress サイトであり、API 連携には使用できません。',
+						'kantanbond'
+					);
+					?>
+				</p>
+
+				<h3><?php echo esc_html__( 'API アクセストークン', 'kantanbond' ); ?></h3>
+				<ol class="kantanbond-help-list">
+					<li>
+						<a href="<?php echo esc_url( $profile_url ); ?>" target="_blank" rel="noopener noreferrer">
+							<?php echo esc_html__( 'KantanBiz のプロフィール画面', 'kantanbond' ); ?>
+						</a>
+						<?php echo esc_html__( 'を開く', 'kantanbond' ); ?>
+					</li>
+					<li><?php echo esc_html__( '「API アクセストークン」セクションで「トークンを発行」をクリック', 'kantanbond' ); ?></li>
+					<li><?php echo esc_html__( '一度だけ表示されるトークン文字列をコピーして「API アクセストークン」欄に貼り付け', 'kantanbond' ); ?></li>
+				</ol>
+				<p class="description">
+					<?php echo esc_html__( '※ パスコードはトークン取得時（POST /api/v1/auth/token）に使うもので、この設定欄には入力しません。', 'kantanbond' ); ?>
+				</p>
+
+				<h3><?php echo esc_html__( 'API Secret', 'kantanbond' ); ?></h3>
+				<p class="description">
+					<?php echo esc_html__( 'KantanBiz 連携時は、接続先オフィスの ID を API Secret として設定します（X-Tenant-Id ヘッダに送信）。', 'kantanbond' ); ?>
+				</p>
+				<ol class="kantanbond-help-list">
+					<li>
+						<a href="<?php echo esc_url( $profile_url ); ?>" target="_blank" rel="noopener noreferrer">
+							<?php echo esc_html__( 'KantanBiz のプロフィール画面', 'kantanbond' ); ?>
+						</a>
+						<?php echo esc_html__( 'を開く', 'kantanbond' ); ?>
+					</li>
+					<li><?php echo esc_html__( '「所有オフィス」または「所属オフィス」の一覧を確認', 'kantanbond' ); ?></li>
+					<li>
+						<?php
+						echo esc_html__(
+							'各オフィスの表示「ID: 3 / オフィス名-slug」の数値部分（例: 3）を「API Secret」欄に入力',
+							'kantanbond'
+						);
+						?>
+					</li>
+				</ol>
+			</div>
 
 			<form method="post" action="" class="kantanbond-settings-form">
 				<?php wp_nonce_field( self::ACTION_SAVE_SETTINGS, self::NONCE_SETTINGS ); ?>
@@ -276,31 +348,25 @@ class KantanBond_Admin {
 									name="kantanbond_api_base_url"
 									value="<?php echo esc_attr( $base_url ); ?>"
 									class="regular-text"
-									placeholder="https://www.kantanbiz.cloud"
+									placeholder="https://kantanbiz.cloud"
 									required
 								/>
-								<p class="description">
-									<?php echo esc_html__( 'KantanBiz の API ベース URL を入力してください。', 'kantanbond' ); ?>
-								</p>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row">
-								<label for="kantanbond_api_key"><?php echo esc_html__( 'API Key', 'kantanbond' ); ?></label>
+								<label for="kantanbond_api_token"><?php echo esc_html__( 'API アクセストークン', 'kantanbond' ); ?></label>
 							</th>
 							<td>
 								<input
 									type="text"
-									id="kantanbond_api_key"
-									name="kantanbond_api_key"
-									value="<?php echo esc_attr( $api_key ); ?>"
-									class="regular-text"
+									id="kantanbond_api_token"
+									name="kantanbond_api_token"
+									value="<?php echo esc_attr( $api_token ); ?>"
+									class="large-text code"
 									autocomplete="off"
 									required
 								/>
-								<p class="description">
-									<?php echo esc_html__( 'KantanBiz で発行した API Key（Bearer トークン）を入力してください。', 'kantanbond' ); ?>
-								</p>
 							</td>
 						</tr>
 						<tr>
@@ -309,17 +375,14 @@ class KantanBond_Admin {
 							</th>
 							<td>
 								<input
-									type="password"
+									type="text"
 									id="kantanbond_api_secret"
 									name="kantanbond_api_secret"
 									value="<?php echo esc_attr( $api_secret ); ?>"
 									class="regular-text"
-									autocomplete="new-password"
+									autocomplete="off"
 									required
 								/>
-								<p class="description">
-									<?php echo esc_html__( 'KantanBiz で発行した API Secret を入力してください。', 'kantanbond' ); ?>
-								</p>
 							</td>
 						</tr>
 					</tbody>
@@ -327,6 +390,35 @@ class KantanBond_Admin {
 
 				<?php submit_button( __( '設定を保存', 'kantanbond' ), 'primary', 'kantanbond_settings_submit' ); ?>
 			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * 公開ページ設置時の注意書きを表示する。
+	 *
+	 * @return void
+	 */
+	private function render_public_access_notice(): void {
+		?>
+		<div class="kantanbond-card kantanbond-notice-card">
+			<h2><?php echo esc_html__( '公開ページへの設置について', 'kantanbond' ); ?></h2>
+			<p class="kantanbond-notice kantanbond-notice-warning">
+				<?php
+				echo esc_html__(
+					'ショートコードを公開ページ（固定ページ・投稿）に設置すると、KantanBiz から取得したデータがインターネット上の誰でも閲覧できる状態になります。',
+					'kantanbond'
+				);
+				?>
+			</p>
+			<p>
+				<?php
+				echo esc_html__(
+					'社内限定や関係者のみに見せたい場合は、WordPress の「パスワード保護」、閲覧権限の設定、会員限定プラグインなどでページへのアクセスを制限してください。',
+					'kantanbond'
+				);
+				?>
+			</p>
 		</div>
 		<?php
 	}
