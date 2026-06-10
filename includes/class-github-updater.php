@@ -107,11 +107,12 @@ class KantanBond_GitHub_Updater {
 			return $transient;
 		}
 
-		if ( $transient === null ) {
+		// get_site_transient() は未設定時に false を返すため null のみの判定では不足。
+		if ( ! is_object( $transient ) ) {
 			$transient = new stdClass();
 		}
 
-		if ( ! isset( $transient->checked ) ) {
+		if ( ! isset( $transient->checked ) || ! is_array( $transient->checked ) ) {
 			$transient->checked = array();
 		}
 
