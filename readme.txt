@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ KantanBond は WordPress サイトと KantanBiz アプリ（https://kantanbiz.cl
 * 管理画面ダッシュボード
 * API 設定（Base URL / API アクセストークン / API Secret）
 * 同期ログの記録・閲覧
-* ショートコードによる顧客・案件データの表示
+* ショートコードによる顧客・案件・商品データの表示
 
 将来的な拡張予定:
 
@@ -50,6 +50,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 固定ページや投稿に `[kantanbond_customers]`、`[kantanbond_projects]`、または `[kantanbond_products]` を記述してください。`[kantanbond_services]` は `[kantanbond_products]` の別名です。
 
 == Changelog ==
+
+= 1.0.9 =
+* API Base URL の初期値を https://kantanbiz.cloud に設定
+* 設定画面のヘルプ見出し・説明を整理（KantanBiz 向け取得手順、重複説明の削除）
+* ダッシュボードに公開ページ設置時の注意書きを追加
 
 = 1.0.8 =
 * ショートコードの ID をクリックで KantanBiz の詳細ページへ別タブ遷移
