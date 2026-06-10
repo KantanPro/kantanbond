@@ -89,6 +89,7 @@ class KantanBond_GitHub_Updater {
 		add_filter( 'site_transient_update_plugins', array( $this, 'check_for_updates' ) );
 		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 10, 3 );
 		add_filter( 'upgrader_pre_install', array( $this, 'before_update' ), 10, 3 );
+		add_filter( 'upgrader_source_selection', array( $this, 'normalize_github_zipball_source' ), 1, 4 );
 		add_filter( 'upgrader_post_install', array( $this, 'rename_github_source' ), 9, 3 );
 		add_filter( 'upgrader_post_install', array( $this, 'after_update' ), 10, 3 );
 		add_filter( 'upgrader_pre_download', array( $this, 'upgrader_pre_download' ), 10, 3 );
@@ -288,6 +289,63 @@ class KantanBond_GitHub_Updater {
 	}
 
 	/**
+	 * GitHub zipball 展開直後にフォルダ名を KantanBond に正規化する。
+	 *
+	 * @param string|\WP_Error     $source        展開元パス。
+	 * @param string               $remote_source リモート展開元。
+	 * @param \WP_Upgrader         $upgrader      アップグレーダー。
+	 * @param array<string, mixed> $hook_extra    フック引数。
+	 * @return string|\WP_Error
+	 */
+	public function normalize_github_zipball_source( $source, string $remote_source, $upgrader, array $hook_extra ) {
+		unset( $remote_source, $upgrader );
+
+		if ( is_wp_error( $source ) || ! is_string( $source ) || '' === trim( $source ) ) {
+			return $source;
+		}
+
+		if ( empty( $hook_extra['type'] ) || 'plugin' !== $hook_extra['type'] ) {
+			return $source;
+		}
+
+		if ( isset( $hook_extra['plugin'] ) && $hook_extra['plugin'] !== $this->plugin_basename ) {
+			return $source;
+		}
+
+		$candidate = trailingslashit( $source );
+		if ( ! is_dir( $candidate ) || ! file_exists( $candidate . 'kantanbond.php' ) ) {
+			return $source;
+		}
+
+		if ( ! function_exists( 'get_plugin_data' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$plugin_data = get_plugin_data( $candidate . 'kantanbond.php', false, false );
+		$name        = isset( $plugin_data['Name'] ) ? (string) $plugin_data['Name'] : '';
+		if ( stripos( $name, 'KantanBond' ) === false ) {
+			return $source;
+		}
+
+		$src = untrailingslashit( $source );
+		if ( basename( $src ) === $this->plugin_slug ) {
+			return $source;
+		}
+
+		$dest = trailingslashit( dirname( $src ) ) . $this->plugin_slug;
+		if ( is_dir( $dest ) ) {
+			$this->rmdir_recursive( $dest );
+		}
+
+		// phpcs:ignore WordPress.PHP.NoSilencedFunctions.Discouraged
+		if ( @rename( $src, $dest ) ) {
+			return trailingslashit( $dest );
+		}
+
+		return $source;
+	}
+
+	/**
 	 * GitHub zipball 展開後のフォルダ名を KantanBond にリネームする。
 	 *
 	 * @param bool|\WP_Error       $response   応答。
@@ -296,34 +354,86 @@ class KantanBond_GitHub_Updater {
 	 * @return bool|\WP_Error|array<string, mixed>
 	 */
 	public function rename_github_source( $response, array $hook_extra, $result ) {
-		if ( ! isset( $hook_extra['plugin'] ) || $hook_extra['plugin'] !== $this->plugin_basename ) {
+		if ( isset( $hook_extra['plugin'] ) && $hook_extra['plugin'] !== $this->plugin_basename ) {
 			return $response;
 		}
 
-		if ( empty( $result ) || empty( $result['destination'] ) || empty( $result['source'] ) ) {
+		if ( empty( $result ) || is_wp_error( $result ) ) {
 			return $response;
 		}
 
-		$destination  = trailingslashit( (string) $result['destination'] );
-		$source       = trailingslashit( (string) $result['source'] );
-		$expected_dir = trailingslashit( WP_PLUGIN_DIR ) . $this->plugin_slug . '/';
+		$expected_dir  = trailingslashit( WP_PLUGIN_DIR ) . $this->plugin_slug . '/';
+		$expected_main = $expected_dir . 'kantanbond.php';
 
-		if ( untrailingslashit( $destination ) === untrailingslashit( $expected_dir ) ) {
+		if ( file_exists( $expected_main ) ) {
 			return $response;
 		}
 
-		if ( strpos( basename( $source ), $this->plugin_slug ) === 0 ) {
-			if ( is_dir( $expected_dir ) ) {
-				$this->rmdir_recursive( $expected_dir );
-			}
+		$installed_dir = $this->find_installed_plugin_directory( $result );
+		if ( ! $installed_dir || ! file_exists( $installed_dir . 'kantanbond.php' ) ) {
+			return $response;
+		}
 
-			// phpcs:ignore WordPress.PHP.NoSilencedFunctions.Discouraged
-			@rename( $source, $expected_dir );
+		if ( untrailingslashit( $installed_dir ) === untrailingslashit( $expected_dir ) ) {
+			return $response;
+		}
+
+		if ( is_dir( $expected_dir ) ) {
+			$this->rmdir_recursive( $expected_dir );
+		}
+
+		// phpcs:ignore WordPress.PHP.NoSilencedFunctions.Discouraged
+		if ( @rename( untrailingslashit( $installed_dir ), untrailingslashit( $expected_dir ) ) ) {
 			$result['destination'] = $expected_dir;
-			$response              = $result;
+			return $result;
 		}
 
 		return $response;
+	}
+
+	/**
+	 * インストール結果から kantanbond.php を含むディレクトリを探す。
+	 *
+	 * @param array<string, mixed> $result インストール結果。
+	 * @return string|null
+	 */
+	private function find_installed_plugin_directory( array $result ): ?string {
+		$paths = array();
+
+		if ( ! empty( $result['source'] ) && is_string( $result['source'] ) ) {
+			$paths[] = trailingslashit( $result['source'] );
+		}
+		if ( ! empty( $result['destination'] ) && is_string( $result['destination'] ) ) {
+			$paths[] = trailingslashit( $result['destination'] );
+		}
+
+		foreach ( $paths as $path ) {
+			if ( file_exists( $path . 'kantanbond.php' ) ) {
+				return $path;
+			}
+
+			if ( ! is_dir( $path ) ) {
+				continue;
+			}
+
+			$entries = scandir( $path );
+			if ( ! is_array( $entries ) ) {
+				continue;
+			}
+
+			foreach ( $entries as $entry ) {
+				if ( $entry === '.' || $entry === '..' ) {
+					continue;
+				}
+
+				$subdir = $path . $entry . '/';
+				if ( is_dir( $subdir ) && file_exists( $subdir . 'kantanbond.php' ) ) {
+					return $subdir;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
