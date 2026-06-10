@@ -226,6 +226,177 @@ class KantanBond_API {
 	}
 
 	/**
+	 * 問い合わせ受信・公開商品用インバウンド API リクエスト（サーバー側のみ。PAT は使わない）。
+	 *
+	 * @param string               $method   HTTP メソッド。
+	 * @param string               $endpoint エンドポイント。
+	 * @param array<string, mixed> $body     POST ボディ。
+	 * @param array<string, mixed> $query    GET クエリ。
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function inbound_request( string $method, string $endpoint, array $body = array(), array $query = array() ) {
+		if ( ! $this->settings->is_public_products_configured() ) {
+			$error = new WP_Error(
+				'kantanbond_inbound_not_configured',
+				__( '公開商品用の API 設定が完了していません（インバウンドトークン）。', 'kantanbond' )
+			);
+			$this->logger->log( KantanBond_Logger::TYPE_ERROR, $error->get_error_message() );
+
+			return $error;
+		}
+
+		$base_url = $this->settings->get_normalized_base_url();
+		$endpoint = '/' . ltrim( $endpoint, '/' );
+
+		if ( $query !== array() ) {
+			$endpoint .= '?' . http_build_query( $query, '', '&', PHP_QUERY_RFC3986 );
+		}
+
+		$url = $base_url . $endpoint;
+
+		$headers = array(
+			'Accept'        => 'application/json',
+			'Authorization' => 'Bearer ' . $this->settings->get_inbound_token(),
+		);
+
+		$default_args = array(
+			'method'  => strtoupper( $method ),
+			'headers' => $headers,
+			'timeout' => 30,
+		);
+
+		if ( $body !== array() ) {
+			$default_args['body'] = wp_json_encode( $body );
+			$default_args['headers']['Content-Type'] = 'application/json';
+		}
+
+		$http_method = $default_args['method'];
+
+		if ( 'GET' === $http_method ) {
+			unset( $default_args['method'] );
+			$response = wp_remote_get( $url, $default_args );
+		} else {
+			$response = wp_remote_post( $url, $default_args );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			$this->logger->log(
+				KantanBond_Logger::TYPE_ERROR,
+				sprintf(
+					/* translators: 1: HTTP method, 2: endpoint, 3: error message */
+					__( 'インバウンド API 通信エラー [%1$s %2$s]: %3$s', 'kantanbond' ),
+					$http_method,
+					$endpoint,
+					$response->get_error_message()
+				)
+			);
+
+			return $response;
+		}
+
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		$raw_body    = wp_remote_retrieve_body( $response );
+		$decoded     = json_decode( $raw_body, true );
+
+		if ( ! is_array( $decoded ) ) {
+			$decoded = array(
+				'raw' => $raw_body,
+			);
+		}
+
+		if ( $status_code >= 400 ) {
+			$error_message = isset( $decoded['message'] ) && is_string( $decoded['message'] )
+				? $decoded['message']
+				: sprintf(
+					/* translators: 1: HTTP status code */
+					__( 'インバウンド API がエラーを返しました（HTTP %d）。', 'kantanbond' ),
+					$status_code
+				);
+
+			$this->logger->log(
+				KantanBond_Logger::TYPE_ERROR,
+				sprintf(
+					/* translators: 1: HTTP method, 2: endpoint, 3: status code, 4: message */
+					__( 'インバウンド API エラー [%1$s %2$s] HTTP %3$d: %4$s', 'kantanbond' ),
+					$http_method,
+					$endpoint,
+					$status_code,
+					$error_message
+				)
+			);
+
+			return new WP_Error(
+				'kantanbond_inbound_api_error',
+				$error_message,
+				array(
+					'status'   => $status_code,
+					'response' => $decoded,
+				)
+			);
+		}
+
+		return $decoded;
+	}
+
+	/**
+	 * 公開商品一覧を取得する。
+	 *
+	 * @param string $category カテゴリ絞り込み（任意）。
+	 * @return array{products: array<int, array<string, mixed>>, categories: array<int, string>}|WP_Error
+	 */
+	public function get_public_products( string $category = '' ) {
+		$query = array();
+		if ( $category !== '' ) {
+			$query['category'] = $category;
+		}
+
+		$response = $this->inbound_request( 'GET', '/api/v1/inbound/public-products', array(), $query );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$data = isset( $response['data'] ) && is_array( $response['data'] ) ? $response['data'] : array();
+		$products = isset( $data['products'] ) && is_array( $data['products'] ) ? $data['products'] : array();
+		$categories = isset( $data['categories'] ) && is_array( $data['categories'] ) ? $data['categories'] : array();
+
+		$normalized_products = array();
+		foreach ( $products as $row ) {
+			if ( is_array( $row ) ) {
+				$normalized_products[] = $row;
+			}
+		}
+
+		$normalized_categories = array();
+		foreach ( $categories as $cat ) {
+			if ( is_string( $cat ) && $cat !== '' ) {
+				$normalized_categories[] = $cat;
+			}
+		}
+
+		return array(
+			'products'   => $normalized_products,
+			'categories' => $normalized_categories,
+		);
+	}
+
+	/**
+	 * 公開商品の Web お申込みを送信する。
+	 *
+	 * @param array<string, mixed> $payload フォームデータ。
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function submit_public_product_order( array $payload ) {
+		$response = $this->inbound_request( 'POST', '/api/v1/inbound/public-product-orders', $payload );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * 商品（services）一覧を取得する。
 	 *
 	 * @return array<int, array<string, mixed>>|WP_Error

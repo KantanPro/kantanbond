@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,9 +49,15 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 固定ページや投稿に `[kantanbond_customers]`、`[kantanbond_projects]`、`[kantanbond_products]`、または `[kantanbond_reports]` を記述してください。`[kantanbond_services]` は `[kantanbond_products]` の別名です。
 
+公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
+
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.2.0 =
+* [kantanbond_public_products] ショートコードを追加（公開商品一覧・モーダルお申込み）
+* KantanBiz インバウンド API 連携（サーバー側プロキシ・インバウンドトークン設定）
 
 = 1.1.2 =
 * 更新チェック時に update_plugins transient が false の場合に Fatal error になる不具合を修正

@@ -146,14 +146,17 @@ class KantanBond_Admin {
 		check_admin_referer( self::ACTION_SAVE_SETTINGS, self::NONCE_SETTINGS );
 
 		$input = array(
-			'api_base_url' => isset( $_POST['kantanbond_api_base_url'] )
+			'api_base_url'  => isset( $_POST['kantanbond_api_base_url'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_base_url'] ) )
 				: '',
-			'api_token'    => isset( $_POST['kantanbond_api_token'] )
+			'api_token'     => isset( $_POST['kantanbond_api_token'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_token'] ) )
 				: '',
-			'api_secret'   => isset( $_POST['kantanbond_api_secret'] )
+			'api_secret'    => isset( $_POST['kantanbond_api_secret'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_api_secret'] ) )
+				: '',
+			'inbound_token' => isset( $_POST['kantanbond_inbound_token'] )
+				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_inbound_token'] ) )
 				: '',
 		);
 
@@ -244,19 +247,22 @@ class KantanBond_Admin {
 						?>
 					</li>
 					<li>
+						<strong><?php echo esc_html__( 'インバウンドトークン', 'kantanbond' ); ?>:</strong>
+						<?php
+						echo $this->settings->get_inbound_token() !== ''
+							? esc_html__( '設定済み', 'kantanbond' )
+							: esc_html__( '未設定', 'kantanbond' );
+						?>
+					</li>
+					<li>
 						<strong><?php echo esc_html__( '同期ログ件数', 'kantanbond' ); ?>:</strong>
 						<?php echo esc_html( (string) $log_count ); ?>
 						<a href="<?php echo esc_url( $logs_url ); ?>"><?php echo esc_html__( 'ログを見る', 'kantanbond' ); ?></a>
 					</li>
-					<li>
-						<strong><?php echo esc_html__( 'ショートコード', 'kantanbond' ); ?>:</strong>
-						<code>[kantanbond_customers]</code>,
-						<code>[kantanbond_projects]</code>,
-						<code>[kantanbond_products]</code>,
-						<code>[kantanbond_reports]</code>
-					</li>
 				</ul>
 			</div>
+
+			<?php $this->render_shortcodes_reference_section(); ?>
 
 			<?php $this->render_public_access_notice(); ?>
 		</div>
@@ -275,10 +281,12 @@ class KantanBond_Admin {
 
 		settings_errors( 'kantanbond_messages' );
 
-		$base_url    = $this->settings->get_base_url();
-		$api_token   = $this->settings->get_api_token();
-		$api_secret  = $this->settings->get_api_secret();
-		$profile_url = KantanBond_Settings::KANTANBIZ_PROFILE_URL;
+		$base_url         = $this->settings->get_base_url();
+		$api_token        = $this->settings->get_api_token();
+		$api_secret       = $this->settings->get_api_secret();
+		$inbound_token    = $this->settings->get_inbound_token();
+		$profile_url      = KantanBond_Settings::KANTANBIZ_PROFILE_URL;
+		$inbound_help_url = KantanBond_Settings::KANTANBIZ_CONTACT_FORM_INBOUND_URL;
 
 		?>
 		<div class="wrap kantanbond-wrap">
@@ -331,6 +339,21 @@ class KantanBond_Admin {
 						?>
 					</li>
 				</ol>
+
+				<h3><?php echo esc_html__( 'インバウンドトークン（公開商品・お申込み用）', 'kantanbond' ); ?></h3>
+				<p class="description">
+					<?php echo esc_html__( '[kantanbond_public_products] では、管理用 API トークンではなくインバウンドトークンを使用します（公開ページに PAT を出さないため）。', 'kantanbond' ); ?>
+				</p>
+				<ol class="kantanbond-help-list">
+					<li>
+						<a href="<?php echo esc_url( $inbound_help_url ); ?>" target="_blank" rel="noopener noreferrer">
+							<?php echo esc_html__( 'KantanBiz の問い合わせ受信設定', 'kantanbond' ); ?>
+						</a>
+						<?php echo esc_html__( 'を開く', 'kantanbond' ); ?>
+					</li>
+					<li><?php echo esc_html__( '「トークンを新規発行」でトークンを発行し、下の欄に貼り付け', 'kantanbond' ); ?></li>
+					<li><?php echo esc_html__( 'お申込み送信は WordPress サーバー経由（admin-ajax）で SaaS API にプロキシされます', 'kantanbond' ); ?></li>
+				</ol>
 			</div>
 
 			<form method="post" action="" class="kantanbond-settings-form">
@@ -352,6 +375,9 @@ class KantanBond_Admin {
 									placeholder="https://kantanbiz.cloud"
 									required
 								/>
+								<p class="description">
+									<?php echo esc_html__( 'ローカル: KantanBiz（php artisan serve）の URL。WordPress が Docker 内のときは http://host.docker.internal:8000 を指定してください（localhost:8081 は WordPress 自身のため API 接続に使えません）。', 'kantanbond' ); ?>
+								</p>
 							</td>
 						</tr>
 						<tr>
@@ -386,11 +412,194 @@ class KantanBond_Admin {
 								/>
 							</td>
 						</tr>
+						<tr>
+							<th scope="row">
+								<label for="kantanbond_inbound_token"><?php echo esc_html__( 'インバウンドトークン', 'kantanbond' ); ?></label>
+							</th>
+							<td>
+								<input
+									type="text"
+									id="kantanbond_inbound_token"
+									name="kantanbond_inbound_token"
+									value="<?php echo esc_attr( $inbound_token ); ?>"
+									class="large-text code"
+									autocomplete="off"
+								/>
+								<p class="description">
+									<?php echo esc_html__( '[kantanbond_public_products] 用。問い合わせ受信（CF7）と同じトークンを使用できます。', 'kantanbond' ); ?>
+								</p>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 
 				<?php submit_button( __( '設定を保存', 'kantanbond' ), 'primary', 'kantanbond_settings_submit' ); ?>
 			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * ショートコード一覧・属性・記述例（KantanProEX 設定画面のショートコード欄を参考）。
+	 *
+	 * @return void
+	 */
+	private function render_shortcodes_reference_section(): void {
+		?>
+		<div class="kantanbond-card kantanbond-shortcodes-reference">
+			<h2><?php echo esc_html__( 'ショートコード', 'kantanbond' ); ?></h2>
+			<p class="description">
+				<?php echo esc_html__( '固定ページや投稿の本文に以下のショートコードを設置して利用できます。', 'kantanbond' ); ?>
+			</p>
+
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( 'ショートコード', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '用途', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '備考', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>[kantanbond_customers]</code></td>
+						<td><?php echo esc_html__( '顧客一覧', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'API 設定（PAT・オフィス ID）が必要。公開ページでは誰でも閲覧可能になります。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_projects]</code></td>
+						<td><?php echo esc_html__( '案件一覧', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'API 設定が必要。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_products]</code></td>
+						<td><?php echo esc_html__( '商品（サービス）一覧', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'API 設定が必要。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_services]</code></td>
+						<td><?php echo esc_html__( '上記と同じ（別名）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'API 設定が必要。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_reports]</code></td>
+						<td><?php echo esc_html__( 'レポート・グラフ', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'API 設定が必要。属性 type / period 等で種別・期間を指定。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_public_products]</code></td>
+						<td><?php echo esc_html__( '公開商品の一覧表示・Web お申込み', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ログイン不要。KantanBiz で「サイトに公開」ON の商品のみ。インバウンドトークンが必要（PAT は不要）。', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_public_products] の属性', 'kantanbond' ); ?></h3>
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( '属性', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '既定値', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '説明', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>layout</code></td>
+						<td><code>grid</code></td>
+						<td><?php echo esc_html__( '表示形式: grid / table / cards', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>columns</code></td>
+						<td><code>3</code></td>
+						<td><?php echo esc_html__( '列数（1〜4）。grid / cards で有効', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>category</code></td>
+						<td><?php echo esc_html__( '（空）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'カテゴリで絞り込み（サーバー側）。絞り込み UI 表示時は初期値にも使用', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>show_filter</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( 'カテゴリ絞り込み UI（サジェスト付き）の表示 ON/OFF', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>ids</code></td>
+						<td><?php echo esc_html__( '（空）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '表示する商品 ID（例: 2,5,8）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>limit</code></td>
+						<td><code>0</code></td>
+						<td><?php echo esc_html__( '表示件数上限（0 で全件）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>order_by</code></td>
+						<td><code>frequency</code></td>
+						<td><?php echo esc_html__( '並び順: id / name / price / frequency / category / tax_rate', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>order</code></td>
+						<td><code>ASC</code></td>
+						<td><?php echo esc_html__( '昇順 ASC / 降順 DESC', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>show_image</code> / <code>show_price</code> / <code>show_unit</code> / <code>show_category</code> / <code>show_tax</code></td>
+						<td><code>yes</code>（<code>show_tax</code> は <code>no</code>）</td>
+						<td><?php echo esc_html__( '各項目の表示 ON/OFF（yes / no）', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_public_products] 記述例', 'kantanbond' ); ?></h3>
+			<ul class="kantanbond-shortcodes-examples">
+				<li><code>[kantanbond_public_products]</code></li>
+				<li><code>[kantanbond_public_products layout="grid" columns="3"]</code></li>
+				<li><code>[kantanbond_public_products layout="table"]</code></li>
+				<li><code>[kantanbond_public_products layout="cards" columns="2" show_tax="yes"]</code></li>
+				<li><code>[kantanbond_public_products category="Web制作" ids="2,5,8"]</code></li>
+				<li><code>[kantanbond_public_products limit="6" order_by="frequency" order="DESC"]</code></li>
+				<li><code>[kantanbond_public_products show_filter="no" show_image="yes" show_category="no"]</code></li>
+				<li><code>[kantanbond_public_products layout="cards" columns="4" category="一般" show_price="yes" show_unit="no"]</code></li>
+			</ul>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_reports] の属性', 'kantanbond' ); ?></h3>
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( '属性', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '既定値', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '説明', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>type</code></td>
+						<td><code>sales</code></td>
+						<td><?php echo esc_html__( 'sales / client / service / supplier / progress / staff_contribution / tax_return', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>period</code></td>
+						<td><code>all_time</code></td>
+						<td><?php echo esc_html__( 'all_time / this_year / last_year / this_month / last_month / last_3_months / last_6_months（tax_return 以外）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>tax_year</code></td>
+						<td><?php echo esc_html( gmdate( 'Y' ) ); ?></td>
+						<td><?php echo esc_html__( 'type="tax_return" のときの対象年（4桁）', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_reports] 記述例', 'kantanbond' ); ?></h3>
+			<ul class="kantanbond-shortcodes-examples">
+				<li><code>[kantanbond_reports]</code></li>
+				<li><code>[kantanbond_reports type="sales" period="this_month"]</code></li>
+				<li><code>[kantanbond_reports type="client" period="this_year"]</code></li>
+				<li><code>[kantanbond_reports type="service" period="last_3_months"]</code></li>
+				<li><code>[kantanbond_reports type="tax_return" tax_year="<?php echo esc_attr( gmdate( 'Y' ) ); ?>"]</code></li>
+			</ul>
 		</div>
 		<?php
 	}

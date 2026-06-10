@@ -137,3 +137,37 @@
 .kantanbond-empty {
 	color: #646970;
 }
+
+.kantanbond-shortcodes-reference h2 {
+	margin-top: 0;
+}
+
+.kantanbond-shortcodes-subheading {
+	font-size: 14px;
+	margin: 24px 0 10px;
+}
+
+.kantanbond-shortcodes-table {
+	margin-top: 12px;
+}
+
+.kantanbond-shortcodes-table code {
+	font-size: 12px;
+	word-break: break-word;
+}
+
+.kantanbond-shortcodes-examples {
+	list-style: disc;
+	margin: 8px 0 0 20px;
+}
+
+.kantanbond-shortcodes-examples li {
+	margin-bottom: 8px;
+}
+
+.kantanbond-shortcodes-examples code {
+	display: inline-block;
+	font-size: 12px;
+	max-width: 100%;
+	word-break: break-all;
+}

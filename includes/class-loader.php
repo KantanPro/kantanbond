@@ -31,12 +31,25 @@ class KantanBond_Loader {
 	private KantanBond_Shortcodes $shortcodes;
 
 	/**
-	 * @param KantanBond_Admin      $admin      管理画面。
-	 * @param KantanBond_Shortcodes $shortcodes ショートコード。
+	 * 公開商品ショートコード。
+	 *
+	 * @var KantanBond_Public_Products
 	 */
-	public function __construct( KantanBond_Admin $admin, KantanBond_Shortcodes $shortcodes ) {
-		$this->admin      = $admin;
-		$this->shortcodes = $shortcodes;
+	private KantanBond_Public_Products $public_products;
+
+	/**
+	 * @param KantanBond_Admin             $admin           管理画面。
+	 * @param KantanBond_Shortcodes        $shortcodes      ショートコード。
+	 * @param KantanBond_Public_Products   $public_products 公開商品。
+	 */
+	public function __construct(
+		KantanBond_Admin $admin,
+		KantanBond_Shortcodes $shortcodes,
+		KantanBond_Public_Products $public_products
+	) {
+		$this->admin           = $admin;
+		$this->shortcodes        = $shortcodes;
+		$this->public_products   = $public_products;
 	}
 
 	/**
@@ -52,6 +65,7 @@ class KantanBond_Loader {
 		}
 
 		$this->shortcodes->init();
+		$this->public_products->init();
 	}
 
 	/**
