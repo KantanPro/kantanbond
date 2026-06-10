@@ -1,0 +1,69 @@
+<?php
+/**
+ * プラグイン各コンポーネントの初期化を担うローダー。
+ *
+ * @package KantanBond
+ */
+
+declare(strict_types=1);
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * フック登録と各クラスの init 呼び出しを集約する。
+ */
+class KantanBond_Loader {
+
+	/**
+	 * 管理画面クラス。
+	 *
+	 * @var KantanBond_Admin
+	 */
+	private KantanBond_Admin $admin;
+
+	/**
+	 * ショートコードクラス。
+	 *
+	 * @var KantanBond_Shortcodes
+	 */
+	private KantanBond_Shortcodes $shortcodes;
+
+	/**
+	 * @param KantanBond_Admin      $admin      管理画面。
+	 * @param KantanBond_Shortcodes $shortcodes ショートコード。
+	 */
+	public function __construct( KantanBond_Admin $admin, KantanBond_Shortcodes $shortcodes ) {
+		$this->admin      = $admin;
+		$this->shortcodes = $shortcodes;
+	}
+
+	/**
+	 * プラグイン全体を初期化する。
+	 *
+	 * @return void
+	 */
+	public function init(): void {
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
+		if ( is_admin() ) {
+			$this->admin->init();
+		}
+
+		$this->shortcodes->init();
+	}
+
+	/**
+	 * 翻訳ファイルを読み込む。
+	 *
+	 * @return void
+	 */
+	public function load_textdomain(): void {
+		load_plugin_textdomain(
+			'kantanbond',
+			false,
+			dirname( KANTANBOND_PLUGIN_BASENAME ) . '/languages'
+		);
+	}
+}

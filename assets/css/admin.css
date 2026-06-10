@@ -1,0 +1,104 @@
+/**
+ * KantanBond 管理画面スタイル
+ *
+ * @package KantanBond
+ */
+
+.kantanbond-wrap {
+	max-width: 960px;
+}
+
+.kantanbond-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin: 20px 0;
+	padding: 20px 24px;
+}
+
+.kantanbond-card h2 {
+	margin-top: 0;
+}
+
+.kantanbond-status {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 12px 0;
+	padding: 12px 16px;
+	border-radius: 4px;
+}
+
+.kantanbond-status-ready {
+	background: #edfaef;
+	border-left: 4px solid #00a32a;
+	color: #1e4620;
+}
+
+.kantanbond-status-pending {
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	color: #614200;
+}
+
+.kantanbond-overview-list {
+	list-style: disc;
+	margin-left: 20px;
+}
+
+.kantanbond-overview-list li {
+	margin-bottom: 8px;
+}
+
+.kantanbond-logs-table .kantanbond-log-type {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 3px;
+	text-transform: uppercase;
+}
+
+.kantanbond-log-type-info {
+	background: #e5f5fa;
+	color: #0073aa;
+}
+
+.kantanbond-log-type-success {
+	background: #edfaef;
+	color: #00a32a;
+}
+
+.kantanbond-log-type-error {
+	background: #fcf0f1;
+	color: #d63638;
+}
+
+.kantanbond-log-type-api {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.kantanbond-table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.kantanbond-table th,
+.kantanbond-table td {
+	border: 1px solid #ddd;
+	padding: 8px 12px;
+	text-align: left;
+}
+
+.kantanbond-table th {
+	background: #f6f7f7;
+}
+
+.kantanbond-error {
+	color: #d63638;
+}
+
+.kantanbond-empty {
+	color: #646970;
+}

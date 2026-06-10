@@ -1,0 +1,34 @@
+/**
+ * KantanBond フロントエンドスタイル
+ *
+ * @package KantanBond
+ */
+
+.kantanbond-shortcode {
+	margin: 1.5em 0;
+	overflow-x: auto;
+}
+
+.kantanbond-table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.kantanbond-table th,
+.kantanbond-table td {
+	border: 1px solid #ddd;
+	padding: 8px 12px;
+	text-align: left;
+}
+
+.kantanbond-table th {
+	background: #f6f7f7;
+}
+
+.kantanbond-error {
+	color: #b32d2e;
+}
+
+.kantanbond-empty {
+	color: #646970;
+}
