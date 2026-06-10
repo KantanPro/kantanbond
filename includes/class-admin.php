@@ -545,7 +545,7 @@ class KantanBond_Admin {
 						<td><?php echo esc_html__( '昇順 ASC / 降順 DESC', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
-						<td><code>show_image</code> / <code>show_price</code> / <code>show_unit</code> / <code>show_category</code> / <code>show_tax</code></td>
+						<td><code>show_image</code> / <code>show_price</code> / <code>show_unit</code> / <code>show_category</code> / <code>show_tax</code> / <code>show_memo</code></td>
 						<td><code>yes</code>（<code>show_tax</code> は <code>no</code>）</td>
 						<td><?php echo esc_html__( '各項目の表示 ON/OFF（yes / no）', 'kantanbond' ); ?></td>
 					</tr>

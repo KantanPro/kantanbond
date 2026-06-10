@@ -73,6 +73,7 @@ class KantanBond_Public_Products {
 				'show_unit'     => 'yes',
 				'show_category' => 'yes',
 				'show_tax'      => 'no',
+				'show_memo'     => 'yes',
 				'show_filter'   => 'yes',
 			),
 			$atts,
@@ -129,6 +130,7 @@ class KantanBond_Public_Products {
 			'unit'     => $this->is_flag_enabled( $atts['show_unit'] ),
 			'category' => $this->is_flag_enabled( $atts['show_category'] ),
 			'tax'      => $this->is_flag_enabled( $atts['show_tax'] ),
+			'memo'     => $this->is_flag_enabled( $atts['show_memo'] ),
 		);
 
 		if ( $layout === 'table' ) {
@@ -268,6 +270,7 @@ class KantanBond_Public_Products {
 					'price'             => __( '単価', 'kantanbond' ),
 					'unit'              => __( '単位', 'kantanbond' ),
 					'tax'               => __( '税率', 'kantanbond' ),
+					'memo'              => __( 'メモ', 'kantanbond' ),
 					'quantity'          => __( '数量', 'kantanbond' ),
 					'companyName'       => __( '会社名', 'kantanbond' ),
 					'contactName'       => __( 'お名前', 'kantanbond' ),
@@ -329,12 +332,17 @@ class KantanBond_Public_Products {
 				$price_block = '<div class="kantanbond-public-products-grid__price-block">' . $price_row_html . $tax_html . '</div>';
 			}
 
+			$memo_html = ( $display['memo'] && $row['memo'] !== '' )
+				? $this->render_product_memo( $row['memo'], 'kantanbond-public-products-grid' )
+				: '';
+
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-grid__item' ) . '>'
 				. $image_html
 				. '<div class="kantanbond-public-products-grid__body">'
 				. '<h3 class="kantanbond-public-products-grid__name">' . esc_html( $row['name'] ) . '</h3>'
 				. $category_html
 				. $price_block
+				. $memo_html
 				. '</div></article>';
 		}
 
@@ -385,12 +393,17 @@ class KantanBond_Public_Products {
 				$price_block = '<div class="kantanbond-public-products-card__price-block">' . $price_row_html . $tax_html . '</div>';
 			}
 
+			$memo_html = ( $display['memo'] && $row['memo'] !== '' )
+				? $this->render_product_memo( $row['memo'], 'kantanbond-public-products-card' )
+				: '';
+
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-card' ) . '>'
 				. $image_html
 				. '<div class="kantanbond-public-products-card__body">'
 				. $category_html
 				. '<h3 class="kantanbond-public-products-card__name">' . esc_html( $row['name'] ) . '</h3>'
 				. $price_block
+				. $memo_html
 				. '</div></article>';
 		}
 
@@ -422,6 +435,9 @@ class KantanBond_Public_Products {
 		if ( $display['tax'] ) {
 			$headers[] = '<th scope="col">' . esc_html__( '税率（%）', 'kantanbond' ) . '</th>';
 		}
+		if ( $display['memo'] ) {
+			$headers[] = '<th scope="col">' . esc_html__( 'メモ', 'kantanbond' ) . '</th>';
+		}
 
 		foreach ( $products as $product ) {
 			$row     = $this->format_product_row( $product );
@@ -446,6 +462,11 @@ class KantanBond_Public_Products {
 			}
 			if ( $display['tax'] ) {
 				$cells[] = '<td>' . esc_html( $row['tax_rate'] ) . '</td>';
+			}
+			if ( $display['memo'] ) {
+				$cells[] = '<td class="kantanbond-public-products-table__memo">'
+					. ( $row['memo'] !== '' ? nl2br( esc_html( $row['memo'] ) ) : '' )
+					. '</td>';
 			}
 
 			$rows .= '<tr' . $this->item_attrs( $payload ) . '>' . implode( '', $cells ) . '</tr>';
@@ -551,6 +572,7 @@ class KantanBond_Public_Products {
 		$tax_rate = isset( $product['tax_rate'] ) && $product['tax_rate'] !== null && $product['tax_rate'] !== ''
 			? (string) $product['tax_rate']
 			: '';
+		$memo     = isset( $product['memo'] ) ? trim( (string) $product['memo'] ) : '';
 
 		$image = '';
 		if ( isset( $product['image_url'] ) && is_string( $product['image_url'] ) && $product['image_url'] !== '' ) {
@@ -565,8 +587,26 @@ class KantanBond_Public_Products {
 			'unit'          => $unit,
 			'category'      => $category,
 			'tax_rate'      => $tax_rate,
+			'memo'          => $memo,
 			'image'         => $image,
 		);
+	}
+
+	/**
+	 * 商品メモ HTML を生成する。
+	 *
+	 * @param string $memo       メモ本文。
+	 * @param string $block_class BEM ブロッククラス（例: kantanbond-public-products-grid）。
+	 * @return string
+	 */
+	private function render_product_memo( string $memo, string $block_class ): string {
+		if ( $memo === '' ) {
+			return '';
+		}
+
+		return '<div class="' . esc_attr( $block_class ) . '__memo">'
+			. nl2br( esc_html( $memo ) )
+			. '</div>';
 	}
 
 	/**

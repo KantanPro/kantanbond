@@ -182,6 +182,15 @@
 	margin: 0;
 }
 
+.kantanbond-public-products-grid__memo {
+	color: #50575e;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	margin: 0.65rem 0 0;
+	white-space: normal;
+	word-break: break-word;
+}
+
 /* カード */
 .kantanbond-public-products-cards {
 	display: grid;
@@ -274,6 +283,17 @@
 	margin: 0;
 }
 
+.kantanbond-public-products-card__memo {
+	border-top: 1px solid #e2e4e7;
+	color: #50575e;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	margin: 0.85rem 0 0;
+	padding-top: 0.75rem;
+	white-space: normal;
+	word-break: break-word;
+}
+
 .kantanbond-public-products-thumb {
 	cursor: zoom-in;
 	display: block;
@@ -281,6 +301,15 @@
 	max-height: 48px;
 	max-width: 48px;
 	object-fit: contain;
+}
+
+.kantanbond-public-products-table__memo {
+	color: #50575e;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	max-width: 280px;
+	white-space: normal;
+	word-break: break-word;
 }
 
 /* クリック可能な商品 */
@@ -465,6 +494,26 @@ body.kantanbond-public-product-lightbox-open {
 .kantanbond-public-product-detail__tax {
 	color: #50575e;
 	margin: 0;
+}
+
+.kantanbond-public-product-detail__memo {
+	margin: 0.75rem 0 0;
+}
+
+.kantanbond-public-product-detail__memo-label {
+	color: #646970;
+	display: block;
+	font-size: 0.8rem;
+	font-weight: 600;
+	margin-bottom: 0.35rem;
+}
+
+.kantanbond-public-product-detail__memo-body {
+	color: #50575e;
+	font-size: 0.9rem;
+	line-height: 1.55;
+	white-space: normal;
+	word-break: break-word;
 }
 
 .kantanbond-public-product-order-form {

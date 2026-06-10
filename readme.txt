@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,9 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.2.3 =
+* [kantanbond_public_products] 商品メモをグリッド・カード・テーブル・詳細モーダルに表示（show_memo 属性対応）
 
 = 1.2.2 =
 * GitHub zipball 更新後にプラグインフォルダ名が `KantanPro-kantanbond-*` のまま残り有効化に失敗する問題を修正（`KantanBond` へ正規化）

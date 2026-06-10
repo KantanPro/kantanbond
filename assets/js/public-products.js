@@ -45,6 +45,10 @@
 		return div.innerHTML;
 	}
 
+	function formatMultiline(text) {
+		return escapeHtml(text).replace(/\n/g, '<br>');
+	}
+
 	function lockBodyScroll() {
 		openModalCount += 1;
 		if (openModalCount === 1) {
@@ -234,6 +238,17 @@
 					': ' +
 					escapeHtml(product.tax_rate) +
 					'%</p>'
+			);
+		}
+		if (product.memo) {
+			parts.push(
+				'<div class="kantanbond-public-product-detail__memo">' +
+					'<span class="kantanbond-public-product-detail__memo-label">' +
+					escapeHtml(i18n.memo || 'メモ') +
+					'</span>' +
+					'<div class="kantanbond-public-product-detail__memo-body">' +
+					formatMultiline(product.memo) +
+					'</div></div>'
 			);
 		}
 		parts.push('</div></div>');
