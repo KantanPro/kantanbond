@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,10 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.1.1 =
+* GitHub Releases 連携による WordPress 管理画面の更新通知・ワンクリック更新に対応
+* 更新時の自動再有効化、zipball 展開後の KantanBond フォルダへのリネームに対応
 
 = 1.1.0 =
 * レポートショートコード `[kantanbond_reports]` を追加（KantanBiz Report API 連携、Chart.js グラフ表示）

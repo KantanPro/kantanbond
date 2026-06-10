@@ -3,7 +3,7 @@
  * Plugin Name: KantanBond
  * Plugin URI: https://kantanbiz.cloud/
  * Description: WordPress と KantanBiz（KantanBiz Cloud）を API 連携する公式連携プラグインです。
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: KantanPro
  * Author URI: https://www.kantanpro.com/
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KANTANBOND_VERSION', '1.1.0' );
+define( 'KANTANBOND_VERSION', '1.1.1' );
 define( 'KANTANBOND_PLUGIN_FILE', __FILE__ );
 define( 'KANTANBOND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KANTANBOND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -35,6 +35,35 @@ require_once KANTANBOND_PLUGIN_DIR . 'includes/class-api.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-shortcodes.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-admin.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-loader.php';
+require_once KANTANBOND_PLUGIN_DIR . 'includes/class-github-updater.php';
+
+/**
+ * GitHub Releases 連携の更新通知（管理画面・WP-Cron）。
+ *
+ * レート制限回避が必要な場合は wp-config.php 等で
+ * define( 'KANTANBOND_GITHUB_TOKEN', 'ghp_xxx' ); を定義してください。
+ *
+ * @return void
+ */
+function kantanbond_init_github_updater(): void {
+	if ( ! is_admin() && ! ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+		return;
+	}
+
+	new KantanBond_GitHub_Updater(
+		array(
+			'plugin_file'  => KANTANBOND_PLUGIN_FILE,
+			'plugin_slug'  => 'KantanBond',
+			'repo_owner'   => 'KantanPro',
+			'repo_name'    => 'kantanbond',
+			'requires_wp'  => '6.8',
+			'requires_php' => '8.1',
+			'tested_wp'    => get_bloginfo( 'version' ),
+		)
+	);
+}
+
+add_action( 'plugins_loaded', 'kantanbond_init_github_updater', 1 );
 
 /**
  * プラグイン有効化フック。
