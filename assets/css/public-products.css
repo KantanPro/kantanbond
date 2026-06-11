@@ -72,9 +72,22 @@
 	width: 100%;
 }
 
+.kantanbond-public-products-table thead {
+	display: table-header-group;
+}
+
+.kantanbond-public-products-table tbody {
+	display: table-row-group;
+}
+
+.kantanbond-public-products-table tr {
+	display: table-row;
+}
+
 .kantanbond-public-products-table th,
 .kantanbond-public-products-table td {
 	border: 1px solid #ddd;
+	display: table-cell;
 	padding: 8px 12px;
 	text-align: left;
 	vertical-align: middle;
@@ -82,6 +95,14 @@
 
 .kantanbond-public-products-table th {
 	background: #f6f7f7;
+}
+
+.kantanbond-public-products-table thead th {
+	padding-bottom: 10px;
+}
+
+.kantanbond-public-products-table tbody tr:first-child td {
+	padding-top: 10px;
 }
 
 /* グリッド */
@@ -114,36 +135,65 @@
 }
 
 .kantanbond-public-products-grid__image-wrap {
-	aspect-ratio: 4 / 3;
 	background: #f6f7f7;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding: 12px 8px 4px;
 }
 
-.kantanbond-public-products-grid__image {
-	cursor: zoom-in;
-	display: block;
-	height: 100%;
-	max-height: 200px;
-	object-fit: contain;
+.kantanbond-public-products-grid__image-wrap .kantanbond-public-product-item__image-btn {
+	align-items: center;
+	display: flex;
+	justify-content: center;
 	width: 100%;
 }
 
+.kantanbond-public-products-grid__image {
+	display: block;
+	height: auto;
+	max-height: 140px;
+	max-width: 88%;
+	object-fit: contain;
+	width: auto;
+}
+
 .kantanbond-public-products-grid__body {
-	padding: 12px 14px;
+	padding: 8px 14px 4px;
 }
 
 .kantanbond-public-products-grid__name {
-	font-size: 1rem;
+	font-size: 0.9rem;
 	font-weight: 600;
-	margin: 0 0 6px;
+	line-height: 1.25;
+	margin: 0;
+	padding: 0;
+}
+
+.kantanbond-public-products-grid__name:first-child {
+	margin-block-start: 0;
+	margin-block-end: 0;
+	padding-block-start: 0;
+	padding-block-end: 0;
+}
+
+.kantanbond-public-products-grid__name + .kantanbond-public-products-grid__category {
+	margin-block-start: 6px;
+	margin-top: 6px;
+}
+
+.kantanbond-public-products-grid__name span {
+	display: inline;
+	line-height: inherit;
+	margin: 0;
+	padding: 0;
 }
 
 .kantanbond-public-products-grid__category {
 	color: #646970;
 	font-size: 0.85rem;
-	margin: 0 0 8px;
+	line-height: 1.2;
+	margin: 0 0 4px;
 }
 
 .kantanbond-public-products-grid__price-block,
@@ -182,12 +232,32 @@
 	margin: 0;
 }
 
+.kantanbond-public-products-grid__memo,
+.kantanbond-public-products-card__memo {
+	color: #50575e;
+	font-size: 0.85rem;
+	line-height: 1.45;
+	margin: 8px 0 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 .kantanbond-public-products-grid__memo {
+	line-height: 1.2;
+	margin: 6px 0 0;
+	margin-block-end: 0;
+}
+
+.kantanbond-public-products-grid__body:has(.kantanbond-public-products-grid__memo:last-child) {
+	padding-bottom: 2px;
+}
+
+.kantanbond-public-products-table__memo {
 	color: #50575e;
 	font-size: 0.85rem;
 	line-height: 1.5;
-	margin: 0.65rem 0 0;
-	white-space: normal;
+	max-width: 280px;
+	white-space: pre-wrap;
 	word-break: break-word;
 }
 
@@ -228,7 +298,6 @@
 }
 
 .kantanbond-public-products-card__image {
-	cursor: zoom-in;
 	display: inline-block;
 	height: auto;
 	max-height: 160px;
@@ -283,19 +352,7 @@
 	margin: 0;
 }
 
-.kantanbond-public-products-card__memo {
-	border-top: 1px solid #e2e4e7;
-	color: #50575e;
-	font-size: 0.85rem;
-	line-height: 1.5;
-	margin: 0.85rem 0 0;
-	padding-top: 0.75rem;
-	white-space: normal;
-	word-break: break-word;
-}
-
 .kantanbond-public-products-thumb {
-	cursor: zoom-in;
 	display: block;
 	height: auto;
 	max-height: 48px;
@@ -303,13 +360,102 @@
 	object-fit: contain;
 }
 
-.kantanbond-public-products-table__memo {
-	color: #50575e;
-	font-size: 0.85rem;
-	line-height: 1.5;
-	max-width: 280px;
-	white-space: normal;
-	word-break: break-word;
+.kantanbond-public-product-item__image-btn {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	cursor: zoom-in;
+	display: block;
+	line-height: 0;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.kantanbond-public-product-item__image-btn--thumb,
+.kantanbond-public-products-table .kantanbond-public-product-item__image-btn {
+	display: inline-block;
+	width: auto;
+}
+
+.kantanbond-public-product-item__image-btn:hover .kantanbond-public-product-item__image,
+.kantanbond-public-product-item__image-btn:focus-visible .kantanbond-public-product-item__image {
+	opacity: 0.92;
+}
+
+.kantanbond-public-product-item__image-btn:focus-visible {
+	outline: 2px solid #6366f1;
+	outline-offset: 2px;
+}
+
+/* 画像拡大ライトボックス */
+.kantanbond-public-product-image-lightbox {
+	align-items: center;
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: 1.5rem;
+	position: fixed;
+	z-index: 100001;
+}
+
+.kantanbond-public-product-image-lightbox[hidden] {
+	display: none !important;
+}
+
+.kantanbond-public-product-image-lightbox.is-open {
+	display: flex;
+}
+
+.kantanbond-public-product-image-lightbox__backdrop {
+	background: rgba(15, 23, 42, 0.82);
+	border: 0;
+	cursor: zoom-out;
+	inset: 0;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+}
+
+.kantanbond-public-product-image-lightbox__figure {
+	margin: 0;
+	max-height: calc(100vh - 4rem);
+	max-width: min(96vw, 1200px);
+	position: relative;
+	z-index: 1;
+}
+
+.kantanbond-public-product-image-lightbox__image {
+	display: block;
+	height: auto;
+	margin: 0 auto;
+	max-height: calc(100vh - 6rem);
+	max-width: 100%;
+	object-fit: contain;
+	width: auto;
+}
+
+.kantanbond-public-product-image-lightbox__caption {
+	color: #f8fafc;
+	font-size: 0.95rem;
+	margin-top: 0.75rem;
+	text-align: center;
+}
+
+.kantanbond-public-product-image-lightbox__close {
+	background: rgba(15, 23, 42, 0.65);
+	border: 0;
+	border-radius: 999px;
+	color: #fff;
+	cursor: pointer;
+	font-size: 1.75rem;
+	height: 2.5rem;
+	line-height: 1;
+	position: absolute;
+	right: 1rem;
+	top: 1rem;
+	width: 2.5rem;
+	z-index: 2;
 }
 
 /* クリック可能な商品 */
@@ -330,6 +476,12 @@
 
 .kantanbond-public-products-table .kantanbond-public-product-item:hover {
 	background: #f8fafc;
+}
+
+.kantanbond-public-products-table .kantanbond-public-product-item:hover,
+.kantanbond-public-products-table .kantanbond-public-product-item:focus {
+	box-shadow: inset 0 0 0 2px #6366f1;
+	outline: none;
 }
 
 /* 詳細・お申し込み（モーダル） */
@@ -401,82 +553,9 @@ body.kantanbond-public-product-modal-open {
 
 .kantanbond-public-product-detail__image {
 	border-radius: 8px;
-	cursor: zoom-in;
 	max-height: 160px;
 	max-width: 200px;
 	object-fit: contain;
-}
-
-/* 画像拡大（ライトボックス） */
-.kantanbond-public-product-lightbox {
-	align-items: center;
-	display: flex;
-	inset: 0;
-	justify-content: center;
-	padding: 1.5rem;
-	position: fixed;
-	z-index: 100001;
-}
-
-.kantanbond-public-product-lightbox[hidden] {
-	display: none !important;
-}
-
-.kantanbond-public-product-lightbox.is-open {
-	display: flex;
-}
-
-body.kantanbond-public-product-lightbox-open {
-	overflow: hidden;
-}
-
-.kantanbond-public-product-lightbox__backdrop {
-	background: rgba(15, 23, 42, 0.85);
-	border: 0;
-	cursor: zoom-out;
-	inset: 0;
-	margin: 0;
-	padding: 0;
-	position: absolute;
-}
-
-.kantanbond-public-product-lightbox__figure {
-	margin: 0;
-	max-height: 90vh;
-	max-width: min(92vw, 1200px);
-	position: relative;
-	z-index: 1;
-}
-
-.kantanbond-public-product-lightbox__image {
-	display: block;
-	height: auto;
-	max-height: 90vh;
-	max-width: min(92vw, 1200px);
-	object-fit: contain;
-	width: auto;
-}
-
-.kantanbond-public-product-lightbox__close {
-	background: rgba(255, 255, 255, 0.95);
-	border: 0;
-	border-radius: 999px;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-	color: #1d2327;
-	cursor: pointer;
-	font-size: 1.5rem;
-	height: 2.25rem;
-	line-height: 1;
-	padding: 0;
-	position: absolute;
-	right: -0.5rem;
-	top: -0.5rem;
-	width: 2.25rem;
-	z-index: 2;
-}
-
-.kantanbond-public-product-lightbox__close:hover {
-	background: #fff;
 }
 
 .kantanbond-public-product-detail__name {
@@ -497,22 +576,18 @@ body.kantanbond-public-product-lightbox-open {
 }
 
 .kantanbond-public-product-detail__memo {
-	margin: 0.75rem 0 0;
+	margin-top: 0.75rem;
+	color: #50575e;
 }
 
 .kantanbond-public-product-detail__memo-label {
-	color: #646970;
 	display: block;
-	font-size: 0.8rem;
 	font-weight: 600;
-	margin-bottom: 0.35rem;
+	margin-bottom: 0.25rem;
 }
 
 .kantanbond-public-product-detail__memo-body {
-	color: #50575e;
-	font-size: 0.9rem;
-	line-height: 1.55;
-	white-space: normal;
+	white-space: pre-wrap;
 	word-break: break-word;
 }
 

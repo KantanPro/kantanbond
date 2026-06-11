@@ -157,6 +157,7 @@ class KantanBond_Public_Products {
 			. '</p>'
 			. '</div>'
 			. $this->render_detail_shell()
+			. $this->render_image_lightbox_shell()
 			. '</div>';
 	}
 
@@ -283,6 +284,8 @@ class KantanBond_Public_Products {
 					'filterPlaceholder' => __( 'カテゴリを入力または選択…', 'kantanbond' ),
 					'filterAll'         => __( 'すべて表示', 'kantanbond' ),
 					'filterEmpty'       => __( '該当する商品がありません。', 'kantanbond' ),
+					'enlargeImage'      => __( '画像を拡大', 'kantanbond' ),
+					'sessionExpired'    => __( 'セッションの有効期限が切れました。ページを再読み込みして再度お試しください。', 'kantanbond' ),
 				),
 			)
 		);
@@ -302,10 +305,12 @@ class KantanBond_Public_Products {
 
 			$image_html = '';
 			if ( $display['image'] && $row['image'] !== '' ) {
-				$image_html = '<div class="kantanbond-public-products-grid__image-wrap"><img src="'
-					. esc_url( $row['image'] )
-					. '" alt="' . esc_attr( $row['name'] )
-					. '" class="kantanbond-public-products-grid__image" loading="lazy" decoding="async" /></div>';
+				$image_html = $this->render_product_image_html(
+					$row['image'],
+					$row['name'],
+					'kantanbond-public-products-grid__image',
+					'kantanbond-public-products-grid__image-wrap'
+				);
 			}
 
 			$category_html = ( $display['category'] && $row['category'] !== '' )
@@ -332,8 +337,8 @@ class KantanBond_Public_Products {
 				$price_block = '<div class="kantanbond-public-products-grid__price-block">' . $price_row_html . $tax_html . '</div>';
 			}
 
-			$memo_html = ( $display['memo'] && $row['memo'] !== '' )
-				? $this->render_product_memo( $row['memo'], 'kantanbond-public-products-grid' )
+			$memo_html = $display['memo']
+				? $this->render_product_list_memo_html( $row['memo'], 'kantanbond-public-products-grid__memo' )
 				: '';
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-grid__item' ) . '>'
@@ -363,10 +368,12 @@ class KantanBond_Public_Products {
 
 			$image_html = '';
 			if ( $display['image'] && $row['image'] !== '' ) {
-				$image_html = '<div class="kantanbond-public-products-card__image-wrap"><img src="'
-					. esc_url( $row['image'] )
-					. '" alt="' . esc_attr( $row['name'] )
-					. '" class="kantanbond-public-products-card__image" loading="lazy" decoding="async" /></div>';
+				$image_html = $this->render_product_image_html(
+					$row['image'],
+					$row['name'],
+					'kantanbond-public-products-card__image',
+					'kantanbond-public-products-card__image-wrap'
+				);
 			}
 
 			$category_html = ( $display['category'] && $row['category'] !== '' )
@@ -393,8 +400,8 @@ class KantanBond_Public_Products {
 				$price_block = '<div class="kantanbond-public-products-card__price-block">' . $price_row_html . $tax_html . '</div>';
 			}
 
-			$memo_html = ( $display['memo'] && $row['memo'] !== '' )
-				? $this->render_product_memo( $row['memo'], 'kantanbond-public-products-card' )
+			$memo_html = $display['memo']
+				? $this->render_product_list_memo_html( $row['memo'], 'kantanbond-public-products-card__memo' )
 				: '';
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-card' ) . '>'
@@ -446,7 +453,13 @@ class KantanBond_Public_Products {
 
 			if ( $display['image'] ) {
 				$img = $row['image'] !== ''
-					? '<img src="' . esc_url( $row['image'] ) . '" alt="' . esc_attr( $row['name'] ) . '" class="kantanbond-public-products-thumb" loading="lazy" decoding="async" width="48" height="48" />'
+					? $this->render_product_image_html(
+						$row['image'],
+						$row['name'],
+						'kantanbond-public-products-thumb',
+						'',
+						'width="48" height="48"'
+					)
 					: '';
 				$cells[] = '<td>' . $img . '</td>';
 			}
@@ -464,9 +477,7 @@ class KantanBond_Public_Products {
 				$cells[] = '<td>' . esc_html( $row['tax_rate'] ) . '</td>';
 			}
 			if ( $display['memo'] ) {
-				$cells[] = '<td class="kantanbond-public-products-table__memo">'
-					. ( $row['memo'] !== '' ? nl2br( esc_html( $row['memo'] ) ) : '' )
-					. '</td>';
+				$cells[] = '<td class="kantanbond-public-products-table__memo">' . esc_html( $row['memo'] ) . '</td>';
 			}
 
 			$rows .= '<tr' . $this->item_attrs( $payload ) . '>' . implode( '', $cells ) . '</tr>';
@@ -593,20 +604,67 @@ class KantanBond_Public_Products {
 	}
 
 	/**
-	 * 商品メモ HTML を生成する。
+	 * 一覧ブロック内の商品画像 HTML（クリックで拡大表示）。
 	 *
-	 * @param string $memo       メモ本文。
-	 * @param string $block_class BEM ブロッククラス（例: kantanbond-public-products-grid）。
+	 * @param string $image_url   画像 URL。
+	 * @param string $name        商品名（alt・aria-label 用）。
+	 * @param string $image_class 画像要素の CSS クラス。
+	 * @param string $wrap_class  ラップ要素の CSS クラス（空なら省略）。
+	 * @param string $extra_attrs img 要素の追加属性（例: width/height）。
 	 * @return string
 	 */
-	private function render_product_memo( string $memo, string $block_class ): string {
+	private function render_product_image_html( string $image_url, string $name, string $image_class, string $wrap_class = '', string $extra_attrs = '' ): string {
+		$label = sprintf(
+			/* translators: %s: product name */
+			__( '%s の画像を拡大', 'kantanbond' ),
+			$name
+		);
+
+		$image_markup = '<button type="button" class="kantanbond-public-product-item__image-btn" aria-label="' . esc_attr( $label ) . '">'
+			. '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $name ) . '" class="' . esc_attr( trim( $image_class . ' kantanbond-public-product-item__image' ) ) . '" loading="lazy" decoding="async"'
+			. ( $extra_attrs !== '' ? ' ' . $extra_attrs : '' )
+			. ' /></button>';
+
+		if ( $wrap_class === '' ) {
+			return $image_markup;
+		}
+
+		return '<div class="' . esc_attr( $wrap_class ) . '">' . $image_markup . '</div>';
+	}
+
+	/**
+	 * 画像拡大表示用ライトボックスの HTML を返す。
+	 *
+	 * @return string
+	 */
+	private function render_image_lightbox_shell(): string {
+		ob_start();
+		?>
+		<div class="kantanbond-public-product-image-lightbox" id="kantanbond-public-product-image-lightbox" hidden>
+			<button type="button" class="kantanbond-public-product-image-lightbox__backdrop" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>"></button>
+			<figure class="kantanbond-public-product-image-lightbox__figure">
+				<img class="kantanbond-public-product-image-lightbox__image" alt="" decoding="async" />
+				<figcaption class="kantanbond-public-product-image-lightbox__caption"></figcaption>
+			</figure>
+			<button type="button" class="kantanbond-public-product-image-lightbox__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
+		</div>
+		<?php
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * 一覧レイアウト用のメモ HTML を返す。
+	 *
+	 * @param string $memo      メモ本文。
+	 * @param string $css_class CSS クラス名。
+	 * @return string
+	 */
+	private function render_product_list_memo_html( string $memo, string $css_class ): string {
 		if ( $memo === '' ) {
 			return '';
 		}
 
-		return '<div class="' . esc_attr( $block_class ) . '__memo">'
-			. nl2br( esc_html( $memo ) )
-			. '</div>';
+		return '<p class="' . esc_attr( $css_class ) . '">' . esc_html( $memo ) . '</p>';
 	}
 
 	/**
@@ -699,6 +757,6 @@ class KantanBond_Public_Products {
 			$formatted = number_format( $price, 2, '.', ',' );
 		}
 
-		return '￥' . $formatted;
+		return $formatted . '円';
 	}
 }
