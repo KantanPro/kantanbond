@@ -8,6 +8,7 @@
 	var config = window.kantanbondPublicProducts;
 	var i18n = config.i18n || {};
 	var openModalCount = 0;
+	var scrollLockPosition = 0;
 
 	function qs(root, selector) {
 		return (root || document).querySelector(selector);
@@ -68,7 +69,9 @@
 	function lockBodyScroll() {
 		openModalCount += 1;
 		if (openModalCount === 1) {
+			scrollLockPosition = window.pageYOffset || document.documentElement.scrollTop || 0;
 			document.body.classList.add('kantanbond-public-product-modal-open');
+			document.body.style.top = '-' + scrollLockPosition + 'px';
 		}
 	}
 
@@ -76,6 +79,8 @@
 		openModalCount = Math.max(0, openModalCount - 1);
 		if (openModalCount === 0) {
 			document.body.classList.remove('kantanbond-public-product-modal-open');
+			document.body.style.top = '';
+			window.scrollTo(0, scrollLockPosition);
 		}
 	}
 

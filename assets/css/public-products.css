@@ -555,19 +555,22 @@
 }
 
 .kantanbond-public-product-image-lightbox__close {
-	background: rgba(15, 23, 42, 0.65);
+	background: rgba(15, 23, 42, 0.75);
 	border: 0;
 	border-radius: 999px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 	color: #fff;
 	cursor: pointer;
 	font-size: 1.75rem;
-	height: 2.5rem;
+	height: 2.75rem;
 	line-height: 1;
-	position: absolute;
-	right: 1rem;
-	top: 1rem;
-	width: 2.5rem;
-	z-index: 2;
+	min-height: 2.75rem;
+	min-width: 2.75rem;
+	position: fixed;
+	right: max(0.75rem, env(safe-area-inset-right, 0px));
+	top: max(0.75rem, env(safe-area-inset-top, 0px));
+	width: 2.75rem;
+	z-index: 100002;
 }
 
 /* クリック可能な商品 */
@@ -598,11 +601,20 @@
 
 /* 詳細・お申し込み（モーダル） */
 .kantanbond-public-product-detail {
-	align-items: center;
+	--kantanbond-modal-pad-top: max(1rem, env(safe-area-inset-top, 0px));
+	--kantanbond-modal-pad-right: max(1rem, env(safe-area-inset-right, 0px));
+	--kantanbond-modal-pad-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+	--kantanbond-modal-pad-left: max(1rem, env(safe-area-inset-left, 0px));
+	align-items: flex-start;
 	display: flex;
 	inset: 0;
 	justify-content: center;
-	padding: 1rem;
+	overflow: hidden;
+	padding:
+		var(--kantanbond-modal-pad-top)
+		var(--kantanbond-modal-pad-right)
+		var(--kantanbond-modal-pad-bottom)
+		var(--kantanbond-modal-pad-left);
 	position: fixed;
 	z-index: 100000;
 }
@@ -616,7 +628,11 @@
 }
 
 body.kantanbond-public-product-modal-open {
+	left: 0;
 	overflow: hidden;
+	position: fixed;
+	right: 0;
+	width: 100%;
 }
 
 .kantanbond-public-product-detail__backdrop {
@@ -635,12 +651,16 @@ body.kantanbond-public-product-modal-open {
 	border-radius: 12px;
 	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 	display: flex;
+	flex: 0 1 auto;
 	flex-direction: column;
-	max-height: min(96vh, 1200px);
-	max-height: min(96dvh, 1200px);
+	margin: 0 auto;
+	max-height: calc(
+		100dvh - var(--kantanbond-modal-pad-top) - var(--kantanbond-modal-pad-bottom)
+	);
+	min-height: 0;
 	overflow: hidden;
 	position: relative;
-	width: min(1100px, calc(100vw - 2rem));
+	width: min(1100px, calc(100vw - var(--kantanbond-modal-pad-left) - var(--kantanbond-modal-pad-right)));
 	z-index: 1;
 }
 
@@ -650,9 +670,7 @@ body.kantanbond-public-product-modal-open {
 	border-bottom: 1px solid #e2e4e7;
 	display: flex;
 	flex-shrink: 0;
-	gap: 0.75rem;
-	justify-content: space-between;
-	padding: 0.65rem 0.75rem 0.65rem 1rem;
+	padding: 0.65rem 5.5rem 0.65rem 1rem;
 	position: relative;
 	z-index: 2;
 }
@@ -671,14 +689,16 @@ body.kantanbond-public-product-modal-open {
 	overflow-x: hidden;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
 	padding: 1.25rem 1.5rem 1.5rem;
 }
 
 .kantanbond-public-product-detail__close {
 	align-items: center;
-	background: #f6f7f7;
+	background: #fff;
 	border: 1px solid #c3c4c7;
 	border-radius: 999px;
+	box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
 	color: #1d2327;
 	cursor: pointer;
 	display: inline-flex;
@@ -692,6 +712,10 @@ body.kantanbond-public-product-modal-open {
 	min-height: 2.75rem;
 	min-width: 2.75rem;
 	padding: 0.45rem 0.85rem;
+	position: fixed;
+	right: var(--kantanbond-modal-pad-right);
+	top: var(--kantanbond-modal-pad-top);
+	z-index: 100002;
 }
 
 .kantanbond-public-product-detail__close-icon {
@@ -946,27 +970,20 @@ body.kantanbond-public-product-modal-open {
 	}
 
 	.kantanbond-public-product-detail {
-		align-items: stretch;
-		justify-content: flex-start;
-		overflow: hidden;
-		padding:
-			max(0.75rem, env(safe-area-inset-top, 0px))
-			max(0.75rem, env(safe-area-inset-right, 0px))
-			max(0.75rem, env(safe-area-inset-bottom, 0px))
-			max(0.75rem, env(safe-area-inset-left, 0px));
+		--kantanbond-modal-pad-top: max(0.75rem, env(safe-area-inset-top, 0px));
+		--kantanbond-modal-pad-right: max(0.75rem, env(safe-area-inset-right, 0px));
+		--kantanbond-modal-pad-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+		--kantanbond-modal-pad-left: max(0.75rem, env(safe-area-inset-left, 0px));
 	}
 
 	.kantanbond-public-product-detail__panel {
 		border-radius: 10px;
-		flex: 1 1 auto;
-		margin: 0 auto;
-		max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-		min-height: 0;
 		width: 100%;
 	}
 
 	.kantanbond-public-product-detail__header {
 		padding-left: 0.85rem;
+		padding-right: 5rem;
 	}
 
 	.kantanbond-public-product-detail__body {
@@ -993,17 +1010,6 @@ body.kantanbond-public-product-modal-open {
 			max(0.75rem, env(safe-area-inset-right, 0px))
 			max(0.75rem, env(safe-area-inset-bottom, 0px))
 			max(0.75rem, env(safe-area-inset-left, 0px));
-	}
-
-	.kantanbond-public-product-image-lightbox__close {
-		font-size: 1.5rem;
-		height: 2.75rem;
-		min-height: 2.75rem;
-		min-width: 2.75rem;
-		position: fixed;
-		right: max(0.75rem, env(safe-area-inset-right, 0px));
-		top: max(0.75rem, env(safe-area-inset-top, 0px));
-		width: 2.75rem;
 	}
 
 	.kantanbond-public-product-image-lightbox__figure {
