@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,12 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.2.7 =
+* [kantanbond_public_products] 公開商品に初回費用（initial_fees）と定期費用（recurring_items）の表示を追加（グリッド・カード・テーブル・詳細モーダル）
+* 商品ステータス（保留中・完売御礼）のラベル表示、画像オーバーレイ、受付停止時の通知文言を実装
+* 受付停止商品の画像にグレースケール＋オーバーレイバッジを表示
+* 計3ファイル・599行増・63行減（v1.2.6…HEAD）
 
 = 1.2.6 =
 * [kantanbond_public_products] お問い合わせモーダルの幅を拡大（最大1100px・画面端に余白を確保）
