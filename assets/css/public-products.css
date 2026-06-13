@@ -140,6 +140,7 @@
 	align-items: center;
 	justify-content: center;
 	padding: 12px 8px 4px;
+	position: relative;
 }
 
 .kantanbond-public-products-grid__image-wrap .kantanbond-public-product-item__image-btn {
@@ -211,6 +212,50 @@
 	flex-wrap: wrap;
 	gap: 0.15em;
 	margin: 0;
+}
+
+.kantanbond-public-products-grid__recurring-items,
+.kantanbond-public-products-card__recurring-items,
+.kantanbond-public-product-detail__recurring-items {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	margin: 0;
+}
+
+.kantanbond-public-products-grid__recurring-item,
+.kantanbond-public-products-card__recurring-item,
+.kantanbond-public-product-detail__recurring-item {
+	line-height: 1.35;
+	margin: 0;
+}
+
+.kantanbond-public-products-grid__recurring-item-line,
+.kantanbond-public-products-card__recurring-item-line,
+.kantanbond-public-product-detail__recurring-item-line {
+	color: #1d2327;
+	display: block;
+}
+
+.kantanbond-public-products-grid__recurring-item-line {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.kantanbond-public-products-grid__recurring-item:nth-child(2) .kantanbond-public-products-grid__recurring-item-line {
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height: 1.4;
+}
+
+.kantanbond-public-products-card__recurring-item-line {
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.kantanbond-public-product-detail__recurring-item-line {
+	font-size: 1.05rem;
+	font-weight: 600;
 }
 
 .kantanbond-public-products-grid__price {
@@ -294,6 +339,7 @@
 .kantanbond-public-products-card__image-wrap {
 	background: linear-gradient(135deg, #f8fafc, #eef2ff);
 	padding: 20px;
+	position: relative;
 	text-align: center;
 }
 
@@ -386,6 +432,72 @@
 .kantanbond-public-product-item__image-btn:focus-visible {
 	outline: 2px solid #6366f1;
 	outline-offset: 2px;
+}
+
+.kantanbond-public-product-item__image-wrap--pending .kantanbond-public-product-item__image,
+.kantanbond-public-product-item__image-wrap--pending .kantanbond-public-products-grid__image,
+.kantanbond-public-product-item__image-wrap--pending .kantanbond-public-products-card__image {
+	filter: grayscale(0.15);
+	opacity: 0.88;
+}
+
+.kantanbond-public-product-item__image-wrap--pending::before {
+	background: rgba(15, 23, 42, 0.28);
+	content: "";
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
+}
+
+.kantanbond-public-product-item__pending-overlay {
+	align-items: center;
+	background: transparent;
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
+}
+
+.kantanbond-public-product-item__pending-overlay-badge {
+	background: #dc2626;
+	border: 2px solid #fff;
+	border-radius: 6px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+	color: #fff;
+	font-size: 1rem;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+	line-height: 1.25;
+	padding: 0.5rem 1rem;
+	text-shadow: none;
+	-webkit-font-smoothing: antialiased;
+	transform: translateZ(0);
+	white-space: nowrap;
+}
+
+.kantanbond-public-products-table__image-wrap {
+	display: inline-block;
+	position: relative;
+	vertical-align: middle;
+}
+
+.kantanbond-public-product-item__image-wrap--pending .kantanbond-public-product-item__pending-overlay-badge {
+	font-size: 0.78rem;
+	padding: 0.28rem 0.55rem;
+}
+
+.kantanbond-public-product-detail__pending-notice {
+	color: #b91c1c;
+	font-size: 0.85rem;
+	margin: 0.35rem 0 0;
+}
+
+.kantanbond-public-product-item--pending,
+.kantanbond-public-product-item--sold-out {
+	opacity: 1;
 }
 
 /* 画像拡大ライトボックス */
@@ -555,6 +667,7 @@ body.kantanbond-public-product-modal-open {
 	background: #f6f7f7;
 	border-radius: 8px;
 	padding: 0.5rem;
+	position: relative;
 }
 
 .kantanbond-public-product-detail__image {
@@ -675,6 +788,66 @@ body.kantanbond-public-product-modal-open {
 	background: #fef2f2;
 	border: 1px solid #fca5a5;
 	color: #991b1b;
+}
+
+.kantanbond-public-products-grid__initial-fees,
+.kantanbond-public-products-card__initial-fees,
+.kantanbond-public-product-detail__initial-fees {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	display: block;
+	line-height: 1.25;
+	margin-top: 0.25rem;
+	padding: 0.2rem 0.45rem 0.18rem;
+}
+
+.kantanbond-public-products-grid__initial-fees__label,
+.kantanbond-public-products-card__initial-fees__label,
+.kantanbond-public-product-detail__initial-fees-label {
+	color: #334155;
+	display: block;
+	font-size: 0.78rem;
+	font-weight: 700;
+	line-height: 1.25;
+	margin: 0 !important;
+	padding: 0;
+}
+
+.kantanbond-public-products-grid__initial-fees__item,
+.kantanbond-public-products-card__initial-fees__item,
+.kantanbond-public-product-detail__initial-fees-item {
+	color: #0f172a;
+	display: block;
+	font-size: 0.84rem;
+	line-height: 1.25;
+	margin: 0 !important;
+	padding: 0.12em 0 0;
+}
+
+.kantanbond-public-products-grid__initial-fees__item .kantanbond-public-products-grid__initial-fees__note,
+.kantanbond-public-products-card__initial-fees__item .kantanbond-public-products-card__initial-fees__note,
+.kantanbond-public-product-detail__initial-fees-item .kantanbond-public-product-detail__initial-fees-note {
+	color: #64748b;
+	display: block;
+	font-size: 0.72rem;
+	font-weight: 400;
+	line-height: 1.25;
+	margin: 0.18em 0 0 !important;
+	padding: 0;
+}
+
+.kantanbond-public-product-detail__recurring-badge {
+	background: #e0f2fe;
+	border-radius: 999px;
+	color: #0369a1;
+	display: inline-block;
+	font-size: 0.72rem;
+	font-weight: 700;
+	line-height: 1;
+	margin-left: 0.35rem;
+	padding: 0.2rem 0.45rem;
+	vertical-align: middle;
 }
 
 @media (max-width: 782px) {

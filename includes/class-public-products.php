@@ -74,6 +74,7 @@ class KantanBond_Public_Products {
 				'show_category' => 'yes',
 				'show_tax'      => 'no',
 				'show_memo'     => 'yes',
+				'show_initial_fees' => 'yes',
 				'show_filter'   => 'yes',
 			),
 			$atts,
@@ -131,6 +132,7 @@ class KantanBond_Public_Products {
 			'category' => $this->is_flag_enabled( $atts['show_category'] ),
 			'tax'      => $this->is_flag_enabled( $atts['show_tax'] ),
 			'memo'     => $this->is_flag_enabled( $atts['show_memo'] ),
+			'initial_fees' => $this->is_flag_enabled( $atts['show_initial_fees'] ),
 		);
 
 		if ( $layout === 'table' ) {
@@ -272,6 +274,9 @@ class KantanBond_Public_Products {
 					'unit'              => __( '単位', 'kantanbond' ),
 					'tax'               => __( '税率', 'kantanbond' ),
 					'memo'              => __( 'メモ', 'kantanbond' ),
+					'initialFees'       => __( '初回費用', 'kantanbond' ),
+					'initialFeesNote'   => __( '初回請求時のみ', 'kantanbond' ),
+					'recurringBadge'    => __( '定期', 'kantanbond' ),
 					'quantity'          => __( '数量', 'kantanbond' ),
 					'companyName'       => __( '会社名', 'kantanbond' ),
 					'contactName'       => __( 'お名前', 'kantanbond' ),
@@ -285,6 +290,10 @@ class KantanBond_Public_Products {
 					'filterAll'         => __( 'すべて表示', 'kantanbond' ),
 					'filterEmpty'       => __( '該当する商品がありません。', 'kantanbond' ),
 					'enlargeImage'      => __( '画像を拡大', 'kantanbond' ),
+					'pendingBadge'      => __( '保留中', 'kantanbond' ),
+					'soldOutBadge'      => __( '完売御礼！', 'kantanbond' ),
+					'pendingNotice'     => __( '現在お問い合わせを受け付けておりません。', 'kantanbond' ),
+					'soldOutNotice'     => __( 'こちらの商品は完売しました。', 'kantanbond' ),
 					'sessionExpired'    => __( 'セッションの有効期限が切れました。ページを再読み込みして再度お試しください。', 'kantanbond' ),
 				),
 			)
@@ -304,41 +313,38 @@ class KantanBond_Public_Products {
 			$payload = $row;
 
 			$image_html = '';
-			if ( $display['image'] && $row['image'] !== '' ) {
-				$image_html = $this->render_product_image_html(
-					$row['image'],
-					$row['name'],
-					'kantanbond-public-products-grid__image',
-					'kantanbond-public-products-grid__image-wrap'
-				);
+			if ( $display['image'] ) {
+				$show_overlay = empty( $row['acceptance_open'] );
+				$status_label = (string) ( $row['status_label'] ?? '' );
+				if ( $row['image'] !== '' ) {
+					$image_html = $this->render_product_image_html(
+						$row['image'],
+						$row['name'],
+						'kantanbond-public-products-grid__image',
+						'kantanbond-public-products-grid__image-wrap',
+						'',
+						$show_overlay,
+						$status_label
+					);
+				} elseif ( $show_overlay && $status_label !== '' ) {
+					$image_html = '<div class="kantanbond-public-products-grid__image-wrap kantanbond-public-product-item__image-wrap--pending">'
+						. $this->render_product_status_overlay_html( $status_label )
+						. '</div>';
+				}
 			}
 
 			$category_html = ( $display['category'] && $row['category'] !== '' )
 				? '<p class="kantanbond-public-products-grid__category">' . esc_html( $row['category'] ) . '</p>'
 				: '';
 
-			$price_row_html = '';
-			if ( $display['price'] || ( $display['unit'] && $row['unit'] !== '' ) ) {
-				$price_part = $display['price']
-					? '<span class="kantanbond-public-products-grid__price">' . esc_html( $row['price_display'] ) . '</span>'
-					: '';
-				$unit_part = ( $display['unit'] && $row['unit'] !== '' )
-					? '<span class="kantanbond-public-products-grid__unit">/' . esc_html( $row['unit'] ) . '</span>'
-					: '';
-				$price_row_html = '<div class="kantanbond-public-products-grid__price-row">' . $price_part . $unit_part . '</div>';
-			}
-
-			$tax_html = ( $display['tax'] && $row['tax_rate'] !== '' )
-				? '<span class="kantanbond-public-products-grid__tax">' . esc_html__( '税率', 'kantanbond' ) . ': ' . esc_html( $row['tax_rate'] ) . '%</span>'
-				: '';
-
-			$price_block = '';
-			if ( $price_row_html !== '' || $tax_html !== '' ) {
-				$price_block = '<div class="kantanbond-public-products-grid__price-block">' . $price_row_html . $tax_html . '</div>';
-			}
+			$price_block = $this->render_product_list_price_block_html( $row, $display, 'kantanbond-public-products-grid' );
 
 			$memo_html = $display['memo']
 				? $this->render_product_list_memo_html( $row['memo'], 'kantanbond-public-products-grid__memo' )
+				: '';
+
+			$initial_fees_html = $display['initial_fees']
+				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-grid__initial-fees' )
 				: '';
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-grid__item' ) . '>'
@@ -347,6 +353,7 @@ class KantanBond_Public_Products {
 				. '<h3 class="kantanbond-public-products-grid__name">' . esc_html( $row['name'] ) . '</h3>'
 				. $category_html
 				. $price_block
+				. $initial_fees_html
 				. $memo_html
 				. '</div></article>';
 		}
@@ -367,41 +374,38 @@ class KantanBond_Public_Products {
 			$payload = $row;
 
 			$image_html = '';
-			if ( $display['image'] && $row['image'] !== '' ) {
-				$image_html = $this->render_product_image_html(
-					$row['image'],
-					$row['name'],
-					'kantanbond-public-products-card__image',
-					'kantanbond-public-products-card__image-wrap'
-				);
+			if ( $display['image'] ) {
+				$show_overlay = empty( $row['acceptance_open'] );
+				$status_label = (string) ( $row['status_label'] ?? '' );
+				if ( $row['image'] !== '' ) {
+					$image_html = $this->render_product_image_html(
+						$row['image'],
+						$row['name'],
+						'kantanbond-public-products-card__image',
+						'kantanbond-public-products-card__image-wrap',
+						'',
+						$show_overlay,
+						$status_label
+					);
+				} elseif ( $show_overlay && $status_label !== '' ) {
+					$image_html = '<div class="kantanbond-public-products-card__image-wrap kantanbond-public-product-item__image-wrap--pending">'
+						. $this->render_product_status_overlay_html( $status_label )
+						. '</div>';
+				}
 			}
 
 			$category_html = ( $display['category'] && $row['category'] !== '' )
 				? '<p class="kantanbond-public-products-card__category">' . esc_html( $row['category'] ) . '</p>'
 				: '';
 
-			$price_row_html = '';
-			if ( $display['price'] || ( $display['unit'] && $row['unit'] !== '' ) ) {
-				$price_part = $display['price']
-					? '<span class="kantanbond-public-products-card__price">' . esc_html( $row['price_display'] ) . '</span>'
-					: '';
-				$unit_part = ( $display['unit'] && $row['unit'] !== '' )
-					? '<span class="kantanbond-public-products-card__unit">/' . esc_html( $row['unit'] ) . '</span>'
-					: '';
-				$price_row_html = '<div class="kantanbond-public-products-card__price-row">' . $price_part . $unit_part . '</div>';
-			}
-
-			$tax_html = ( $display['tax'] && $row['tax_rate'] !== '' )
-				? '<span class="kantanbond-public-products-card__tax">' . esc_html__( '税率', 'kantanbond' ) . ': ' . esc_html( $row['tax_rate'] ) . '%</span>'
-				: '';
-
-			$price_block = '';
-			if ( $price_row_html !== '' || $tax_html !== '' ) {
-				$price_block = '<div class="kantanbond-public-products-card__price-block">' . $price_row_html . $tax_html . '</div>';
-			}
+			$price_block = $this->render_product_list_price_block_html( $row, $display, 'kantanbond-public-products-card' );
 
 			$memo_html = $display['memo']
 				? $this->render_product_list_memo_html( $row['memo'], 'kantanbond-public-products-card__memo' )
+				: '';
+
+			$initial_fees_html = $display['initial_fees']
+				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-card__initial-fees' )
 				: '';
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-card' ) . '>'
@@ -410,6 +414,7 @@ class KantanBond_Public_Products {
 				. $category_html
 				. '<h3 class="kantanbond-public-products-card__name">' . esc_html( $row['name'] ) . '</h3>'
 				. $price_block
+				. $initial_fees_html
 				. $memo_html
 				. '</div></article>';
 		}
@@ -445,6 +450,9 @@ class KantanBond_Public_Products {
 		if ( $display['memo'] ) {
 			$headers[] = '<th scope="col">' . esc_html__( 'メモ', 'kantanbond' ) . '</th>';
 		}
+		if ( $display['initial_fees'] ) {
+			$headers[] = '<th scope="col">' . esc_html__( '初回費用', 'kantanbond' ) . '</th>';
+		}
 
 		foreach ( $products as $product ) {
 			$row     = $this->format_product_row( $product );
@@ -452,13 +460,17 @@ class KantanBond_Public_Products {
 			$cells   = array();
 
 			if ( $display['image'] ) {
-				$img = $row['image'] !== ''
+				$show_overlay = empty( $row['acceptance_open'] );
+				$status_label = (string) ( $row['status_label'] ?? '' );
+				$img          = $row['image'] !== ''
 					? $this->render_product_image_html(
 						$row['image'],
 						$row['name'],
 						'kantanbond-public-products-thumb',
-						'',
-						'width="48" height="48"'
+						'kantanbond-public-products-table__image-wrap',
+						'width="48" height="48"',
+						$show_overlay,
+						$status_label
 					)
 					: '';
 				$cells[] = '<td>' . $img . '</td>';
@@ -468,7 +480,10 @@ class KantanBond_Public_Products {
 				$cells[] = '<td>' . esc_html( $row['category'] ) . '</td>';
 			}
 			if ( $display['price'] ) {
-				$cells[] = '<td>' . esc_html( $row['price_display'] ) . '</td>';
+				$price_cell = ! empty( $row['recurring_items_summary'] )
+					? (string) $row['recurring_items_summary']
+					: (string) $row['price_display'];
+				$cells[] = '<td>' . esc_html( $price_cell ) . '</td>';
 			}
 			if ( $display['unit'] ) {
 				$cells[] = '<td>' . esc_html( $row['unit'] ) . '</td>';
@@ -478,6 +493,9 @@ class KantanBond_Public_Products {
 			}
 			if ( $display['memo'] ) {
 				$cells[] = '<td class="kantanbond-public-products-table__memo">' . esc_html( $row['memo'] ) . '</td>';
+			}
+			if ( $display['initial_fees'] ) {
+				$cells[] = '<td class="kantanbond-public-products-table__initial-fees">' . esc_html( $row['initial_fees_summary'] ) . '</td>';
 			}
 
 			$rows .= '<tr' . $this->item_attrs( $payload ) . '>' . implode( '', $cells ) . '</tr>';
@@ -584,11 +602,20 @@ class KantanBond_Public_Products {
 			? (string) $product['tax_rate']
 			: '';
 		$memo     = isset( $product['memo'] ) ? trim( (string) $product['memo'] ) : '';
+		$initial_fees = $this->normalize_initial_fees( $product['initial_fees'] ?? array() );
+		$recurring_items = $this->normalize_recurring_items( $product['recurring_items'] ?? array() );
+		$is_recurring = ! empty( $product['is_recurring'] );
 
 		$image = '';
 		if ( isset( $product['image_url'] ) && is_string( $product['image_url'] ) && $product['image_url'] !== '' ) {
 			$image = $this->api->resolve_asset_url( $product['image_url'] );
 		}
+
+		$acceptance_open    = ! isset( $product['acceptance_open'] ) || (bool) $product['acceptance_open'];
+		$availability_state = isset( $product['availability_state'] ) ? (string) $product['availability_state'] : 'open';
+		$status_label       = isset( $product['status_label'] ) ? (string) $product['status_label'] : '';
+		$is_sold_out        = ! empty( $product['is_sold_out'] ) || $availability_state === 'sold_out';
+		$is_pending         = ! empty( $product['is_pending'] ) || $availability_state === 'pending';
 
 		return array(
 			'id'            => isset( $product['id'] ) ? (int) $product['id'] : 0,
@@ -599,8 +626,226 @@ class KantanBond_Public_Products {
 			'category'      => $category,
 			'tax_rate'      => $tax_rate,
 			'memo'          => $memo,
+			'is_recurring'  => $is_recurring,
+			'initial_fees'  => $initial_fees,
+			'recurring_items' => $recurring_items,
+			'initial_fees_summary' => $this->format_initial_fees_summary( $initial_fees ),
+			'recurring_items_summary' => $this->format_recurring_items_summary( $recurring_items, $unit ),
 			'image'         => $image,
+			'acceptance_open' => $acceptance_open,
+			'availability_state' => $availability_state,
+			'is_sold_out'   => $is_sold_out,
+			'is_pending'    => $is_pending,
+			'status_label'  => $status_label,
 		);
+	}
+
+	/**
+	 * @param mixed $raw API の recurring_items。
+	 * @return array<int, array{item_name: string, amount: float, amount_display: string, tax_rate: string}>
+	 */
+	private function normalize_recurring_items( mixed $raw ): array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+
+		$items = array();
+		foreach ( $raw as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$name = isset( $row['item_name'] ) ? trim( (string) $row['item_name'] ) : '';
+			if ( $name === '' ) {
+				continue;
+			}
+			$amount = isset( $row['amount'] ) ? (float) $row['amount'] : 0.0;
+			$tax_rate = isset( $row['tax_rate'] ) && $row['tax_rate'] !== null && $row['tax_rate'] !== ''
+				? (string) $row['tax_rate']
+				: '';
+
+			$items[] = array(
+				'item_name'      => $name,
+				'amount'         => $amount,
+				'amount_display' => $this->format_yen( $amount ),
+				'tax_rate'       => $tax_rate,
+			);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * @param array<int, array{item_name: string, amount_display: string}> $recurring_items 定期請求項目。
+	 * @param string                                                        $unit            単位。
+	 * @return string
+	 */
+	private function format_recurring_items_summary( array $recurring_items, string $unit ): string {
+		if ( $recurring_items === array() ) {
+			return '';
+		}
+
+		$parts = array();
+		foreach ( $recurring_items as $item ) {
+			$parts[] = $this->format_recurring_item_line(
+				(string) $item['item_name'],
+				(string) $item['amount_display'],
+				$unit,
+			);
+		}
+
+		return implode( '、', $parts );
+	}
+
+	private function format_recurring_item_line( string $item_name, string $amount_display, string $unit ): string {
+		$suffix = $unit !== '' ? '/' . $unit : '';
+
+		return $item_name . ' ' . $amount_display . $suffix;
+	}
+
+	/**
+	 * @param array<string, mixed> $row     整形済み商品行。
+	 * @param array<string, bool> $display 表示フラグ。
+	 * @param string               $prefix  CSS クラス接頭辞（grid / card）。
+	 * @return string
+	 */
+	private function render_product_list_price_block_html( array $row, array $display, string $prefix ): string {
+		if ( ! $display['price'] && ! ( $display['unit'] && $row['unit'] !== '' ) && ! ( $display['tax'] && $row['tax_rate'] !== '' ) ) {
+			return '';
+		}
+
+		$unit = (string) ( $row['unit'] ?? '' );
+		$service_tax_rate = (string) ( $row['tax_rate'] ?? '' );
+		$price_html = '';
+		$has_recurring_items = ! empty( $row['recurring_items'] ) && is_array( $row['recurring_items'] );
+
+		if ( $has_recurring_items ) {
+			$lines = '';
+			foreach ( $row['recurring_items'] as $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$item_name = (string) ( $item['item_name'] ?? '' );
+				$amount_display = (string) ( $item['amount_display'] ?? '' );
+				if ( $item_name === '' || $amount_display === '' ) {
+					continue;
+				}
+				$line_text = $this->format_recurring_item_line( $item_name, $amount_display, $display['unit'] && $unit !== '' ? $unit : '' );
+				$lines .= '<div class="' . esc_attr( $prefix ) . '__recurring-item">'
+					. '<span class="' . esc_attr( $prefix ) . '__recurring-item-line">' . esc_html( $line_text ) . '</span>'
+					. '</div>';
+			}
+			if ( $lines !== '' ) {
+				$price_html = '<div class="' . esc_attr( $prefix ) . '__recurring-items">' . $lines . '</div>';
+			}
+		}
+
+		if ( $price_html === '' && $display['price'] ) {
+			$price_part = '<span class="' . esc_attr( $prefix ) . '__price">' . esc_html( (string) $row['price_display'] ) . '</span>';
+			$unit_part = ( $display['unit'] && $unit !== '' )
+				? '<span class="' . esc_attr( $prefix ) . '__unit">/' . esc_html( $unit ) . '</span>'
+				: '';
+			$price_html = '<div class="' . esc_attr( $prefix ) . '__price-row">' . $price_part . $unit_part . '</div>';
+		}
+
+		$tax_html = ( $display['tax'] && $service_tax_rate !== '' && ! $has_recurring_items )
+			? '<span class="' . esc_attr( $prefix ) . '__tax">' . esc_html__( '税率', 'kantanbond' ) . ': ' . esc_html( $service_tax_rate ) . '%</span>'
+			: '';
+
+		if ( $price_html === '' && $tax_html === '' ) {
+			return '';
+		}
+
+		return '<div class="' . esc_attr( $prefix ) . '__price-block">' . $price_html . $tax_html . '</div>';
+	}
+
+	/**
+	 * @param mixed $raw API の initial_fees。
+	 * @return array<int, array{fee_name: string, amount: float, amount_display: string, tax_rate: string}>
+	 */
+	private function normalize_initial_fees( mixed $raw ): array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+
+		$fees = array();
+		foreach ( $raw as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$name = isset( $row['fee_name'] ) ? trim( (string) $row['fee_name'] ) : '';
+			if ( $name === '' ) {
+				continue;
+			}
+			$amount = isset( $row['amount'] ) ? (float) $row['amount'] : 0.0;
+			$tax_rate = isset( $row['tax_rate'] ) && $row['tax_rate'] !== null && $row['tax_rate'] !== ''
+				? (string) $row['tax_rate']
+				: '';
+
+			$fees[] = array(
+				'fee_name'       => $name,
+				'amount'         => $amount,
+				'amount_display' => $this->format_yen( $amount ),
+				'tax_rate'       => $tax_rate,
+			);
+		}
+
+		return $fees;
+	}
+
+	/**
+	 * @param array<int, array{fee_name: string, amount_display: string}> $initial_fees 初回費用。
+	 * @return string
+	 */
+	private function format_initial_fees_summary( array $initial_fees ): string {
+		if ( $initial_fees === array() ) {
+			return '';
+		}
+
+		$parts = array();
+		foreach ( $initial_fees as $fee ) {
+			$parts[] = $fee['fee_name'] . ' ' . $fee['amount_display'];
+		}
+
+		return implode( '、', $parts );
+	}
+
+	/**
+	 * @param array<string, mixed> $row 整形済み商品行。
+	 * @param string               $css_class CSS クラス名。
+	 * @return string
+	 */
+	private function render_product_list_initial_fees_html( array $row, string $css_class ): string {
+		if ( empty( $row['initial_fees'] ) || ! is_array( $row['initial_fees'] ) ) {
+			return '';
+		}
+
+		$fee_lines = array();
+		foreach ( $row['initial_fees'] as $fee ) {
+			if ( ! is_array( $fee ) ) {
+				continue;
+			}
+			$fee_lines[] = esc_html( (string) ( $fee['fee_name'] ?? '' ) ) . ' '
+				. esc_html( (string) ( $fee['amount_display'] ?? '' ) );
+		}
+
+		if ( $fee_lines === array() ) {
+			return '';
+		}
+
+		$items = '';
+		$last  = count( $fee_lines ) - 1;
+		foreach ( $fee_lines as $index => $line ) {
+			$items .= '<span class="' . esc_attr( $css_class ) . '__item">' . $line;
+			if ( $index === $last ) {
+				$items .= '<span class="' . esc_attr( $css_class ) . '__note">' . esc_html__( '初回請求時のみ', 'kantanbond' ) . '</span>';
+			}
+			$items .= '</span>';
+		}
+
+		return '<div class="' . esc_attr( $css_class ) . '">'
+			. '<span class="' . esc_attr( $css_class ) . '__label">' . esc_html__( '初回費用', 'kantanbond' ) . '</span>'
+			. $items
+			. '</div>';
 	}
 
 	/**
@@ -611,9 +856,11 @@ class KantanBond_Public_Products {
 	 * @param string $image_class 画像要素の CSS クラス。
 	 * @param string $wrap_class  ラップ要素の CSS クラス（空なら省略）。
 	 * @param string $extra_attrs img 要素の追加属性（例: width/height）。
+	 * @param bool   $show_status_overlay 受付停止オーバーレイを画像上に表示するか。
+	 * @param string $status_label        オーバーレイ文言。
 	 * @return string
 	 */
-	private function render_product_image_html( string $image_url, string $name, string $image_class, string $wrap_class = '', string $extra_attrs = '' ): string {
+	private function render_product_image_html( string $image_url, string $name, string $image_class, string $wrap_class = '', string $extra_attrs = '', bool $show_status_overlay = false, string $status_label = '' ): string {
 		$label = sprintf(
 			/* translators: %s: product name */
 			__( '%s の画像を拡大', 'kantanbond' ),
@@ -629,7 +876,27 @@ class KantanBond_Public_Products {
 			return $image_markup;
 		}
 
-		return '<div class="' . esc_attr( $wrap_class ) . '">' . $image_markup . '</div>';
+		$wrap_classes = trim( $wrap_class . ( $show_status_overlay ? ' kantanbond-public-product-item__image-wrap--pending' : '' ) );
+		$overlay      = $show_status_overlay ? $this->render_product_status_overlay_html( $status_label ) : '';
+
+		return '<div class="' . esc_attr( $wrap_classes ) . '">' . $image_markup . $overlay . '</div>';
+	}
+
+	/**
+	 * 画像上に重ねる受付停止オーバーレイ HTML。
+	 *
+	 * @param string $label 表示ラベル（保留中 / 完売御礼！ 等）。
+	 * @return string
+	 */
+	private function render_product_status_overlay_html( string $label ): string {
+		$label = trim( $label );
+		if ( $label === '' ) {
+			return '';
+		}
+
+		return '<span class="kantanbond-public-product-item__pending-overlay" aria-hidden="true">'
+			. '<span class="kantanbond-public-product-item__pending-overlay-badge">' . esc_html( $label ) . '</span>'
+			. '</span>';
 	}
 
 	/**
@@ -673,7 +940,12 @@ class KantanBond_Public_Products {
 	 * @return string
 	 */
 	private function item_attrs( array $payload, string $extra_class = '' ): string {
-		$classes  = trim( 'kantanbond-public-product-item ' . $extra_class );
+		$classes = trim( 'kantanbond-public-product-item ' . $extra_class );
+		if ( ! empty( $payload['is_sold_out'] ) ) {
+			$classes .= ' kantanbond-public-product-item--sold-out';
+		} elseif ( ! empty( $payload['is_pending'] ) ) {
+			$classes .= ' kantanbond-public-product-item--pending';
+		}
 		$category = isset( $payload['category'] ) ? (string) $payload['category'] : '';
 
 		return ' class="' . esc_attr( $classes ) . '"'
