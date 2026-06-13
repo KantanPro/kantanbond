@@ -128,10 +128,12 @@
 }
 
 .kantanbond-public-products-grid__item {
+	background: #fff;
 	border: 1px solid #e2e4e7;
 	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
 	overflow: hidden;
-	background: #fff;
 }
 
 .kantanbond-public-products-grid__image-wrap {
@@ -160,6 +162,7 @@
 }
 
 .kantanbond-public-products-grid__body {
+	flex: 1 1 auto;
 	padding: 8px 14px 4px;
 }
 
@@ -333,6 +336,8 @@
 	border: 1px solid #e2e4e7;
 	border-radius: 12px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	display: flex;
+	flex-direction: column;
 	overflow: hidden;
 }
 
@@ -352,6 +357,7 @@
 }
 
 .kantanbond-public-products-card__body {
+	flex: 1 1 auto;
 	padding: 16px 18px 18px;
 }
 
@@ -591,30 +597,73 @@
 	z-index: 3;
 }
 
-/* クリック可能な商品 */
+/* 商品ブロック・問い合わすボタン */
 .kantanbond-public-product-item {
-	cursor: pointer;
-	transition: box-shadow 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
-}
-
-.kantanbond-public-product-item:hover,
-.kantanbond-public-product-item:focus {
-	outline: 2px solid #6366f1;
-	outline-offset: 2px;
+	transition: box-shadow 0.15s ease;
 }
 
 .kantanbond-public-product-item.is-active {
 	box-shadow: 0 0 0 2px #6366f1;
 }
 
-.kantanbond-public-products-table .kantanbond-public-product-item:hover {
-	background: #f8fafc;
+.kantanbond-public-product-item__footer {
+	flex-shrink: 0;
+	margin-top: auto;
+	padding: 8px 14px 12px;
 }
 
-.kantanbond-public-products-table .kantanbond-public-product-item:hover,
-.kantanbond-public-products-table .kantanbond-public-product-item:focus {
-	box-shadow: inset 0 0 0 2px #6366f1;
-	outline: none;
+.kantanbond-public-products-card .kantanbond-public-product-item__footer {
+	padding: 0 18px 18px;
+}
+
+.kantanbond-public-product-item__inquire-wrap--table {
+	padding: 0;
+}
+
+.kantanbond-public-product-item__inquire-btn {
+	background: #6366f1;
+	border: 0;
+	border-radius: 6px;
+	color: #fff;
+	cursor: pointer;
+	display: block;
+	font: inherit;
+	font-size: 0.9rem;
+	font-weight: 600;
+	min-height: 2.75rem;
+	padding: 0.65rem 1rem;
+	text-align: center;
+	width: 100%;
+}
+
+.kantanbond-public-products-table .kantanbond-public-product-item__inquire-btn {
+	display: inline-block;
+	min-width: 6.5rem;
+	width: auto;
+}
+
+.kantanbond-public-product-item__inquire-btn:hover,
+.kantanbond-public-product-item__inquire-btn:focus-visible {
+	background: #4f46e5;
+	outline: 2px solid #6366f1;
+	outline-offset: 2px;
+}
+
+.kantanbond-public-product-item__inquire-btn:disabled {
+	background: #e2e4e7;
+	color: #646970;
+	cursor: not-allowed;
+	opacity: 1;
+}
+
+.kantanbond-public-products-table__inquire {
+	text-align: center;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.kantanbond-public-products-card.kantanbond-public-product-item.is-active {
+	box-shadow: 0 0 0 2px #6366f1, 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* 詳細・お申し込み（モーダル） */

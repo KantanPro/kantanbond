@@ -457,7 +457,8 @@
 				'kantanbond-public-product-order-form__message kantanbond-public-product-order-form__message--' + (type || 'info');
 		}
 
-		function openDetail(el) {
+		function openDetail(el, options) {
+			options = options || {};
 			var product = parseProduct(el);
 			if (!product || !product.id) {
 				return;
@@ -491,6 +492,17 @@
 			document.addEventListener('keydown', onEscapeKey);
 
 			window.requestAnimationFrame(function () {
+				if (options.focusForm && form && !form.hidden) {
+					if (dialogBody) {
+						dialogBody.scrollTop = Math.max(0, form.offsetTop - 16);
+					}
+					var firstField = qs(form, 'input[name="contact_name"]');
+					if (firstField) {
+						firstField.focus();
+						return;
+					}
+				}
+
 				if (closeBtn) {
 					closeBtn.focus();
 				}
@@ -514,15 +526,21 @@
 			}
 		}
 
-		qsa(wrapper, '.kantanbond-public-product-item').forEach(function (item) {
-			item.addEventListener('click', function () {
-				openDetail(item);
-			});
-			item.addEventListener('keydown', function (event) {
-				if (event.key === 'Enter' || event.key === ' ') {
-					event.preventDefault();
-					openDetail(item);
+		qsa(wrapper, '.kantanbond-public-product-item__inquire-btn').forEach(function (btn) {
+			btn.addEventListener('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+
+				if (btn.disabled) {
+					return;
 				}
+
+				var item = btn.closest('.kantanbond-public-product-item');
+				if (!item) {
+					return;
+				}
+
+				openDetail(item, { focusForm: true });
 			});
 		});
 

@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,14 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.3 =
+* [kantanbond_public_products] 各商品ブロック下部に「問い合わす」ボタンを追加
+* ボタンクリックでお問い合わせモーダルを開き、フォームまでスクロールして入力欄にフォーカス
+* グリッド・カード・テーブルレイアウトすべてに対応
+* 受付停止・完売・保留中商品はボタンを無効化してステータスを表示
+* ブロック全体クリックでのモーダル表示を廃止し、問い合わせ操作を明確化
+* 計3ファイル・134行増・25行減（v1.3.2…HEAD）
 
 = 1.3.2 =
 * [kantanbond_public_products] 定期契約タイプのモーダルで閉じる（×）ボタンが画面上部に隠れる問題を修正

@@ -297,6 +297,7 @@ class KantanBond_Public_Products {
 					'soldOutBadge'      => __( '完売御礼！', 'kantanbond' ),
 					'pendingNotice'     => __( '現在お問い合わせを受け付けておりません。', 'kantanbond' ),
 					'soldOutNotice'     => __( 'こちらの商品は完売しました。', 'kantanbond' ),
+					'inquire'           => __( '問い合わす', 'kantanbond' ),
 					'sessionExpired'    => __( 'セッションの有効期限が切れました。ページを再読み込みして再度お試しください。', 'kantanbond' ),
 				),
 			)
@@ -350,6 +351,8 @@ class KantanBond_Public_Products {
 				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-grid__initial-fees' )
 				: '';
 
+			$inquire_html = $this->render_inquiry_button_html( $row );
+
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-grid__item' ) . '>'
 				. $image_html
 				. '<div class="kantanbond-public-products-grid__body">'
@@ -358,7 +361,9 @@ class KantanBond_Public_Products {
 				. $price_block
 				. $initial_fees_html
 				. $memo_html
-				. '</div></article>';
+				. '</div>'
+				. $inquire_html
+				. '</article>';
 		}
 
 		return '<div class="kantanbond-public-products-grid kantanbond-public-products-grid--cols-' . esc_attr( (string) $columns ) . '">' . $items . '</div>';
@@ -411,6 +416,8 @@ class KantanBond_Public_Products {
 				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-card__initial-fees' )
 				: '';
 
+			$inquire_html = $this->render_inquiry_button_html( $row );
+
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-card' ) . '>'
 				. $image_html
 				. '<div class="kantanbond-public-products-card__body">'
@@ -419,7 +426,9 @@ class KantanBond_Public_Products {
 				. $price_block
 				. $initial_fees_html
 				. $memo_html
-				. '</div></article>';
+				. '</div>'
+				. $inquire_html
+				. '</article>';
 		}
 
 		return '<div class="kantanbond-public-products-cards kantanbond-public-products-cards--cols-' . esc_attr( (string) $columns ) . '">' . $items . '</div>';
@@ -456,6 +465,7 @@ class KantanBond_Public_Products {
 		if ( $display['initial_fees'] ) {
 			$headers[] = '<th scope="col">' . esc_html__( '初回費用', 'kantanbond' ) . '</th>';
 		}
+		$headers[] = '<th scope="col">' . esc_html__( 'お問い合わせ', 'kantanbond' ) . '</th>';
 
 		foreach ( $products as $product ) {
 			$row     = $this->format_product_row( $product );
@@ -500,6 +510,8 @@ class KantanBond_Public_Products {
 			if ( $display['initial_fees'] ) {
 				$cells[] = '<td class="kantanbond-public-products-table__initial-fees">' . esc_html( $row['initial_fees_summary'] ) . '</td>';
 			}
+
+			$cells[] = '<td class="kantanbond-public-products-table__inquire">' . $this->render_inquiry_button_html( $row, true ) . '</td>';
 
 			$rows .= '<tr' . $this->item_attrs( $payload ) . '>' . implode( '', $cells ) . '</tr>';
 		}
@@ -953,6 +965,37 @@ class KantanBond_Public_Products {
 	}
 
 	/**
+	 * 一覧ブロック下部の「問い合わす」ボタン HTML。
+	 *
+	 * @param array<string, mixed> $row        整形済み商品行。
+	 * @param bool                 $table_cell テーブルセル内表示（フッター余白なし）。
+	 * @return string
+	 */
+	private function render_inquiry_button_html( array $row, bool $table_cell = false ): string {
+		$acceptance_open = ! empty( $row['acceptance_open'] ) && empty( $row['is_pending'] ) && empty( $row['is_sold_out'] );
+		$wrapper_class   = $table_cell
+			? 'kantanbond-public-product-item__inquire-wrap kantanbond-public-product-item__inquire-wrap--table'
+			: 'kantanbond-public-product-item__footer';
+
+		if ( $acceptance_open ) {
+			return '<div class="' . esc_attr( $wrapper_class ) . '">'
+				. '<button type="button" class="kantanbond-public-product-item__inquire-btn">'
+				. esc_html__( '問い合わす', 'kantanbond' )
+				. '</button></div>';
+		}
+
+		$label = (string) ( $row['status_label'] ?? '' );
+		if ( $label === '' ) {
+			$label = __( '受付停止', 'kantanbond' );
+		}
+
+		return '<div class="' . esc_attr( $wrapper_class ) . '">'
+			. '<button type="button" class="kantanbond-public-product-item__inquire-btn" disabled>'
+			. esc_html( $label )
+			. '</button></div>';
+	}
+
+	/**
 	 * @param array<string, mixed> $payload 商品データ。
 	 * @param string               $extra_class 追加クラス。
 	 * @return string
@@ -967,7 +1010,6 @@ class KantanBond_Public_Products {
 		$category = isset( $payload['category'] ) ? (string) $payload['category'] : '';
 
 		return ' class="' . esc_attr( $classes ) . '"'
-			. ' role="button" tabindex="0"'
 			. ' data-category="' . esc_attr( $category ) . '"'
 			. ' data-product="' . esc_attr( wp_json_encode( $payload ) ) . '"';
 	}
