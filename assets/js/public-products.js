@@ -66,20 +66,25 @@
 		});
 	}
 
+	function mountOverlay(el) {
+		if (!el || el.parentNode === document.documentElement) {
+			return;
+		}
+		document.documentElement.appendChild(el);
+	}
+
 	function lockBodyScroll() {
 		openModalCount += 1;
 		if (openModalCount === 1) {
 			scrollLockPosition = window.pageYOffset || document.documentElement.scrollTop || 0;
-			document.body.classList.add('kantanbond-public-product-modal-open');
-			document.body.style.top = '-' + scrollLockPosition + 'px';
+			document.documentElement.classList.add('kantanbond-public-product-modal-open');
 		}
 	}
 
 	function unlockBodyScroll() {
 		openModalCount = Math.max(0, openModalCount - 1);
 		if (openModalCount === 0) {
-			document.body.classList.remove('kantanbond-public-product-modal-open');
-			document.body.style.top = '';
+			document.documentElement.classList.remove('kantanbond-public-product-modal-open');
 			window.scrollTo(0, scrollLockPosition);
 		}
 	}
@@ -246,8 +251,8 @@
 			return null;
 		}
 
-		if (imageLightbox.parentNode !== document.body) {
-			document.body.appendChild(imageLightbox);
+		if (imageLightbox.parentNode !== document.documentElement) {
+			mountOverlay(imageLightbox);
 		}
 
 		var backdrop = qs(imageLightbox, '.kantanbond-public-product-image-lightbox__backdrop');
@@ -401,8 +406,8 @@
 			return;
 		}
 
-		if (detail.parentNode !== document.body) {
-			document.body.appendChild(detail);
+		if (detail.parentNode !== document.documentElement) {
+			mountOverlay(detail);
 		}
 
 		var content = qs(detail, '.kantanbond-public-product-detail__content');
@@ -411,6 +416,7 @@
 		var formCloseBtn = qs(form, '.kantanbond-public-product-order-form__close');
 		var backdrop = qs(detail, '.kantanbond-public-product-detail__backdrop');
 		var dialog = qs(detail, '.kantanbond-public-product-detail__panel');
+		var dialogFrame = qs(detail, '.kantanbond-public-product-detail__frame');
 		var dialogBody = qs(detail, '.kantanbond-public-product-detail__body');
 		var messageBox = qs(form, '.kantanbond-public-product-order-form__message');
 		var submitBtn = qs(form, '.kantanbond-public-product-order-form__submit');
@@ -534,6 +540,12 @@
 
 		if (dialog) {
 			dialog.addEventListener('click', function (event) {
+				event.stopPropagation();
+			});
+		}
+
+		if (dialogFrame) {
+			dialogFrame.addEventListener('click', function (event) {
 				event.stopPropagation();
 			});
 		}

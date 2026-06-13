@@ -547,11 +547,14 @@ class KantanBond_Public_Products {
 		?>
 		<div class="kantanbond-public-product-detail" id="kantanbond-public-product-detail" hidden>
 			<button type="button" class="kantanbond-public-product-detail__backdrop" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>"></button>
-			<button type="button" class="kantanbond-public-product-detail__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">
-				<span class="kantanbond-public-product-detail__close-icon" aria-hidden="true">&times;</span>
-				<span class="kantanbond-public-product-detail__close-text"><?php echo esc_html__( '閉じる', 'kantanbond' ); ?></span>
-			</button>
-			<div class="kantanbond-public-product-detail__panel" role="dialog" aria-modal="true" aria-labelledby="kantanbond-public-product-detail-title">
+			<div class="kantanbond-public-product-detail__frame">
+				<div class="kantanbond-public-product-detail__toolbar">
+					<button type="button" class="kantanbond-public-product-detail__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">
+						<span class="kantanbond-public-product-detail__close-icon" aria-hidden="true">&times;</span>
+						<span class="kantanbond-public-product-detail__close-text"><?php echo esc_html__( '閉じる', 'kantanbond' ); ?></span>
+					</button>
+				</div>
+				<div class="kantanbond-public-product-detail__panel" role="dialog" aria-modal="true" aria-labelledby="kantanbond-public-product-detail-title">
 				<div class="kantanbond-public-product-detail__header">
 					<span class="kantanbond-public-product-detail__header-title"><?php echo esc_html__( '商品詳細', 'kantanbond' ); ?></span>
 				</div>
@@ -595,6 +598,7 @@ class KantanBond_Public_Products {
 					<div class="kantanbond-public-product-order-form__message" role="status" aria-live="polite" hidden></div>
 				</form>
 				</div>
+			</div>
 			</div>
 		</div>
 		<?php
@@ -921,11 +925,13 @@ class KantanBond_Public_Products {
 		?>
 		<div class="kantanbond-public-product-image-lightbox" id="kantanbond-public-product-image-lightbox" hidden>
 			<button type="button" class="kantanbond-public-product-image-lightbox__backdrop" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>"></button>
+			<div class="kantanbond-public-product-image-lightbox__toolbar">
+				<button type="button" class="kantanbond-public-product-image-lightbox__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
+			</div>
 			<figure class="kantanbond-public-product-image-lightbox__figure">
 				<img class="kantanbond-public-product-image-lightbox__image" alt="" decoding="async" />
 				<figcaption class="kantanbond-public-product-image-lightbox__caption"></figcaption>
 			</figure>
-			<button type="button" class="kantanbond-public-product-image-lightbox__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
 		</div>
 		<?php
 		return (string) ob_get_clean();

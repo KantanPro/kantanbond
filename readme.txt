@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,14 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.2 =
+* [kantanbond_public_products] 定期契約タイプのモーダルで閉じる（×）ボタンが画面上部に隠れる問題を修正
+* 閉じるボタンをパネル上部の専用ツールバーへ移動（position: fixed を廃止）
+* モーダルをツールバー＋スクロールパネルの縦 flex レイアウトに変更
+* iOS 向けスクロールロックを html の overflow 制御に変更し、モーダルを documentElement 直下にマウント
+* 画像ライトボックスも同様のツールバー構成に統一
+* 計3ファイル・91行増・66行減（v1.3.1…HEAD）
 
 = 1.3.1 =
 * [kantanbond_public_products] 閉じる（×）ボタンが画面上部に隠れる問題を修正
