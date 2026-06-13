@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.2.9 =
+* [kantanbond_public_products] の `category` 属性で複数カテゴリーをカンマ区切り指定可能に（例: `category="サポート,WEB制作"`）
+* 複数カテゴリー指定時は KantanBiz API へ OR 条件で問い合わせ
+* `category` 指定時、絞り込み UI のサジェストを指定カテゴリーのみに限定
+* ショートコード設定画面の属性説明・記述例を更新
+* 計3ファイル・約80行増・10行減（v1.2.8…HEAD）
 
 = 1.2.8 =
 * 機能変更なし（v1.2.7 以降のコード変更なし）
