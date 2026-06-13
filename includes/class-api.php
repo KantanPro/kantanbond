@@ -341,13 +341,28 @@ class KantanBond_API {
 	/**
 	 * 公開商品一覧を取得する。
 	 *
-	 * @param string $category カテゴリ絞り込み（任意）。
+	 * @param string|array<int, string> $category カテゴリ絞り込み（任意。配列またはカンマ区切り文字列）。
 	 * @return array{products: array<int, array<string, mixed>>, categories: array<int, string>}|WP_Error
 	 */
-	public function get_public_products( string $category = '' ) {
+	public function get_public_products( $category = '' ) {
 		$query = array();
-		if ( $category !== '' ) {
-			$query['category'] = $category;
+		if ( is_array( $category ) ) {
+			$categories = array();
+			foreach ( $category as $item ) {
+				$item = sanitize_text_field( (string) $item );
+				if ( $item !== '' ) {
+					$categories[] = $item;
+				}
+			}
+			$categories = array_values( array_unique( $categories ) );
+		} else {
+			$categories = $this->parse_categories( (string) $category );
+		}
+
+		if ( $categories !== array() ) {
+			$query['category'] = count( $categories ) === 1
+				? $categories[0]
+				: implode( ',', $categories );
 		}
 
 		$response = $this->inbound_request( 'GET', '/api/v1/inbound/public-products', array(), $query );
@@ -530,5 +545,32 @@ class KantanBond_API {
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * category クエリ（カンマ区切り可）を配列に変換する。
+	 *
+	 * @param string $category_attr カテゴリー文字列。
+	 * @return array<int, string>
+	 */
+	private function parse_categories( string $category_attr ): array {
+		if ( $category_attr === '' ) {
+			return array();
+		}
+
+		$parts = preg_split( '/\s*,\s*/', $category_attr );
+		if ( ! is_array( $parts ) ) {
+			return array();
+		}
+
+		$categories = array();
+		foreach ( $parts as $part ) {
+			$category = sanitize_text_field( $part );
+			if ( $category !== '' ) {
+				$categories[] = $category;
+			}
+		}
+
+		return array_values( array_unique( $categories ) );
 	}
 }

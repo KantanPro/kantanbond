@@ -81,7 +81,8 @@ class KantanBond_Public_Products {
 			'kantanbond_public_products'
 		);
 
-		$result = $this->api->get_public_products( sanitize_text_field( $atts['category'] ) );
+		$selected_categories = $this->parse_categories( $atts['category'] );
+		$result              = $this->api->get_public_products( $selected_categories );
 
 		if ( is_wp_error( $result ) ) {
 			return '<p class="kantanbond-public-products kantanbond-public-products--empty" role="alert">'
@@ -89,8 +90,8 @@ class KantanBond_Public_Products {
 				. '</p>';
 		}
 
-		$products   = $result['products'];
-		$categories = $result['categories'];
+		$products        = $result['products'];
+		$all_categories  = $result['categories'];
 		$ids        = $this->parse_ids( $atts['ids'] );
 
 		if ( $ids !== array() ) {
@@ -143,9 +144,11 @@ class KantanBond_Public_Products {
 			$inner = $this->render_grid( $products, $display, $columns );
 		}
 
-		$show_filter = $this->is_flag_enabled( $atts['show_filter'] );
-		$filter_html = ( $show_filter && $categories !== array() )
-			? $this->render_category_filter( $categories, sanitize_text_field( $atts['category'] ) )
+		$show_filter       = $this->is_flag_enabled( $atts['show_filter'] );
+		$filter_categories = $selected_categories !== array() ? $selected_categories : $all_categories;
+		$filter_initial    = count( $selected_categories ) === 1 ? $selected_categories[0] : '';
+		$filter_html       = ( $show_filter && $filter_categories !== array() )
+			? $this->render_category_filter( $filter_categories, $filter_initial )
 			: '';
 
 		$this->enqueue_assets();
@@ -962,6 +965,33 @@ class KantanBond_Public_Products {
 		$value = strtolower( trim( $value ) );
 
 		return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
+	}
+
+	/**
+	 * category 属性（カンマ区切り可）を配列に変換する。
+	 *
+	 * @param string $category_attr カテゴリー属性。
+	 * @return array<int, string>
+	 */
+	private function parse_categories( string $category_attr ): array {
+		if ( $category_attr === '' ) {
+			return array();
+		}
+
+		$parts = preg_split( '/\s*,\s*/', $category_attr );
+		if ( ! is_array( $parts ) ) {
+			return array();
+		}
+
+		$categories = array();
+		foreach ( $parts as $part ) {
+			$category = sanitize_text_field( $part );
+			if ( $category !== '' ) {
+				$categories[] = $category;
+			}
+		}
+
+		return array_values( array_unique( $categories ) );
 	}
 
 	/**

@@ -517,7 +517,7 @@ class KantanBond_Admin {
 					<tr>
 						<td><code>category</code></td>
 						<td><?php echo esc_html__( '（空）', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( 'カテゴリで絞り込み（サーバー側）。絞り込み UI 表示時は初期値にも使用', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'カテゴリで絞り込み（サーバー側）。複数指定時はカンマ区切り（例: サポート,WEB制作）。絞り込み UI 表示時は単一指定のみ初期値に使用', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>show_filter</code></td>
@@ -559,6 +559,7 @@ class KantanBond_Admin {
 				<li><code>[kantanbond_public_products layout="table"]</code></li>
 				<li><code>[kantanbond_public_products layout="cards" columns="2" show_tax="yes"]</code></li>
 				<li><code>[kantanbond_public_products category="Web制作" ids="2,5,8"]</code></li>
+				<li><code>[kantanbond_public_products category="サポート,WEB制作"]</code></li>
 				<li><code>[kantanbond_public_products limit="6" order_by="frequency" order="DESC"]</code></li>
 				<li><code>[kantanbond_public_products show_filter="no" show_image="yes" show_category="no"]</code></li>
 				<li><code>[kantanbond_public_products layout="cards" columns="4" category="一般" show_price="yes" show_unit="no"]</code></li>
