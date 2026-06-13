@@ -403,8 +403,10 @@
 		var content = qs(detail, '.kantanbond-public-product-detail__content');
 		var form = qs(detail, '.kantanbond-public-product-order-form');
 		var closeBtn = qs(detail, '.kantanbond-public-product-detail__close');
+		var formCloseBtn = qs(form, '.kantanbond-public-product-order-form__close');
 		var backdrop = qs(detail, '.kantanbond-public-product-detail__backdrop');
 		var dialog = qs(detail, '.kantanbond-public-product-detail__panel');
+		var dialogBody = qs(detail, '.kantanbond-public-product-detail__body');
 		var messageBox = qs(form, '.kantanbond-public-product-order-form__message');
 		var submitBtn = qs(form, '.kantanbond-public-product-order-form__submit');
 		var serviceIdInput = qs(form, 'input[name="service_id"]');
@@ -517,12 +519,22 @@
 			closeBtn.addEventListener('click', closeDetail);
 		}
 
+		if (formCloseBtn) {
+			formCloseBtn.addEventListener('click', closeDetail);
+		}
+
 		if (backdrop) {
 			backdrop.addEventListener('click', closeDetail);
 		}
 
 		if (dialog) {
 			dialog.addEventListener('click', function (event) {
+				event.stopPropagation();
+			});
+		}
+
+		if (dialogBody) {
+			dialogBody.addEventListener('click', function (event) {
 				event.stopPropagation();
 			});
 		}

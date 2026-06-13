@@ -548,7 +548,14 @@ class KantanBond_Public_Products {
 		<div class="kantanbond-public-product-detail" id="kantanbond-public-product-detail" hidden>
 			<button type="button" class="kantanbond-public-product-detail__backdrop" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>"></button>
 			<div class="kantanbond-public-product-detail__panel" role="dialog" aria-modal="true" aria-labelledby="kantanbond-public-product-detail-title">
-				<button type="button" class="kantanbond-public-product-detail__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
+				<div class="kantanbond-public-product-detail__header">
+					<span class="kantanbond-public-product-detail__header-title"><?php echo esc_html__( '商品詳細', 'kantanbond' ); ?></span>
+					<button type="button" class="kantanbond-public-product-detail__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">
+						<span class="kantanbond-public-product-detail__close-icon" aria-hidden="true">&times;</span>
+						<span class="kantanbond-public-product-detail__close-text"><?php echo esc_html__( '閉じる', 'kantanbond' ); ?></span>
+					</button>
+				</div>
+				<div class="kantanbond-public-product-detail__body">
 				<div class="kantanbond-public-product-detail__content"></div>
 				<form class="kantanbond-public-product-order-form" novalidate>
 					<h4 class="kantanbond-public-product-order-form__title" id="kantanbond-public-product-detail-title"><?php echo esc_html__( 'お問い合わせ', 'kantanbond' ); ?></h4>
@@ -583,9 +590,11 @@ class KantanBond_Public_Products {
 					</p>
 					<p class="kantanbond-public-product-order-form__actions">
 						<button type="submit" class="kantanbond-public-product-order-form__submit"><?php echo esc_html__( '送信する', 'kantanbond' ); ?></button>
+						<button type="button" class="kantanbond-public-product-order-form__close"><?php echo esc_html__( '閉じる', 'kantanbond' ); ?></button>
 					</p>
 					<div class="kantanbond-public-product-order-form__message" role="status" aria-live="polite" hidden></div>
 				</form>
+				</div>
 			</div>
 		</div>
 		<?php

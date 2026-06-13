@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.0 =
+* [kantanbond_public_products] モバイルでお問い合わせモーダルを閉じられない問題を修正（一部端末で閉じるボタンが画面外に出る不具合）
+* モーダルに固定ヘッダー（商品詳細＋閉じる）を追加し、スクロール中も閉じる操作を常時表示
+* モバイル向けに閉じるボタンのタップ領域拡大、フォーム下部の「閉じる」ボタン追加、safe-area 対応
+* 画像ライトボックスとカテゴリ絞り込み UI のモバイル表示を改善
+* 計4ファイル・約170行増・20行減（v1.2.9…HEAD）
 
 = 1.2.9 =
 * [kantanbond_public_products] の `category` 属性で複数カテゴリーをカンマ区切り指定可能に（例: `category="サポート,WEB制作"`）
