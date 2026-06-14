@@ -937,13 +937,15 @@ class KantanBond_Public_Products {
 		?>
 		<div class="kantanbond-public-product-image-lightbox" id="kantanbond-public-product-image-lightbox" hidden>
 			<button type="button" class="kantanbond-public-product-image-lightbox__backdrop" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>"></button>
-			<div class="kantanbond-public-product-image-lightbox__toolbar">
-				<button type="button" class="kantanbond-public-product-image-lightbox__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
+			<div class="kantanbond-public-product-image-lightbox__frame">
+				<div class="kantanbond-public-product-image-lightbox__toolbar">
+					<button type="button" class="kantanbond-public-product-image-lightbox__close" aria-label="<?php echo esc_attr__( '閉じる', 'kantanbond' ); ?>">&times;</button>
+				</div>
+				<figure class="kantanbond-public-product-image-lightbox__figure">
+					<img class="kantanbond-public-product-image-lightbox__image" alt="" decoding="async" />
+					<figcaption class="kantanbond-public-product-image-lightbox__caption"></figcaption>
+				</figure>
 			</div>
-			<figure class="kantanbond-public-product-image-lightbox__figure">
-				<img class="kantanbond-public-product-image-lightbox__image" alt="" decoding="async" />
-				<figcaption class="kantanbond-public-product-image-lightbox__caption"></figcaption>
-			</figure>
 		</div>
 		<?php
 		return (string) ob_get_clean();
