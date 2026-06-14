@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,12 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.4 =
+* [kantanbond_public_products] 画像拡大ライトボックスで拡大画像が画面左に寄る問題を修正
+* ライトボックスに中央配置用 frame ラッパーを追加し、画像を画面中央に表示
+* 画像の最大高さを 100dvh 基準に調整
+* 計2ファイル・26行増・10行減（v1.3.3…HEAD）
 
 = 1.3.3 =
 * [kantanbond_public_products] 各商品ブロック下部に「問い合わす」ボタンを追加
