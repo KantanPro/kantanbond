@@ -457,6 +457,26 @@
 				'kantanbond-public-product-order-form__message kantanbond-public-product-order-form__message--' + (type || 'info');
 		}
 
+		function syncQuantityField(product) {
+			if (!form) {
+				return;
+			}
+
+			var field = qs(form, '.kantanbond-public-product-order-form__field--quantity');
+			if (!field) {
+				return;
+			}
+
+			var fixed = product && product.quantity_fixed === true;
+			field.hidden = fixed;
+			field.classList.toggle('is-hidden', fixed);
+
+			var qty = qs(field, 'input[name="quantity"]');
+			if (qty) {
+				qty.value = '1';
+			}
+		}
+
 		function openDetail(el, options) {
 			options = options || {};
 			var product = parseProduct(el);
@@ -477,6 +497,7 @@
 				if (qty) {
 					qty.value = '1';
 				}
+				syncQuantityField(product);
 				form.hidden = !acceptanceOpen;
 			}
 

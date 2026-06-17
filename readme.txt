@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.4
+Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.6 =
+* [kantanbond_public_products] 数量固定時に数量欄がテーマ CSS で表示されたままになる問題を修正（display: none を明示）
+
+= 1.3.5 =
+* [kantanbond_public_products] KantanBiz の「公開フォームの数量」設定（1固定）に対応
+* 数量固定商品ではお問い合わせフォームの数量欄を非表示にし、送信数量を1に固定
 
 = 1.3.4 =
 * [kantanbond_public_products] 画像拡大ライトボックスで拡大画像が画面左に寄る問題を修正

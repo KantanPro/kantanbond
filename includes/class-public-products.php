@@ -591,7 +591,7 @@ class KantanBond_Public_Products {
 						<label for="kantanbond-pp-phone"><?php echo esc_html__( '電話番号', 'kantanbond' ); ?></label>
 						<input type="tel" id="kantanbond-pp-phone" name="phone" autocomplete="tel" />
 					</p>
-					<p class="kantanbond-public-product-order-form__field">
+					<p class="kantanbond-public-product-order-form__field kantanbond-public-product-order-form__field--quantity">
 						<label for="kantanbond-pp-quantity"><?php echo esc_html__( '数量', 'kantanbond' ); ?></label>
 						<input type="number" id="kantanbond-pp-quantity" name="quantity" min="1" step="1" value="1" />
 					</p>
@@ -665,6 +665,7 @@ class KantanBond_Public_Products {
 			'is_sold_out'   => $is_sold_out,
 			'is_pending'    => $is_pending,
 			'status_label'  => $status_label,
+			'quantity_fixed' => ! empty( $product['quantity_fixed'] ),
 		);
 	}
 

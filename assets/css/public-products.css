@@ -903,6 +903,11 @@ html.kantanbond-public-product-modal-open body {
 	margin: 0 0 0.85rem;
 }
 
+.kantanbond-public-product-order-form__field--quantity[hidden],
+.kantanbond-public-product-order-form__field--quantity.is-hidden {
+	display: none !important;
+}
+
 .kantanbond-public-product-order-form__field label {
 	display: block;
 	font-weight: 600;
