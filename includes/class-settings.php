@@ -21,6 +21,10 @@ class KantanBond_Settings {
 	public const OPTION_SECRET         = 'kantanbond_api_secret';
 	public const OPTION_INBOUND_TOKEN  = 'kantanbond_inbound_token';
 
+	public const OPTION_PUBLIC_PRODUCT_CARD_BG_COLOR = 'kantanbond_public_product_card_bg_color';
+
+	public const DEFAULT_PUBLIC_PRODUCT_CARD_BG_COLOR = '#e2e8f0';
+
 	/** @deprecated 1.0.1 の一時オプションキー（後方互換用） */
 	public const OPTION_TENANT_ID = 'kantanbond_tenant_id';
 
@@ -48,6 +52,9 @@ class KantanBond_Settings {
 		$api_token      = isset( $input['api_token'] ) ? sanitize_text_field( trim( $input['api_token'] ) ) : '';
 		$api_secret     = isset( $input['api_secret'] ) ? sanitize_text_field( trim( $input['api_secret'] ) ) : '';
 		$inbound_token  = isset( $input['inbound_token'] ) ? sanitize_text_field( trim( $input['inbound_token'] ) ) : '';
+		$card_bg_color  = isset( $input['public_product_card_bg_color'] )
+			? sanitize_hex_color( trim( (string) $input['public_product_card_bg_color'] ) )
+			: '';
 
 		if ( $base_url === '' ) {
 			$base_url = self::KANTANBIZ_APP_URL;
@@ -57,6 +64,12 @@ class KantanBond_Settings {
 		update_option( self::OPTION_API_TOKEN, $api_token );
 		update_option( self::OPTION_SECRET, $api_secret );
 		update_option( self::OPTION_INBOUND_TOKEN, $inbound_token );
+		update_option(
+			self::OPTION_PUBLIC_PRODUCT_CARD_BG_COLOR,
+			$card_bg_color !== '' && $card_bg_color !== false
+				? $card_bg_color
+				: self::DEFAULT_PUBLIC_PRODUCT_CARD_BG_COLOR
+		);
 
 		delete_option( self::OPTION_API_KEY );
 		delete_option( self::OPTION_TENANT_ID );
@@ -145,6 +158,25 @@ class KantanBond_Settings {
 	public function is_public_products_configured(): bool {
 		return $this->get_normalized_base_url() !== ''
 			&& $this->get_inbound_token() !== '';
+	}
+
+	/**
+	 * [kantanbond_public_products] のグリッド・カード型一覧の背景色（HEX）。
+	 *
+	 * @return string
+	 */
+	public function get_public_product_card_bg_color(): string {
+		$value = get_option( self::OPTION_PUBLIC_PRODUCT_CARD_BG_COLOR, self::DEFAULT_PUBLIC_PRODUCT_CARD_BG_COLOR );
+
+		if ( ! is_string( $value ) || $value === '' ) {
+			return self::DEFAULT_PUBLIC_PRODUCT_CARD_BG_COLOR;
+		}
+
+		$sanitized = sanitize_hex_color( $value );
+
+		return $sanitized !== '' && $sanitized !== false
+			? $sanitized
+			: self::DEFAULT_PUBLIC_PRODUCT_CARD_BG_COLOR;
 	}
 
 	/**

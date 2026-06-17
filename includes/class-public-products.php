@@ -26,15 +26,22 @@ class KantanBond_Public_Products {
 	private KantanBond_API $api;
 
 	/**
+	 * @var KantanBond_Settings
+	 */
+	private KantanBond_Settings $settings;
+
+	/**
 	 * @var bool
 	 */
 	private static bool $assets_enqueued = false;
 
 	/**
-	 * @param KantanBond_API $api API クライアント。
+	 * @param KantanBond_API      $api      API クライアント。
+	 * @param KantanBond_Settings $settings 設定。
 	 */
-	public function __construct( KantanBond_API $api ) {
-		$this->api = $api;
+	public function __construct( KantanBond_API $api, KantanBond_Settings $settings ) {
+		$this->api      = $api;
+		$this->settings = $settings;
 	}
 
 	/**
@@ -253,6 +260,12 @@ class KantanBond_Public_Products {
 			KANTANBOND_VERSION
 		);
 
+		$card_bg_color = $this->settings->get_public_product_card_bg_color();
+		if ( $card_bg_color !== '' ) {
+			$inline_css = '.kantanbond-public-products { --kantanbond-public-product-card-bg: ' . esc_attr( $card_bg_color ) . '; }';
+			wp_add_inline_style( 'kantanbond-public-products', $inline_css );
+		}
+
 		wp_enqueue_script(
 			'kantanbond-public-products',
 			KANTANBOND_PLUGIN_URL . 'assets/js/public-products.js',
@@ -351,6 +364,11 @@ class KantanBond_Public_Products {
 				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-grid__initial-fees' )
 				: '';
 
+			$public_html_block = $this->render_product_public_html_block(
+				(string) ( $row['public_html'] ?? '' ),
+				'kantanbond-public-products-grid__public-html'
+			);
+
 			$inquire_html = $this->render_inquiry_button_html( $row );
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-grid__item' ) . '>'
@@ -361,6 +379,7 @@ class KantanBond_Public_Products {
 				. $price_block
 				. $initial_fees_html
 				. $memo_html
+				. $public_html_block
 				. '</div>'
 				. $inquire_html
 				. '</article>';
@@ -416,6 +435,11 @@ class KantanBond_Public_Products {
 				? $this->render_product_list_initial_fees_html( $row, 'kantanbond-public-products-card__initial-fees' )
 				: '';
 
+			$public_html_block = $this->render_product_public_html_block(
+				(string) ( $row['public_html'] ?? '' ),
+				'kantanbond-public-products-card__public-html'
+			);
+
 			$inquire_html = $this->render_inquiry_button_html( $row );
 
 			$items .= '<article' . $this->item_attrs( $payload, 'kantanbond-public-products-card' ) . '>'
@@ -426,6 +450,7 @@ class KantanBond_Public_Products {
 				. $price_block
 				. $initial_fees_html
 				. $memo_html
+				. $public_html_block
 				. '</div>'
 				. $inquire_html
 				. '</article>';
@@ -666,6 +691,7 @@ class KantanBond_Public_Products {
 			'is_pending'    => $is_pending,
 			'status_label'  => $status_label,
 			'quantity_fixed' => ! empty( $product['quantity_fixed'] ),
+			'public_html'    => isset( $product['public_html'] ) ? trim( (string) $product['public_html'] ) : '',
 		);
 	}
 
@@ -965,6 +991,21 @@ class KantanBond_Public_Products {
 		}
 
 		return '<p class="' . esc_attr( $css_class ) . '">' . esc_html( $memo ) . '</p>';
+	}
+
+	/**
+	 * 公開用 HTML ブロック（API 側でサニタイズ済み）。
+	 *
+	 * @param string $public_html 表示用 HTML。
+	 * @param string $css_class   CSS クラス。
+	 * @return string
+	 */
+	private function render_product_public_html_block( string $public_html, string $css_class ): string {
+		if ( $public_html === '' ) {
+			return '';
+		}
+
+		return '<div class="' . esc_attr( $css_class ) . '">' . $public_html . '</div>';
 	}
 
 	/**

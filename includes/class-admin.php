@@ -158,6 +158,9 @@ class KantanBond_Admin {
 			'inbound_token' => isset( $_POST['kantanbond_inbound_token'] )
 				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_inbound_token'] ) )
 				: '',
+			'public_product_card_bg_color' => isset( $_POST['kantanbond_public_product_card_bg_color'] )
+				? sanitize_text_field( wp_unslash( (string) $_POST['kantanbond_public_product_card_bg_color'] ) )
+				: '',
 		);
 
 		$this->settings->save( $input );
@@ -285,6 +288,7 @@ class KantanBond_Admin {
 		$api_token        = $this->settings->get_api_token();
 		$api_secret       = $this->settings->get_api_secret();
 		$inbound_token    = $this->settings->get_inbound_token();
+		$card_bg_color    = $this->settings->get_public_product_card_bg_color();
 		$profile_url      = KantanBond_Settings::KANTANBIZ_PROFILE_URL;
 		$inbound_help_url = KantanBond_Settings::KANTANBIZ_CONTACT_FORM_INBOUND_URL;
 
@@ -427,6 +431,22 @@ class KantanBond_Admin {
 								/>
 								<p class="description">
 									<?php echo esc_html__( '[kantanbond_public_products] 用。問い合わせ受信（CF7）と同じトークンを使用できます。', 'kantanbond' ); ?>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label for="kantanbond_public_product_card_bg_color"><?php echo esc_html__( '公開商品カードの背景色', 'kantanbond' ); ?></label>
+							</th>
+							<td>
+								<input
+									type="color"
+									id="kantanbond_public_product_card_bg_color"
+									name="kantanbond_public_product_card_bg_color"
+									value="<?php echo esc_attr( $card_bg_color ); ?>"
+								/>
+								<p class="description">
+									<?php echo esc_html__( '[kantanbond_public_products] のグリッド型・カード型一覧で、各商品カードと画像エリアの背景色を設定します。', 'kantanbond' ); ?>
 								</p>
 							</td>
 						</tr>

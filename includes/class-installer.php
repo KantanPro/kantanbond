@@ -70,6 +70,8 @@ class KantanBond_Installer {
 		delete_option( 'kantanbond_api_secret' );
 		delete_option( 'kantanbond_tenant_id' );
 		delete_option( 'kantanbond_api_key' );
+		delete_option( KantanBond_Settings::OPTION_INBOUND_TOKEN );
+		delete_option( KantanBond_Settings::OPTION_PUBLIC_PRODUCT_CARD_BG_COLOR );
 		delete_option( 'kantanbond_version' );
 	}
 

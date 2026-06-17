@@ -234,6 +234,13 @@
 					'</div></div>'
 			);
 		}
+		if (product.public_html) {
+			parts.push(
+				'<div class="kantanbond-public-product-detail__public-html">' +
+					product.public_html +
+				'</div>'
+			);
+		}
 		parts.push('</div></div>');
 		return parts.join('');
 	}

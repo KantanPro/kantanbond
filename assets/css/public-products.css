@@ -127,22 +127,31 @@
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.kantanbond-public-products-grid__item {
-	background: #fff;
-	border: 1px solid #e2e4e7;
-	border-radius: 8px;
+.kantanbond-public-products-grid__item,
+.kantanbond-public-products-card {
+	background: var(--kantanbond-public-product-card-bg, #e2e8f0);
+	border: 1px solid #c8d2de;
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
 }
 
+.kantanbond-public-products-grid__item {
+	border-radius: 8px;
+}
+
+.kantanbond-public-products-grid__image-wrap,
+.kantanbond-public-products-card__image-wrap {
+	background: var(--kantanbond-public-product-card-bg, #e2e8f0);
+	position: relative;
+}
+
 .kantanbond-public-products-grid__image-wrap {
-	background: #f6f7f7;
-	display: flex;
 	align-items: center;
+	display: flex;
 	justify-content: center;
 	padding: 12px 8px 4px;
-	position: relative;
 }
 
 .kantanbond-public-products-grid__image-wrap .kantanbond-public-product-item__image-btn {
@@ -309,6 +318,25 @@
 	word-break: break-word;
 }
 
+.kantanbond-public-products-grid__public-html,
+.kantanbond-public-products-card__public-html {
+	margin: 8px 0 0;
+}
+
+.kantanbond-public-products-grid__public-html img,
+.kantanbond-public-products-card__public-html img,
+.kantanbond-public-product-detail__public-html img {
+	display: block;
+	height: auto;
+	max-width: 100%;
+}
+
+.kantanbond-public-products-grid__public-html a,
+.kantanbond-public-products-card__public-html a,
+.kantanbond-public-product-detail__public-html a {
+	display: inline-block;
+}
+
 /* カード */
 .kantanbond-public-products-cards {
 	display: grid;
@@ -332,19 +360,11 @@
 }
 
 .kantanbond-public-products-card {
-	background: #fff;
-	border: 1px solid #e2e4e7;
 	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
 }
 
 .kantanbond-public-products-card__image-wrap {
-	background: linear-gradient(135deg, #f8fafc, #eef2ff);
 	padding: 20px;
-	position: relative;
 	text-align: center;
 }
 
@@ -886,6 +906,10 @@ html.kantanbond-public-product-modal-open body {
 .kantanbond-public-product-detail__memo-body {
 	white-space: pre-wrap;
 	word-break: break-word;
+}
+
+.kantanbond-public-product-detail__public-html {
+	margin-top: 0.75rem;
 }
 
 .kantanbond-public-product-order-form {

@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.6
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.8 =
+* API設定に「公開商品カードの背景色」を追加（[kantanbond_public_products] のグリッド型・カード型一覧に反映）
+
+= 1.3.7 =
+* [kantanbond_public_products] KantanBiz の「公開用HTML」をグリッド・カード・詳細モーダルに表示
+* [kantanbond_public_products] カード背景色を KantanProEX に合わせて統一（#e2e8f0・画像エリア含む）
 
 = 1.3.6 =
 * [kantanbond_public_products] 数量固定時に数量欄がテーマ CSS で表示されたままになる問題を修正（display: none を明示）
