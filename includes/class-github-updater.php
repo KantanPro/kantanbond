@@ -132,6 +132,11 @@ class KantanBond_GitHub_Updater {
 		}
 
 		if ( version_compare( $current_version, $latest['version'], '<' ) ) {
+			$package = $this->resolve_update_package_url( $latest );
+			if ( $package === '' ) {
+				return $transient;
+			}
+
 			if ( ! isset( $transient->response ) ) {
 				$transient->response = array();
 			}
@@ -142,7 +147,7 @@ class KantanBond_GitHub_Updater {
 				'plugin'       => $this->plugin_basename,
 				'new_version'  => $latest['version'],
 				'url'          => 'https://github.com/' . $this->repo_owner . '/' . $this->repo_name,
-				'package'      => $latest['download_url'],
+				'package'      => $package,
 				'requires'     => $this->requires_wp,
 				'requires_php' => $this->requires_php,
 				'tested'       => $this->tested_wp,
@@ -226,13 +231,27 @@ class KantanBond_GitHub_Updater {
 	 * @return bool|string|\WP_Error
 	 */
 	public function upgrader_pre_download( $reply, string $package, $upgrader ) {
-		unset( $upgrader );
-
-		if ( strpos( $package, 'github.com' ) !== false ) {
-			add_filter( 'http_request_args', array( $this, 'github_download_args' ), 10, 2 );
+		if ( false !== $reply || $package === '' || ! $this->is_github_url( $package ) ) {
+			return $reply;
 		}
 
-		return $reply;
+		if ( ! $this->is_target_upgrader_package( $package, $upgrader ) ) {
+			return $reply;
+		}
+
+		$package = $this->normalize_package_url( $package );
+		if ( $package === '' ) {
+			return new WP_Error(
+				'download_failed',
+				'GitHub からのダウンロード URL を解決できませんでした。しばらく待ってから再度お試しください。'
+			);
+		}
+
+		add_filter( 'http_request_args', array( $this, 'github_download_args' ), 10, 2 );
+		$temp_file = download_url( $package, 300 );
+		remove_filter( 'http_request_args', array( $this, 'github_download_args' ), 10 );
+
+		return $temp_file;
 	}
 
 	/**
@@ -243,14 +262,24 @@ class KantanBond_GitHub_Updater {
 	 * @return array<string, mixed>
 	 */
 	public function github_download_args( array $args, string $url ): array {
-		if ( strpos( $url, 'github.com' ) !== false ) {
-			$args['timeout'] = 60;
-			$args['headers']['User-Agent'] = 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' );
+		if ( ! $this->is_github_url( $url ) ) {
+			return $args;
+		}
 
-			$token = $this->get_github_token();
-			if ( $token !== '' ) {
-				$args['headers']['Authorization'] = 'Bearer ' . $token;
-			}
+		$args['timeout'] = 60;
+		$args['headers'] = isset( $args['headers'] ) && is_array( $args['headers'] ) ? $args['headers'] : array();
+		$args['headers']['User-Agent'] = 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' );
+
+		// 公開アーカイブ URL には API トークンを送らない（403 / レート制限回避）
+		if ( strpos( $url, 'api.github.com' ) === false ) {
+			unset( $args['headers']['Authorization'] );
+			$args['headers']['Accept'] = '*/*';
+			return $args;
+		}
+
+		$token = $this->get_github_token();
+		if ( $token !== '' ) {
+			$args['headers']['Authorization'] = 'Bearer ' . $token;
 		}
 
 		return $args;
@@ -601,7 +630,8 @@ class KantanBond_GitHub_Updater {
 		}
 
 		$normalized_version = ltrim( (string) $data['tag_name'], 'v' );
-		$download_url       = isset( $data['zipball_url'] ) ? (string) $data['zipball_url'] : '';
+		$release_tag        = (string) $data['tag_name'];
+		$download_url       = $this->build_public_release_download_url( $release_tag );
 
 		if ( isset( $data['assets'] ) && is_array( $data['assets'] ) ) {
 			foreach ( $data['assets'] as $asset ) {
@@ -619,6 +649,8 @@ class KantanBond_GitHub_Updater {
 			}
 		}
 
+		$download_url = $this->normalize_package_url( $download_url );
+
 		$changelog = $this->get_changelog_for_version( $normalized_version );
 		if ( $changelog === '' && ! empty( $data['body'] ) ) {
 			$changelog = (string) $data['body'];
@@ -626,6 +658,7 @@ class KantanBond_GitHub_Updater {
 
 		$version_info = array(
 			'version'      => $normalized_version,
+			'release_tag'  => $release_tag,
 			'download_url' => $download_url,
 			'published_at' => isset( $data['published_at'] ) ? (string) $data['published_at'] : '',
 			'description'  => ! empty( $data['body'] ) ? (string) $data['body'] : '',
@@ -680,6 +713,153 @@ class KantanBond_GitHub_Updater {
 		}
 
 		return '';
+	}
+
+	/**
+	 * 更新用 package URL を解決する。
+	 *
+	 * @param array<string, mixed> $latest 最新版情報。
+	 * @return string
+	 */
+	private function resolve_update_package_url( array $latest ): string {
+		if ( ! empty( $latest['download_url'] ) ) {
+			$url = $this->normalize_package_url( (string) $latest['download_url'] );
+			if ( $url !== '' && strpos( $url, 'api.github.com' ) === false ) {
+				return $url;
+			}
+		}
+
+		if ( ! empty( $latest['release_tag'] ) ) {
+			return $this->build_public_release_download_url( (string) $latest['release_tag'] );
+		}
+
+		return '';
+	}
+
+	/**
+	 * GitHub 公開アーカイブ URL を生成する（zipball API URL 回避）。
+	 *
+	 * @param string $tag_name リリースタグ。
+	 * @return string
+	 */
+	private function build_public_release_download_url( string $tag_name ): string {
+		$tag_name = trim( $tag_name );
+		if ( $tag_name === '' ) {
+			return '';
+		}
+
+		return sprintf(
+			'https://github.com/%s/%s/archive/refs/tags/%s.zip',
+			$this->repo_owner,
+			$this->repo_name,
+			rawurlencode( $tag_name )
+		);
+	}
+
+	/**
+	 * zipball / API URL を公開ダウンロード URL に正規化する。
+	 *
+	 * @param string $package ダウンロード URL。
+	 * @return string
+	 */
+	private function normalize_package_url( string $package ): string {
+		$package = trim( $package );
+		if ( $package === '' ) {
+			return '';
+		}
+
+		if (
+			strpos( $package, '/archive/refs/tags/' ) !== false
+			|| strpos( $package, '/releases/download/' ) !== false
+		) {
+			return $package;
+		}
+
+		if ( preg_match( '#api\.github\.com/repos/[^/]+/[^/]+/zipball/([^/?#]+)#i', $package, $matches ) ) {
+			return $this->build_public_release_download_url( rawurldecode( $matches[1] ) );
+		}
+
+		if ( preg_match( '#github\.com/[^/]+/[^/]+/zipball/([^/?#]+)#i', $package, $matches ) ) {
+			return $this->build_public_release_download_url( rawurldecode( $matches[1] ) );
+		}
+
+		$cached = get_transient( $this->transient_key( 'latest_version' ) );
+		if ( is_array( $cached ) && ! empty( $cached['release_tag'] ) ) {
+			return $this->build_public_release_download_url( (string) $cached['release_tag'] );
+		}
+
+		return $package;
+	}
+
+	/**
+	 * GitHub 関連 URL かどうか。
+	 *
+	 * @param string $url URL。
+	 * @return bool
+	 */
+	private function is_github_url( string $url ): bool {
+		return strpos( $url, 'github.com' ) !== false
+			|| strpos( $url, 'githubusercontent.com' ) !== false
+			|| strpos( $url, 'codeload.github.com' ) !== false;
+	}
+
+	/**
+	 * 更新対象が自プラグインかどうか。
+	 *
+	 * @param string $package  パッケージ URL。
+	 * @param object $upgrader アップグレーダー。
+	 * @return bool
+	 */
+	private function is_target_upgrader_package( string $package, $upgrader ): bool {
+		$hook_extra = $this->get_upgrader_hook_extra( $upgrader );
+		if ( $this->is_target_plugin_update( $hook_extra ) ) {
+			return true;
+		}
+
+		$repo_path = $this->repo_owner . '/' . $this->repo_name;
+		return stripos( $package, $repo_path ) !== false;
+	}
+
+	/**
+	 * hook_extra が自プラグイン更新かどうか。
+	 *
+	 * @param array<string, mixed> $hook_extra フック情報。
+	 * @return bool
+	 */
+	private function is_target_plugin_update( array $hook_extra ): bool {
+		if ( ! empty( $hook_extra['plugin'] ) && $hook_extra['plugin'] === $this->plugin_basename ) {
+			return true;
+		}
+
+		if ( ! empty( $hook_extra['plugins'] ) && is_array( $hook_extra['plugins'] ) ) {
+			return in_array( $this->plugin_basename, $hook_extra['plugins'], true );
+		}
+
+		return false;
+	}
+
+	/**
+	 * アップグレーダーから hook_extra を取得する。
+	 *
+	 * @param object $upgrader アップグレーダー。
+	 * @return array<string, mixed>
+	 */
+	private function get_upgrader_hook_extra( $upgrader ): array {
+		$hook_extra = array();
+
+		if ( ! is_object( $upgrader ) || ! isset( $upgrader->skin ) || ! is_object( $upgrader->skin ) ) {
+			return $hook_extra;
+		}
+
+		if ( ! empty( $upgrader->skin->plugin ) ) {
+			$hook_extra['plugin'] = (string) $upgrader->skin->plugin;
+		}
+
+		if ( ! empty( $upgrader->skin->options['hook_extra'] ) && is_array( $upgrader->skin->options['hook_extra'] ) ) {
+			$hook_extra = array_merge( $hook_extra, $upgrader->skin->options['hook_extra'] );
+		}
+
+		return $hook_extra;
 	}
 
 	/**
