@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.0 =
+* [kantanbond_public_products] お問い合わせ・購入フォームの数量入力欄をコンパクト化（約4桁幅）
+* [kantanbond_public_products] 数量入力欄の横にサービス単位を表示
+* [kantanbond_public_products] 商品詳細モーダルの最大幅を 720px に調整し中央表示を改善
 
 = 1.3.9 =
 * [kantanbond_public_products] 完売・保留中商品のステータスが翻訳キー（services.availability.sold_out 等）のまま表示される問題を修正
