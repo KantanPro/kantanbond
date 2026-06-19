@@ -91,7 +91,18 @@
 
 	function getProductStatusLabel(product) {
 		if (product && product.status_label) {
-			return product.status_label;
+			var label = String(product.status_label);
+			if (label.indexOf('services.availability.sold_out') !== -1) {
+				return i18n.soldOutBadge || '完売御礼！';
+			}
+			if (label.indexOf('services.availability.pending') !== -1) {
+				return i18n.pendingBadge || '保留中';
+			}
+			if (label.indexOf('.') !== -1 && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(label)) {
+				// 未翻訳の i18n キー
+			} else {
+				return label;
+			}
 		}
 		if (product && product.is_sold_out) {
 			return i18n.soldOutBadge || '完売御礼！';

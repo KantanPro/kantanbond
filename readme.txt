@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.3.8
+Stable tag: 1.3.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.3.9 =
+* [kantanbond_public_products] 完売・保留中商品のステータスが翻訳キー（services.availability.sold_out 等）のまま表示される問題を修正
+* API の status_label が未翻訳キーの場合に「完売御礼！」「保留中」等の日本語へ変換（PHP・JS 両対応）
 
 = 1.3.8 =
 * API設定に「公開商品カードの背景色」を追加（[kantanbond_public_products] のグリッド型・カード型一覧に反映）

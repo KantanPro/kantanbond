@@ -669,6 +669,7 @@ class KantanBond_Public_Products {
 		$status_label       = isset( $product['status_label'] ) ? (string) $product['status_label'] : '';
 		$is_sold_out        = ! empty( $product['is_sold_out'] ) || $availability_state === 'sold_out';
 		$is_pending         = ! empty( $product['is_pending'] ) || $availability_state === 'pending';
+		$status_label       = $this->resolve_availability_label( $status_label, $availability_state, $is_sold_out, $is_pending );
 
 		return array(
 			'id'            => isset( $product['id'] ) ? (int) $product['id'] : 0,
@@ -1029,6 +1030,12 @@ class KantanBond_Public_Products {
 		}
 
 		$label = (string) ( $row['status_label'] ?? '' );
+		$label = $this->resolve_availability_label(
+			$label,
+			(string) ( $row['availability_state'] ?? '' ),
+			! empty( $row['is_sold_out'] ),
+			! empty( $row['is_pending'] )
+		);
 		if ( $label === '' ) {
 			$label = __( '受付停止', 'kantanbond' );
 		}
@@ -1066,6 +1073,47 @@ class KantanBond_Public_Products {
 		$value = strtolower( trim( $value ) );
 
 		return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
+	}
+
+	/**
+	 * API の status_label（翻訳キーのまま返る場合あり）を表示用日本語へ変換。
+	 *
+	 * @param string $label              API の status_label。
+	 * @param string $availability_state open / sold_out / pending。
+	 * @param bool   $is_sold_out        完売フラグ。
+	 * @param bool   $is_pending         保留フラグ。
+	 * @return string
+	 */
+	private function resolve_availability_label( string $label, string $availability_state, bool $is_sold_out, bool $is_pending ): string {
+		$label = trim( $label );
+
+		$key_map = array(
+			'services.availability.sold_out' => __( '完売御礼！', 'kantanbond' ),
+			'services.availability.pending'  => __( '保留中', 'kantanbond' ),
+		);
+
+		if ( $label !== '' && isset( $key_map[ $label ] ) ) {
+			return $key_map[ $label ];
+		}
+
+		// Laravel 翻訳キーがそのまま渡された場合（services.xxx.yyy 等）
+		if ( $label !== '' && str_contains( $label, '.' ) && ! preg_match( '/[\x{3040}-\x{30ff}\x{4e00}-\x{9faf}]/u', $label ) ) {
+			$label = '';
+		}
+
+		if ( $label !== '' ) {
+			return $label;
+		}
+
+		if ( $is_sold_out || $availability_state === 'sold_out' ) {
+			return __( '完売御礼！', 'kantanbond' );
+		}
+
+		if ( $is_pending || $availability_state === 'pending' ) {
+			return __( '保留中', 'kantanbond' );
+		}
+
+		return '';
 	}
 
 	/**
