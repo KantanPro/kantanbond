@@ -493,6 +493,18 @@
 			if (qty) {
 				qty.value = '1';
 			}
+
+			var unitEl = qs(field, '.kantanbond-public-product-order-form__quantity-unit');
+			if (unitEl) {
+				var unit = product && product.unit ? String(product.unit).trim() : '';
+				if (unit !== '') {
+					unitEl.textContent = unit;
+					unitEl.hidden = false;
+				} else {
+					unitEl.textContent = '';
+					unitEl.hidden = true;
+				}
+			}
 		}
 
 		function openDetail(el, options) {

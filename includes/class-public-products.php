@@ -618,7 +618,10 @@ class KantanBond_Public_Products {
 					</p>
 					<p class="kantanbond-public-product-order-form__field kantanbond-public-product-order-form__field--quantity">
 						<label for="kantanbond-pp-quantity"><?php echo esc_html__( '数量', 'kantanbond' ); ?></label>
-						<input type="number" id="kantanbond-pp-quantity" name="quantity" min="1" step="1" value="1" />
+						<span class="kantanbond-public-product-order-form__quantity-control">
+							<input type="number" id="kantanbond-pp-quantity" name="quantity" min="1" step="1" value="1" inputmode="numeric" />
+							<span class="kantanbond-public-product-order-form__quantity-unit" hidden></span>
+						</span>
 					</p>
 					<p class="kantanbond-public-product-order-form__field">
 						<label for="kantanbond-pp-message"><?php echo esc_html__( 'ご要望・備考', 'kantanbond' ); ?></label>

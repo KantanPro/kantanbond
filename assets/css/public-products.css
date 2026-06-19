@@ -706,7 +706,7 @@
 	--kantanbond-modal-pad-right: max(1rem, env(safe-area-inset-right, 0px));
 	--kantanbond-modal-pad-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 	--kantanbond-modal-pad-left: max(1rem, env(safe-area-inset-left, 0px));
-	align-items: stretch;
+	align-items: center;
 	display: flex;
 	flex-direction: column;
 	inset: 0;
@@ -745,14 +745,16 @@ html.kantanbond-public-product-modal-open body {
 }
 
 .kantanbond-public-product-detail__frame {
+	align-self: center;
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
 	margin: 0 auto;
 	max-height: 100%;
+	max-width: min(720px, calc(100vw - var(--kantanbond-modal-pad-left) - var(--kantanbond-modal-pad-right)));
 	min-height: 0;
 	position: relative;
-	width: min(1100px, calc(100vw - var(--kantanbond-modal-pad-left) - var(--kantanbond-modal-pad-right)));
+	width: 100%;
 	z-index: 1;
 }
 
@@ -936,6 +938,26 @@ html.kantanbond-public-product-modal-open body {
 	display: block;
 	font-weight: 600;
 	margin-bottom: 0.35rem;
+}
+
+.kantanbond-public-product-order-form__field--quantity .kantanbond-public-product-order-form__quantity-control {
+	align-items: center;
+	display: flex;
+	gap: 0.5rem;
+}
+
+.kantanbond-public-product-order-form__field--quantity input[type="number"] {
+	flex: 0 0 auto;
+	font-variant-numeric: tabular-nums;
+	max-width: 4.5em;
+	text-align: center;
+	width: 4.5em;
+}
+
+.kantanbond-public-product-order-form__field--quantity .kantanbond-public-product-order-form__quantity-unit {
+	color: #50575e;
+	flex: 0 0 auto;
+	font-weight: 500;
 }
 
 .kantanbond-public-product-order-form__field .required {
