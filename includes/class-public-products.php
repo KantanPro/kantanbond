@@ -139,8 +139,12 @@ class KantanBond_Public_Products {
 		}
 
 		$layout = sanitize_key( $atts['layout'] );
-		if ( $layout === 'grit' ) {
-			$layout = 'grid';
+		$layout_aliases = array(
+			'grit' => 'grid',
+			'curd' => 'cards',
+		);
+		if ( isset( $layout_aliases[ $layout ] ) ) {
+			$layout = $layout_aliases[ $layout ];
 		}
 		if ( ! in_array( $layout, array( 'grid', 'table', 'cards' ), true ) ) {
 			$layout = 'grid';

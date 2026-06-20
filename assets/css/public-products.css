@@ -32,11 +32,27 @@
 	width: 100%;
 }
 
-.kantanbond-public-products--align-left {
+.kantanbond-public-products.kantanbond-public-products--align-left {
 	margin-left: 0;
 	margin-right: 0;
 	max-width: 100%;
+	text-align: left;
 	width: 100%;
+}
+
+.aligncenter .kantanbond-public-products--align-left,
+.has-text-align-center .kantanbond-public-products--align-left,
+.wp-block-shortcode.aligncenter .kantanbond-public-products--align-left {
+	margin-left: 0;
+	margin-right: 0;
+	text-align: left;
+	width: 100%;
+}
+
+.kantanbond-public-products--align-left .kantanbond-public-products-grid,
+.kantanbond-public-products--align-left .kantanbond-public-products-cards,
+.kantanbond-public-products--align-left .kantanbond-public-products-filter {
+	justify-content: flex-start;
 }
 
 .kantanbond-public-products--empty {
