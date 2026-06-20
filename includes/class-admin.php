@@ -471,6 +471,9 @@ class KantanBond_Admin {
 			<p class="description">
 				<?php echo esc_html__( '固定ページや投稿の本文に以下のショートコードを設置して利用できます。', 'kantanbond' ); ?>
 			</p>
+			<p class="description">
+				<?php echo esc_html__( '共通属性 align: left（左寄せ・既定）/ center（中央寄せ）/ right（右寄せ）。日本語では 左寄せ・中央寄せ・右寄せ も指定できます。', 'kantanbond' ); ?>
+			</p>
 
 			<table class="widefat striped kantanbond-shortcodes-table">
 				<thead>
@@ -524,6 +527,11 @@ class KantanBond_Admin {
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td><code>align</code></td>
+						<td><code>left</code></td>
+						<td><?php echo esc_html__( 'ブロックの横寄せ: left / center / right（左寄せ・中央寄せ・右寄せ）', 'kantanbond' ); ?></td>
+					</tr>
 					<tr>
 						<td><code>layout</code></td>
 						<td><code>grid</code></td>
@@ -582,6 +590,8 @@ class KantanBond_Admin {
 				<li><code>[kantanbond_public_products category="サポート,WEB制作"]</code></li>
 				<li><code>[kantanbond_public_products limit="6" order_by="frequency" order="DESC"]</code></li>
 				<li><code>[kantanbond_public_products show_filter="no" show_image="yes" show_category="no"]</code></li>
+				<li><code>[kantanbond_public_products align="center" layout="cards" columns="2"]</code></li>
+				<li><code>[kantanbond_public_products align="右寄せ" layout="grid" columns="3"]</code></li>
 				<li><code>[kantanbond_public_products layout="cards" columns="4" category="一般" show_price="yes" show_unit="no"]</code></li>
 			</ul>
 
@@ -595,6 +605,11 @@ class KantanBond_Admin {
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td><code>align</code></td>
+						<td><code>left</code></td>
+						<td><?php echo esc_html__( 'ブロックの横寄せ: left / center / right（左寄せ・中央寄せ・右寄せ）', 'kantanbond' ); ?></td>
+					</tr>
 					<tr>
 						<td><code>type</code></td>
 						<td><code>sales</code></td>
@@ -619,6 +634,7 @@ class KantanBond_Admin {
 				<li><code>[kantanbond_reports type="sales" period="this_month"]</code></li>
 				<li><code>[kantanbond_reports type="client" period="this_year"]</code></li>
 				<li><code>[kantanbond_reports type="service" period="last_3_months"]</code></li>
+				<li><code>[kantanbond_reports align="center" type="sales" period="this_month"]</code></li>
 				<li><code>[kantanbond_reports type="tax_return" tax_year="<?php echo esc_attr( gmdate( 'Y' ) ); ?>"]</code></li>
 			</ul>
 		</div>

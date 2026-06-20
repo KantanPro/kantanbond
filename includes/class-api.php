@@ -342,7 +342,7 @@ class KantanBond_API {
 	 * 公開商品一覧を取得する。
 	 *
 	 * @param string|array<int, string> $category カテゴリ絞り込み（任意。配列またはカンマ区切り文字列）。
-	 * @return array{products: array<int, array<string, mixed>>, categories: array<int, string>}|WP_Error
+	 * @return array{products: array<int, array<string, mixed>>, categories: array<int, string>, stripe_available: bool}|WP_Error
 	 */
 	public function get_public_products( $category = '' ) {
 		$query = array();
@@ -374,6 +374,7 @@ class KantanBond_API {
 		$data = isset( $response['data'] ) && is_array( $response['data'] ) ? $response['data'] : array();
 		$products = isset( $data['products'] ) && is_array( $data['products'] ) ? $data['products'] : array();
 		$categories = isset( $data['categories'] ) && is_array( $data['categories'] ) ? $data['categories'] : array();
+		$stripe_available = ! empty( $data['stripe_available'] );
 
 		$normalized_products = array();
 		foreach ( $products as $row ) {
@@ -390,8 +391,9 @@ class KantanBond_API {
 		}
 
 		return array(
-			'products'   => $normalized_products,
-			'categories' => $normalized_categories,
+			'products'         => $normalized_products,
+			'categories'       => $normalized_categories,
+			'stripe_available' => $stripe_available,
 		);
 	}
 
@@ -403,6 +405,22 @@ class KantanBond_API {
 	 */
 	public function submit_public_product_order( array $payload ) {
 		$response = $this->inbound_request( 'POST', '/api/v1/inbound/public-product-orders', $payload );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $response;
+	}
+
+	/**
+	 * 公開商品の Stripe 即時購入を送信する。
+	 *
+	 * @param array<string, mixed> $payload フォームデータと URL。
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function submit_public_product_purchase( array $payload ) {
+		$response = $this->inbound_request( 'POST', '/api/v1/inbound/public-product-purchases', $payload );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

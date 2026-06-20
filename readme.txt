@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.4 =
+* [kantanbond_public_products] Stripe 即時購入（instant_purchase）に対応（購入ボタン・Stripe Checkout 遷移）
+* [kantanbond_public_purchase_thank_you] 決済完了・キャンセル用サンクスショートコードと固定ページの自動作成を追加
+* 全ショートコード共通の align 属性（left / center / right、日本語「左寄せ・中央寄せ・右寄せ」）を追加
+* [kantanbond_customers] / [kantanbond_projects] / [kantanbond_products] / [kantanbond_reports] に align 対応を拡張
+* 管理画面のショートコード説明に align 属性と記述例を追加
 
 = 1.4.3 =
 * [kantanbond_public_products] グリッド型・カード型一覧の商品画像をカード幅いっぱいに表示

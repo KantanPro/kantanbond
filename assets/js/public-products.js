@@ -7,6 +7,7 @@
 
 	var config = window.kantanbondPublicProducts;
 	var i18n = config.i18n || {};
+	var stripeAvailable = !!(config.stripeAvailable || config.stripePurchase);
 	var openModalCount = 0;
 	var scrollLockPosition = 0;
 
@@ -416,6 +417,14 @@
 		applyFilter();
 	}
 
+	function isProductAcceptanceOpen(product) {
+		return product && product.acceptance_open !== false && !product.is_pending && !product.is_sold_out;
+	}
+
+	function isInstantPurchaseProduct(product) {
+		return stripeAvailable && product && product.instant_purchase === true;
+	}
+
 	function initWrapper(wrapper) {
 		initCategoryFilter(wrapper);
 		initImageLightbox(wrapper);
@@ -440,6 +449,26 @@
 		var submitBtn = qs(form, '.kantanbond-public-product-order-form__submit');
 		var serviceIdInput = qs(form, 'input[name="service_id"]');
 		var lastActiveElement = null;
+		var activeProduct = null;
+
+		function applyFormLabels(product) {
+			if (!form) {
+				return;
+			}
+			var instantPurchase = isInstantPurchaseProduct(product);
+			var title = qs(form, '.kantanbond-public-product-order-form__title');
+			if (title) {
+				title.textContent = instantPurchase
+					? i18n.orderTitlePurchase || 'ご購入'
+					: i18n.orderTitle || 'お問い合わせ';
+			}
+			if (submitBtn) {
+				submitBtn.textContent = instantPurchase
+					? i18n.submitPurchase || '購入する'
+					: i18n.submitInquire || i18n.submit || '送信する';
+			}
+			form.classList.toggle('kantanbond-public-product-order-form--purchase', instantPurchase);
+		}
 
 		function onEscapeKey(event) {
 			if (event.key === 'Escape') {
@@ -514,7 +543,8 @@
 				return;
 			}
 
-			var acceptanceOpen = product.acceptance_open !== false && !product.is_pending;
+			var acceptanceOpen = isProductAcceptanceOpen(product);
+			activeProduct = product;
 			lastActiveElement = document.activeElement;
 
 			hideMessage();
@@ -529,6 +559,7 @@
 				}
 				syncQuantityField(product);
 				form.hidden = !acceptanceOpen;
+				applyFormLabels(product);
 			}
 
 			if (content) {
@@ -570,6 +601,7 @@
 			unlockBodyScroll();
 			setActiveItem(null);
 			hideMessage();
+			activeProduct = null;
 			document.removeEventListener('keydown', onEscapeKey);
 
 			if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
@@ -592,6 +624,26 @@
 				}
 
 				openDetail(item, { focusForm: true });
+			});
+		});
+
+		qsa(wrapper, '.kantanbond-public-product-item').forEach(function (item) {
+			item.addEventListener('click', function (event) {
+				if (event.target.closest('.kantanbond-public-product-item__inquire-btn')) {
+					return;
+				}
+				if (event.target.closest('.kantanbond-public-product-item__image-btn')) {
+					return;
+				}
+				var product = parseProduct(item);
+				if (!product || !product.id) {
+					return;
+				}
+				if (isInstantPurchaseProduct(product) && isProductAcceptanceOpen(product)) {
+					openDetail(item, { focusForm: true });
+					return;
+				}
+				openDetail(item);
 			});
 		});
 
@@ -635,13 +687,20 @@
 					return;
 				}
 
+				var instantPurchase = isInstantPurchaseProduct(activeProduct);
 				var formData = new FormData(form);
-				formData.append('action', 'kantanbond_public_product_submit');
+				formData.append(
+					'action',
+					instantPurchase ? 'kantanbond_public_product_purchase' : 'kantanbond_public_product_submit'
+				);
 				formData.append('nonce', config.nonce);
+				formData.append('return_url', window.location.href);
 
 				if (submitBtn) {
 					submitBtn.disabled = true;
-					submitBtn.textContent = i18n.submitting || '送信中…';
+					submitBtn.textContent = instantPurchase
+						? i18n.submittingPurchase || '決済準備中…'
+						: i18n.submitting || '送信中…';
 				}
 
 				fetch(config.ajaxUrl, {
@@ -652,6 +711,15 @@
 					.then(parseAjaxJsonResponse)
 					.then(function (json) {
 						if (json && json.success) {
+							if (instantPurchase) {
+								var checkoutUrl = json.data && json.data.checkout_url;
+								if (checkoutUrl) {
+									window.location.href = checkoutUrl;
+									return;
+								}
+								showMessage(i18n.networkError || '決済ページの取得に失敗しました', 'error');
+								return;
+							}
 							showMessage((json.data && json.data.message) || i18n.submit || '送信しました', 'success');
 							form.hidden = true;
 						} else {
@@ -668,7 +736,7 @@
 					.finally(function () {
 						if (submitBtn) {
 							submitBtn.disabled = false;
-							submitBtn.textContent = i18n.submit || '送信する';
+							applyFormLabels(activeProduct);
 						}
 					});
 			});

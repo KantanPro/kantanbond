@@ -94,15 +94,17 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_customers( array $atts = array() ): string {
+		$align = $this->parse_align_attribute( $atts, 'kantanbond_customers' );
 		$customers = $this->api->get_customers();
 
 		if ( is_wp_error( $customers ) ) {
-			return $this->render_error_message( $customers->get_error_message() );
+			return $this->render_error_message( $customers->get_error_message(), $align );
 		}
 
 		if ( empty( $customers ) ) {
 			return $this->wrap_output(
-				'<p class="kantanbond-empty">' . esc_html__( '顧客データがありません。', 'kantanbond' ) . '</p>'
+				'<p class="kantanbond-empty">' . esc_html__( '顧客データがありません。', 'kantanbond' ) . '</p>',
+				$align
 			);
 		}
 
@@ -148,7 +150,7 @@ class KantanBond_Shortcodes {
 			$rows
 		);
 
-		return $this->wrap_output( $table );
+		return $this->wrap_output( $table, $align );
 	}
 
 	/**
@@ -158,15 +160,17 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_projects( array $atts = array() ): string {
+		$align = $this->parse_align_attribute( $atts, 'kantanbond_projects' );
 		$projects = $this->api->get_projects();
 
 		if ( is_wp_error( $projects ) ) {
-			return $this->render_error_message( $projects->get_error_message() );
+			return $this->render_error_message( $projects->get_error_message(), $align );
 		}
 
 		if ( empty( $projects ) ) {
 			return $this->wrap_output(
-				'<p class="kantanbond-empty">' . esc_html__( '案件データがありません。', 'kantanbond' ) . '</p>'
+				'<p class="kantanbond-empty">' . esc_html__( '案件データがありません。', 'kantanbond' ) . '</p>',
+				$align
 			);
 		}
 
@@ -229,7 +233,7 @@ class KantanBond_Shortcodes {
 			$rows
 		);
 
-		return $this->wrap_output( $table );
+		return $this->wrap_output( $table, $align );
 	}
 
 	/**
@@ -239,15 +243,17 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_products( array $atts = array() ): string {
+		$align = $this->parse_align_attribute( $atts, 'kantanbond_products' );
 		$products = $this->api->get_products();
 
 		if ( is_wp_error( $products ) ) {
-			return $this->render_error_message( $products->get_error_message() );
+			return $this->render_error_message( $products->get_error_message(), $align );
 		}
 
 		if ( empty( $products ) ) {
 			return $this->wrap_output(
-				'<p class="kantanbond-empty">' . esc_html__( '商品データがありません。', 'kantanbond' ) . '</p>'
+				'<p class="kantanbond-empty">' . esc_html__( '商品データがありません。', 'kantanbond' ) . '</p>',
+				$align
 			);
 		}
 
@@ -323,7 +329,7 @@ class KantanBond_Shortcodes {
 			$rows
 		);
 
-		return $this->wrap_output( $table );
+		return $this->wrap_output( $table, $align );
 	}
 
 	/**
@@ -340,10 +346,13 @@ class KantanBond_Shortcodes {
 				'type'      => 'sales',
 				'period'    => 'all_time',
 				'tax_year'  => (string) gmdate( 'Y' ),
+				'align'     => 'left',
 			),
 			$atts,
 			'kantanbond_reports'
 		);
+
+		$align = KantanBond_Shortcode_Align::normalize( (string) $atts['align'] );
 
 		$type   = sanitize_key( $atts['type'] );
 		$period = sanitize_key( $atts['period'] );
@@ -354,7 +363,8 @@ class KantanBond_Shortcodes {
 					/* translators: %s: report type key */
 					__( 'レポート種別「%s」は無効です。', 'kantanbond' ),
 					$type
-				)
+				),
+				$align
 			);
 		}
 
@@ -364,7 +374,8 @@ class KantanBond_Shortcodes {
 					/* translators: %s: period key */
 					__( '集計期間「%s」は無効です。', 'kantanbond' ),
 					$period
-				)
+				),
+				$align
 			);
 		}
 
@@ -372,14 +383,14 @@ class KantanBond_Shortcodes {
 		if ( $type === 'tax_return' ) {
 			$tax_year = (int) $atts['tax_year'];
 			if ( $tax_year < 2020 || $tax_year > (int) gmdate( 'Y' ) + 1 ) {
-				return $this->render_error_message( __( 'tax_year の値が不正です。', 'kantanbond' ) );
+				return $this->render_error_message( __( 'tax_year の値が不正です。', 'kantanbond' ), $align );
 			}
 		}
 
 		$report = $this->api->get_report( $type, $period, $tax_year );
 
 		if ( is_wp_error( $report ) ) {
-			return $this->render_error_message( $report->get_error_message() );
+			return $this->render_error_message( $report->get_error_message(), $align );
 		}
 
 		$root_id = wp_unique_id( 'kantanbond-report-' );
@@ -413,7 +424,13 @@ class KantanBond_Shortcodes {
 			implode( '', $parts )
 		);
 
-		return '<div class="kantanbond-shortcode kantanbond-reports">' . $inner . '</div>';
+		$wrapper_class = KantanBond_Shortcode_Align::merge_classes(
+			'kantanbond-shortcode kantanbond-reports',
+			$align,
+			'kantanbond-shortcode'
+		);
+
+		return '<div class="' . esc_attr( $wrapper_class ) . '">' . $inner . '</div>';
 	}
 
 	/**
@@ -1017,9 +1034,10 @@ class KantanBond_Shortcodes {
 	 * @param string $message エラーメッセージ。
 	 * @return string
 	 */
-	private function render_error_message( string $message ): string {
+	private function render_error_message( string $message, string $align = 'left' ): string {
 		return $this->wrap_output(
-			'<p class="kantanbond-error" role="alert">' . esc_html( $message ) . '</p>'
+			'<p class="kantanbond-error" role="alert">' . esc_html( $message ) . '</p>',
+			$align
 		);
 	}
 
@@ -1027,9 +1045,31 @@ class KantanBond_Shortcodes {
 	 * 出力をラップする。
 	 *
 	 * @param string $inner 内部 HTML。
+	 * @param string $align 横寄せ（left / center / right）。
 	 * @return string
 	 */
-	private function wrap_output( string $inner ): string {
-		return '<div class="kantanbond-shortcode">' . $inner . '</div>';
+	private function wrap_output( string $inner, string $align = 'left' ): string {
+		$class = KantanBond_Shortcode_Align::merge_classes( 'kantanbond-shortcode', $align, 'kantanbond-shortcode' );
+
+		return '<div class="' . esc_attr( $class ) . '">' . $inner . '</div>';
+	}
+
+	/**
+	 * align 属性を読み取る。
+	 *
+	 * @param array<string, string> $atts     ショートコード属性。
+	 * @param string                $tag      ショートコードタグ名。
+	 * @return string
+	 */
+	private function parse_align_attribute( array $atts, string $tag ): string {
+		$parsed = shortcode_atts(
+			array(
+				'align' => 'left',
+			),
+			$atts,
+			$tag
+		);
+
+		return KantanBond_Shortcode_Align::normalize( (string) $parsed['align'] );
 	}
 }

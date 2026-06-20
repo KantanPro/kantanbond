@@ -20,6 +20,13 @@ class KantanBond_Public_Products {
 
 	public const AJAX_ACTION = 'kantanbond_public_product_submit';
 
+	public const AJAX_PURCHASE_ACTION = 'kantanbond_public_product_purchase';
+
+	/**
+	 * @var bool
+	 */
+	private bool $stripe_available = false;
+
 	/**
 	 * @var KantanBond_API
 	 */
@@ -53,6 +60,8 @@ class KantanBond_Public_Products {
 		add_shortcode( 'kantanbond_public_products', array( $this, 'render_shortcode' ) );
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, array( $this, 'ajax_submit_order' ) );
 		add_action( 'wp_ajax_nopriv_' . self::AJAX_ACTION, array( $this, 'ajax_submit_order' ) );
+		add_action( 'wp_ajax_' . self::AJAX_PURCHASE_ACTION, array( $this, 'ajax_purchase_order' ) );
+		add_action( 'wp_ajax_nopriv_' . self::AJAX_PURCHASE_ACTION, array( $this, 'ajax_purchase_order' ) );
 	}
 
 	/**
@@ -83,6 +92,7 @@ class KantanBond_Public_Products {
 				'show_memo'     => 'yes',
 				'show_initial_fees' => 'yes',
 				'show_filter'   => 'yes',
+				'align'         => 'left',
 			),
 			$atts,
 			'kantanbond_public_products'
@@ -99,6 +109,7 @@ class KantanBond_Public_Products {
 
 		$products        = $result['products'];
 		$all_categories  = $result['categories'];
+		$this->stripe_available = ! empty( $result['stripe_available'] );
 		$ids        = $this->parse_ids( $atts['ids'] );
 
 		if ( $ids !== array() ) {
@@ -160,7 +171,13 @@ class KantanBond_Public_Products {
 
 		$this->enqueue_assets();
 
-		return '<div class="kantanbond-public-products kantanbond-public-products--' . esc_attr( $layout ) . '">'
+		$wrapper_class = KantanBond_Shortcode_Align::merge_classes(
+			'kantanbond-public-products kantanbond-public-products--' . $layout,
+			(string) $atts['align'],
+			'kantanbond-public-products'
+		);
+
+		return '<div class="' . esc_attr( $wrapper_class ) . '">'
 			. $filter_html
 			. '<div class="kantanbond-public-products-list">'
 			. $inner
@@ -242,6 +259,83 @@ class KantanBond_Public_Products {
 	}
 
 	/**
+	 * Stripe 即時購入 AJAX（SaaS API へプロキシ）。
+	 *
+	 * @return void
+	 */
+	public function ajax_purchase_order(): void {
+		check_ajax_referer( self::NONCE_ACTION, 'nonce' );
+
+		if ( ! empty( $_POST['company_url'] ) ) {
+			wp_send_json_error(
+				array( 'message' => __( '送信に失敗しました。', 'kantanbond' ) ),
+				400
+			);
+		}
+
+		$service_id = isset( $_POST['service_id'] ) ? absint( $_POST['service_id'] ) : 0;
+		if ( $service_id <= 0 ) {
+			wp_send_json_error(
+				array( 'message' => __( '商品が指定されていません。', 'kantanbond' ) ),
+				400
+			);
+		}
+
+		$return_url = isset( $_POST['return_url'] ) ? esc_url_raw( wp_unslash( (string) $_POST['return_url'] ) ) : '';
+		if ( $return_url === '' ) {
+			$return_url = wp_get_referer() ?: home_url( '/' );
+		}
+
+		$payload = array(
+			'service_id'   => $service_id,
+			'company_name' => isset( $_POST['company_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['company_name'] ) ) : '',
+			'contact_name' => isset( $_POST['contact_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['contact_name'] ) ) : '',
+			'email'        => isset( $_POST['email'] ) ? sanitize_email( wp_unslash( (string) $_POST['email'] ) ) : '',
+			'phone'        => isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['phone'] ) ) : '',
+			'message'      => isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['message'] ) ) : '',
+			'quantity'     => isset( $_POST['quantity'] ) ? (float) wp_unslash( $_POST['quantity'] ) : 1,
+			'success_url'  => KantanBond_Public_Purchase_Thank_You::get_success_url(),
+			'cancel_url'   => KantanBond_Public_Purchase_Thank_You::get_cancel_url( $return_url ),
+			'return_url'   => $return_url,
+		);
+
+		if ( $payload['contact_name'] === '' ) {
+			wp_send_json_error(
+				array( 'message' => __( 'お名前を入力してください。', 'kantanbond' ) ),
+				400
+			);
+		}
+
+		if ( $payload['email'] === '' || ! is_email( $payload['email'] ) ) {
+			wp_send_json_error(
+				array( 'message' => __( '有効なメールアドレスを入力してください。', 'kantanbond' ) ),
+				400
+			);
+		}
+
+		if ( $payload['quantity'] < 1 ) {
+			$payload['quantity'] = 1;
+		}
+
+		$response = $this->api->submit_public_product_purchase( $payload );
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error(
+				array( 'message' => $response->get_error_message() ),
+				400
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'message'      => __( '決済ページへ移動します…', 'kantanbond' ),
+				'order_id'     => isset( $response['data']['order_id'] ) ? (int) $response['data']['order_id'] : 0,
+				'checkout_url' => isset( $response['data']['checkout_url'] ) ? (string) $response['data']['checkout_url'] : '',
+			)
+		);
+	}
+
+	/**
 	 * CSS/JS を読み込む。
 	 *
 	 * @return void
@@ -280,10 +374,15 @@ class KantanBond_Public_Products {
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( self::NONCE_ACTION ),
+				'stripeAvailable' => $this->stripe_available,
 				'i18n'    => array(
 					'orderTitle'        => __( 'お問い合わせ', 'kantanbond' ),
+					'orderTitlePurchase'=> __( 'ご購入', 'kantanbond' ),
 					'submit'            => __( '送信する', 'kantanbond' ),
+					'submitPurchase'    => __( '購入する', 'kantanbond' ),
+					'submitInquire'     => __( '送信する', 'kantanbond' ),
 					'submitting'        => __( '送信中…', 'kantanbond' ),
+					'submittingPurchase'=> __( '決済準備中…', 'kantanbond' ),
 					'close'             => __( '閉じる', 'kantanbond' ),
 					'category'          => __( 'カテゴリ', 'kantanbond' ),
 					'price'             => __( '単価', 'kantanbond' ),
@@ -311,6 +410,7 @@ class KantanBond_Public_Products {
 					'pendingNotice'     => __( '現在お問い合わせを受け付けておりません。', 'kantanbond' ),
 					'soldOutNotice'     => __( 'こちらの商品は完売しました。', 'kantanbond' ),
 					'inquire'           => __( '問い合わす', 'kantanbond' ),
+					'purchase'          => __( '購入する', 'kantanbond' ),
 					'sessionExpired'    => __( 'セッションの有効期限が切れました。ページを再読み込みして再度お試しください。', 'kantanbond' ),
 				),
 			)
@@ -695,6 +795,7 @@ class KantanBond_Public_Products {
 			'is_pending'    => $is_pending,
 			'status_label'  => $status_label,
 			'quantity_fixed' => ! empty( $product['quantity_fixed'] ),
+			'instant_purchase' => ! empty( $product['instant_purchase'] ),
 			'public_html'    => isset( $product['public_html'] ) ? trim( (string) $product['public_html'] ) : '',
 		);
 	}
@@ -1021,14 +1122,21 @@ class KantanBond_Public_Products {
 	 */
 	private function render_inquiry_button_html( array $row, bool $table_cell = false ): string {
 		$acceptance_open = ! empty( $row['acceptance_open'] ) && empty( $row['is_pending'] ) && empty( $row['is_sold_out'] );
+		$purchase_mode   = ! empty( $row['instant_purchase'] );
 		$wrapper_class   = $table_cell
 			? 'kantanbond-public-product-item__inquire-wrap kantanbond-public-product-item__inquire-wrap--table'
 			: 'kantanbond-public-product-item__footer';
 
 		if ( $acceptance_open ) {
+			$label = $purchase_mode ? __( '購入する', 'kantanbond' ) : __( '問い合わす', 'kantanbond' );
+			$btn_class = 'kantanbond-public-product-item__inquire-btn';
+			if ( $purchase_mode ) {
+				$btn_class .= ' kantanbond-public-product-item__purchase-btn';
+			}
+
 			return '<div class="' . esc_attr( $wrapper_class ) . '">'
-				. '<button type="button" class="kantanbond-public-product-item__inquire-btn">'
-				. esc_html__( '問い合わす', 'kantanbond' )
+				. '<button type="button" class="' . esc_attr( $btn_class ) . '">'
+				. esc_html( $label )
 				. '</button></div>';
 		}
 
@@ -1060,6 +1168,9 @@ class KantanBond_Public_Products {
 			$classes .= ' kantanbond-public-product-item--sold-out';
 		} elseif ( ! empty( $payload['is_pending'] ) ) {
 			$classes .= ' kantanbond-public-product-item--pending';
+		}
+		if ( ! empty( $payload['instant_purchase'] ) ) {
+			$classes .= ' kantanbond-public-product-item--instant-purchase';
 		}
 		$category = isset( $payload['category'] ) ? (string) $payload['category'] : '';
 
