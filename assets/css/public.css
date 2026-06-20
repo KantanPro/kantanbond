@@ -25,6 +25,14 @@
 	width: fit-content;
 }
 
+.kantanbond-shortcode--align-left,
+.kantanbond-public-products--align-left {
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	width: 100%;
+}
+
 .kantanbond-public-products--align-center .kantanbond-public-products-filter,
 .kantanbond-public-products--align-right .kantanbond-public-products-filter {
 	width: 100%;

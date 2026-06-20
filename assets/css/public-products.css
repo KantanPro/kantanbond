@@ -32,6 +32,13 @@
 	width: 100%;
 }
 
+.kantanbond-public-products--align-left {
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	width: 100%;
+}
+
 .kantanbond-public-products--empty {
 	color: #646970;
 }
@@ -42,8 +49,16 @@
 	display: flex;
 	flex-wrap: nowrap;
 	gap: 0.5rem;
-	justify-content: center;
+	justify-content: flex-start;
 	margin-bottom: 1.25rem;
+}
+
+.kantanbond-public-products--align-center .kantanbond-public-products-filter {
+	justify-content: center;
+}
+
+.kantanbond-public-products--align-right .kantanbond-public-products-filter {
+	justify-content: flex-end;
 }
 
 .kantanbond-public-products-filter__label {
@@ -130,12 +145,20 @@
 	padding-top: 10px;
 }
 
-/* グリッド（件数が列数より少ないときも中央寄せ） */
+/* グリッド */
 .kantanbond-public-products-grid {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1.25rem;
+	justify-content: flex-start;
+}
+
+.kantanbond-public-products--align-center .kantanbond-public-products-grid {
 	justify-content: center;
+}
+
+.kantanbond-public-products--align-right .kantanbond-public-products-grid {
+	justify-content: flex-end;
 }
 
 .kantanbond-public-products-grid--cols-1 > .kantanbond-public-products-grid__item {
@@ -366,12 +389,20 @@
 	display: inline-block;
 }
 
-/* カード（件数が列数より少ないときも中央寄せ） */
+/* カード */
 .kantanbond-public-products-cards {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1.5rem;
+	justify-content: flex-start;
+}
+
+.kantanbond-public-products--align-center .kantanbond-public-products-cards {
 	justify-content: center;
+}
+
+.kantanbond-public-products--align-right .kantanbond-public-products-cards {
+	justify-content: flex-end;
 }
 
 .kantanbond-public-products-cards--cols-1 > .kantanbond-public-products-card {

@@ -63,9 +63,6 @@ class KantanBond_Shortcode_Align {
 	 */
 	public static function merge_classes( string $base_classes, string $raw_align, string $prefix ): string {
 		$align = self::normalize( $raw_align );
-		if ( $align === 'left' ) {
-			return trim( $base_classes );
-		}
 
 		return trim( $base_classes . ' ' . $prefix . '--align-' . $align );
 	}

@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.5 =
+* [kantanbond_public_products] align="left"（左寄せ）指定時にグリッド・カード・カテゴリ絞り込みが中央寄せのままになる問題を修正
+* align 属性で left / center / right に応じて一覧・絞り込み UI の横寄せを切り替え
+* layout="grit" の typo を grid として解釈するよう補正
 
 = 1.4.4 =
 * [kantanbond_public_products] Stripe 即時購入（instant_purchase）に対応（購入ボタン・Stripe Checkout 遷移）
