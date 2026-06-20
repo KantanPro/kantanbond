@@ -155,26 +155,24 @@
 }
 
 .kantanbond-public-products-grid__image-wrap {
-	align-items: center;
+	align-items: stretch;
 	display: flex;
 	justify-content: center;
-	padding: 12px 8px 4px;
+	padding: 14px 14px 0;
 }
 
 .kantanbond-public-products-grid__image-wrap .kantanbond-public-product-item__image-btn {
-	align-items: center;
-	display: flex;
-	justify-content: center;
+	align-items: stretch;
+	display: block;
 	width: 100%;
 }
 
 .kantanbond-public-products-grid__image {
 	display: block;
 	height: auto;
-	max-height: 140px;
-	max-width: 88%;
+	max-width: 100%;
 	object-fit: contain;
-	width: auto;
+	width: 100%;
 }
 
 .kantanbond-public-products-grid__body {
@@ -377,16 +375,24 @@
 }
 
 .kantanbond-public-products-card__image-wrap {
-	padding: 20px;
-	text-align: center;
+	align-items: stretch;
+	display: flex;
+	justify-content: center;
+	padding: 18px 18px 0;
+}
+
+.kantanbond-public-products-card__image-wrap .kantanbond-public-product-item__image-btn {
+	align-items: stretch;
+	display: block;
+	width: 100%;
 }
 
 .kantanbond-public-products-card__image {
-	display: inline-block;
+	display: block;
 	height: auto;
-	max-height: 160px;
 	max-width: 100%;
 	object-fit: contain;
+	width: 100%;
 }
 
 .kantanbond-public-products-card__body {
