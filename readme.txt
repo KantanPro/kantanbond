@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.2 =
+* [kantanbond_public_products] グリッド型・カード型一覧で、表示件数が列数より少ないときに左寄せになる問題を修正（中央寄せ）
+* [kantanbond_public_products] カテゴリ絞り込み UI を中央寄せに変更
 
 = 1.4.1 =
 * GitHub 更新時の zipball API URL を公開アーカイブ URL に変換（レート制限・403 回避）

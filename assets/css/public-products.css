@@ -18,6 +18,7 @@
 	display: flex;
 	flex-wrap: nowrap;
 	gap: 0.5rem;
+	justify-content: center;
 	margin-bottom: 1.25rem;
 }
 
@@ -32,7 +33,7 @@
 .kantanbond-public-products-filter__input {
 	border: 1px solid #c3c4c7;
 	border-radius: 6px;
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	font: inherit;
 	max-width: 280px;
 	min-width: 8em;
@@ -105,26 +106,32 @@
 	padding-top: 10px;
 }
 
-/* グリッド */
+/* グリッド（件数が列数より少ないときも中央寄せ） */
 .kantanbond-public-products-grid {
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1.25rem;
+	justify-content: center;
 }
 
-.kantanbond-public-products-grid--cols-1 {
-	grid-template-columns: 1fr;
+.kantanbond-public-products-grid--cols-1 > .kantanbond-public-products-grid__item {
+	flex: 0 1 100%;
+	max-width: 100%;
 }
 
-.kantanbond-public-products-grid--cols-2 {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+.kantanbond-public-products-grid--cols-2 > .kantanbond-public-products-grid__item {
+	flex: 0 1 calc((100% - 1.25rem) / 2);
+	max-width: calc((100% - 1.25rem) / 2);
 }
 
-.kantanbond-public-products-grid--cols-3 {
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+.kantanbond-public-products-grid--cols-3 > .kantanbond-public-products-grid__item {
+	flex: 0 1 calc((100% - 2.5rem) / 3);
+	max-width: calc((100% - 2.5rem) / 3);
 }
 
-.kantanbond-public-products-grid--cols-4 {
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+.kantanbond-public-products-grid--cols-4 > .kantanbond-public-products-grid__item {
+	flex: 0 1 calc((100% - 3.75rem) / 4);
+	max-width: calc((100% - 3.75rem) / 4);
 }
 
 .kantanbond-public-products-grid__item,
@@ -337,26 +344,32 @@
 	display: inline-block;
 }
 
-/* カード */
+/* カード（件数が列数より少ないときも中央寄せ） */
 .kantanbond-public-products-cards {
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1.5rem;
+	justify-content: center;
 }
 
-.kantanbond-public-products-cards--cols-1 {
-	grid-template-columns: 1fr;
+.kantanbond-public-products-cards--cols-1 > .kantanbond-public-products-card {
+	flex: 0 1 100%;
+	max-width: 100%;
 }
 
-.kantanbond-public-products-cards--cols-2 {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+.kantanbond-public-products-cards--cols-2 > .kantanbond-public-products-card {
+	flex: 0 1 calc((100% - 1.5rem) / 2);
+	max-width: calc((100% - 1.5rem) / 2);
 }
 
-.kantanbond-public-products-cards--cols-3 {
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+.kantanbond-public-products-cards--cols-3 > .kantanbond-public-products-card {
+	flex: 0 1 calc((100% - 3rem) / 3);
+	max-width: calc((100% - 3rem) / 3);
 }
 
-.kantanbond-public-products-cards--cols-4 {
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+.kantanbond-public-products-cards--cols-4 > .kantanbond-public-products-card {
+	flex: 0 1 calc((100% - 4.5rem) / 4);
+	max-width: calc((100% - 4.5rem) / 4);
 }
 
 .kantanbond-public-products-card {
@@ -1094,13 +1107,10 @@ html.kantanbond-public-product-modal-open body {
 }
 
 @media (max-width: 782px) {
-	.kantanbond-public-products-grid--cols-2,
-	.kantanbond-public-products-grid--cols-3,
-	.kantanbond-public-products-grid--cols-4,
-	.kantanbond-public-products-cards--cols-2,
-	.kantanbond-public-products-cards--cols-3,
-	.kantanbond-public-products-cards--cols-4 {
-		grid-template-columns: 1fr;
+	.kantanbond-public-products-grid > .kantanbond-public-products-grid__item,
+	.kantanbond-public-products-cards > .kantanbond-public-products-card {
+		flex: 0 1 100%;
+		max-width: 100%;
 	}
 
 	.kantanbond-public-products-filter {
