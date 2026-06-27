@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,9 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.7 =
+* [kantanbond_public_products] 公開用HTML内のリンク表示を改善（長いURLの省略表示・折り返し・画像リンクのレイアウト崩れ防止）
 
 = 1.4.6 =
 * [kantanbond_public_products] align="left" 時にテーマ・ブロックエディタの中央寄せ（aligncenter 等）を上書きして左寄せを維持
