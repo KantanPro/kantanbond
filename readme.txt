@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.10
+Stable tag: 1.4.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス�
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.11 =
+* [kantanbond_billing_plans] フリーの上限表示を更新（顧客・案件は無制限、自社商品 10・協力会社 5）
+* 使えない機能の × 一覧を削除し、利用可能な制限のみ表示
+* 料金プランカードの高さを揃え、CTA を下揃えに調整
 
 = 1.4.10 =
 * [kantanbond_billing_plans] フリーを機能制限つき永続プラン表示に更新（件数上限・スタッフ招待不可）

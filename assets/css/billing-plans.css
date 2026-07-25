@@ -48,12 +48,16 @@
 
 @media (min-width: 1100px) {
 	.kantanbond-billing-plans__grid {
-		align-items: center;
+		align-items: stretch;
 		grid-template-columns: repeat(var(--kantanbond-plans-columns, 4), minmax(0, 1fr));
 	}
 }
 
 .kantanbond-billing-plans__item {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 100%;
 	position: relative;
 }
 
@@ -63,8 +67,6 @@
 
 @media (min-width: 768px) {
 	.kantanbond-billing-plans__item--recommended {
-		margin-bottom: -0.125rem;
-		margin-top: -0.125rem;
 		z-index: 2;
 	}
 }
@@ -116,12 +118,6 @@
 	box-shadow: 0 12px 28px rgba(99, 102, 241, 0.22);
 }
 
-@media (min-width: 768px) {
-	.kantanbond-billing-plans__card--recommended {
-		transform: scale(1.04);
-	}
-}
-
 .kantanbond-billing-plans__radio:checked + .kantanbond-billing-plans__card,
 .kantanbond-billing-plans__item.is-selected .kantanbond-billing-plans__card {
 	background: rgba(238, 242, 255, 0.7);
@@ -136,8 +132,9 @@
 
 .kantanbond-billing-plans__label {
 	cursor: pointer;
-	display: block;
+	display: flex;
 	flex: 1 1 auto;
+	flex-direction: column;
 	padding: 1.25rem;
 }
 
@@ -202,6 +199,7 @@
 
 .kantanbond-billing-plans__features {
 	color: #4b5563;
+	flex: 1 1 auto;
 	font-size: 0.8125rem;
 	list-style: none;
 	margin: 0.75rem 0 0;
@@ -221,17 +219,18 @@
 	font-weight: 700;
 }
 
-.kantanbond-billing-plans__features li.is-unavailable {
-	color: #6b7280;
-}
-
-.kantanbond-billing-plans__features li.is-unavailable .kantanbond-billing-plans__check {
-	color: #9ca3af;
-}
-
 .kantanbond-billing-plans__cta-wrap {
 	border-top: 1px solid #e5e7eb;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	margin-top: auto;
+	min-height: 8.5rem;
 	padding: 1rem 1.25rem 1.25rem;
+}
+
+.kantanbond-billing-plans__item--free .kantanbond-billing-plans__cta-wrap {
+	min-height: 8.5rem;
 }
 
 .kantanbond-billing-plans__card--recommended .kantanbond-billing-plans__cta-wrap {
