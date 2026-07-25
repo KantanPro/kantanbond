@@ -91,18 +91,77 @@
 	}
 
 	/**
+	 * おすすめ以外のカード高さを、その中の最大に揃える（余白をチームまで伸ばさない）。
+	 *
+	 * @param {HTMLElement} root
+	 */
+	function equalizeSecondaryCards(root) {
+		if (root.dataset.kantanbondEqualizing === '1') {
+			return;
+		}
+
+		var items = root.querySelectorAll(
+			'.kantanbond-billing-plans__item:not(.kantanbond-billing-plans__item--recommended)'
+		);
+		if (items.length < 2) {
+			return;
+		}
+
+		root.dataset.kantanbondEqualizing = '1';
+
+		items.forEach(function (item) {
+			var card = item.querySelector('.kantanbond-billing-plans__card');
+			if (card) {
+				card.style.minHeight = '';
+			}
+		});
+
+		var maxHeight = 0;
+		items.forEach(function (item) {
+			var card = item.querySelector('.kantanbond-billing-plans__card');
+			if (!card) {
+				return;
+			}
+			maxHeight = Math.max(maxHeight, card.offsetHeight);
+		});
+
+		if (maxHeight > 0) {
+			var next = maxHeight + 'px';
+			items.forEach(function (item) {
+				var card = item.querySelector('.kantanbond-billing-plans__card');
+				if (card && card.style.minHeight !== next) {
+					card.style.minHeight = next;
+				}
+			});
+		}
+
+		window.requestAnimationFrame(function () {
+			delete root.dataset.kantanbondEqualizing;
+		});
+	}
+
+	/**
+	 * @param {HTMLElement} root
+	 */
+	function layoutRoot(root) {
+		equalizeSecondaryCards(root);
+	}
+
+	/**
 	 * @param {ParentNode} scope
 	 */
 	function bind(scope) {
 		var roots = scope.querySelectorAll('[data-kantanbond-billing-plans]');
 		roots.forEach(function (root) {
 			if (root.dataset.kantanbondPlansBound === '1') {
+				layoutRoot(root);
 				return;
 			}
 			root.dataset.kantanbondPlansBound = '1';
 
 			syncSelected(root);
 			syncAllCtas(root);
+			layoutRoot(root);
 
 			root.addEventListener('change', function (event) {
 				var target = event.target;
@@ -119,7 +178,25 @@
 					syncAllCtas(root);
 				}
 			});
+
+			if (typeof ResizeObserver !== 'undefined') {
+				var ro = new ResizeObserver(function () {
+					layoutRoot(root);
+				});
+				ro.observe(root);
+			}
 		});
+
+		if (!window.__kantanbondBillingPlansResizeBound) {
+			window.__kantanbondBillingPlansResizeBound = true;
+			window.addEventListener('resize', function () {
+				document
+					.querySelectorAll('[data-kantanbond-billing-plans]')
+					.forEach(function (root) {
+						layoutRoot(root);
+					});
+			});
+		}
 	}
 
 	function init() {

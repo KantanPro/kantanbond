@@ -282,6 +282,10 @@ class KantanBond_Billing_Plans {
 									<p class="kantanbond-billing-plans__stripe-note">
 										<?php echo esc_html__( '申し込み後、Stripe の決済画面へ進みます。', 'kantanbond' ); ?>
 									</p>
+								<?php else : ?>
+									<p class="kantanbond-billing-plans__stripe-note">
+										<?php echo esc_html__( '開始時に Stripe でクレジットカード登録が必要です（この時点では課金されません）。', 'kantanbond' ); ?>
+									</p>
 								<?php endif; ?>
 
 								<a
@@ -311,18 +315,23 @@ class KantanBond_Billing_Plans {
 			return;
 		}
 
+		$css_path = KANTANBOND_PLUGIN_DIR . 'assets/css/billing-plans.css';
+		$js_path  = KANTANBOND_PLUGIN_DIR . 'assets/js/billing-plans.js';
+		$css_ver  = is_readable( $css_path ) ? (string) filemtime( $css_path ) : KANTANBOND_VERSION;
+		$js_ver   = is_readable( $js_path ) ? (string) filemtime( $js_path ) : KANTANBOND_VERSION;
+
 		wp_enqueue_style(
 			'kantanbond-billing-plans',
 			KANTANBOND_PLUGIN_URL . 'assets/css/billing-plans.css',
 			array(),
-			KANTANBOND_VERSION
+			$css_ver
 		);
 
 		wp_enqueue_script(
 			'kantanbond-billing-plans',
 			KANTANBOND_PLUGIN_URL . 'assets/js/billing-plans.js',
 			array(),
-			KANTANBOND_VERSION,
+			$js_ver,
 			true
 		);
 

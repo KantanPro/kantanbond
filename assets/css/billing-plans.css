@@ -31,7 +31,8 @@
 }
 
 .kantanbond-billing-plans__grid {
-	align-items: stretch;
+	/* おすすめは中身どおり高く。他3枚は JS で互いに高さ揃え */
+	align-items: end;
 	display: grid;
 	gap: 1.25rem;
 	grid-template-columns: 1fr;
@@ -48,7 +49,7 @@
 
 @media (min-width: 1100px) {
 	.kantanbond-billing-plans__grid {
-		align-items: stretch;
+		align-items: end;
 		grid-template-columns: repeat(var(--kantanbond-plans-columns, 4), minmax(0, 1fr));
 	}
 }
@@ -56,19 +57,12 @@
 .kantanbond-billing-plans__item {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
-	min-height: 100%;
 	position: relative;
 }
 
 .kantanbond-billing-plans__item--recommended {
 	padding-top: 0.75rem;
-}
-
-@media (min-width: 768px) {
-	.kantanbond-billing-plans__item--recommended {
-		z-index: 2;
-	}
+	z-index: 2;
 }
 
 .kantanbond-billing-plans__badge {
@@ -106,16 +100,21 @@
 	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 	display: flex;
 	flex-direction: column;
-	height: 100%;
 	overflow: hidden;
 	position: relative;
 	text-align: left;
-	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+/* おすすめ以外: JS の min-height 揃え時に内部を伸ばして CTA を下端へ */
+.kantanbond-billing-plans__item:not(.kantanbond-billing-plans__item--recommended) .kantanbond-billing-plans__card {
+	height: 100%;
 }
 
 .kantanbond-billing-plans__card--recommended {
 	border-color: #818cf8;
-	box-shadow: 0 12px 28px rgba(99, 102, 241, 0.22);
+	border-width: 3px;
+	box-shadow: 0 14px 32px rgba(99, 102, 241, 0.28);
 }
 
 .kantanbond-billing-plans__radio:checked + .kantanbond-billing-plans__card,
@@ -132,10 +131,14 @@
 
 .kantanbond-billing-plans__label {
 	cursor: pointer;
+	display: block;
+	padding: 1.25rem;
+}
+
+.kantanbond-billing-plans__item:not(.kantanbond-billing-plans__item--recommended) .kantanbond-billing-plans__label {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
-	padding: 1.25rem;
 }
 
 .kantanbond-billing-plans__item--recommended .kantanbond-billing-plans__label {
@@ -199,11 +202,14 @@
 
 .kantanbond-billing-plans__features {
 	color: #4b5563;
-	flex: 1 1 auto;
 	font-size: 0.8125rem;
 	list-style: none;
 	margin: 0.75rem 0 0;
 	padding: 0;
+}
+
+.kantanbond-billing-plans__item:not(.kantanbond-billing-plans__item--recommended) .kantanbond-billing-plans__features {
+	flex: 1 1 auto;
 }
 
 .kantanbond-billing-plans__features li {
@@ -221,15 +227,15 @@
 
 .kantanbond-billing-plans__cta-wrap {
 	border-top: 1px solid #e5e7eb;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
 	margin-top: auto;
-	min-height: 8.5rem;
 	padding: 1rem 1.25rem 1.25rem;
 }
 
+/* フリーは支払い間隔 UI が無いので、他の有料カードと CTA 下端を揃える */
 .kantanbond-billing-plans__item--free .kantanbond-billing-plans__cta-wrap {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
 	min-height: 8.5rem;
 }
 
