@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.13
+Stable tag: 1.4.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,12 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.14 =
+* [kantanbond_billing_plans] を unlock 合言葉で個別有効化可能に（wp-config 不要）
+* 例: [kantanbond_billing_plans unlock="kantanbiz-plans"]
+* 合言葉変更用定数 KANTANBOND_BILLING_PLANS_UNLOCK / フィルターにも対応
+* 管理画面のショートコード説明に unlock 属性と記述例を追加
 
 = 1.4.13 =
 * [kantanbond_billing_plans] フリープランに「開始時の Stripe クレジットカード登録（課金なし）」案内を追加

@@ -3,7 +3,7 @@
  * Plugin Name: KantanBond
  * Plugin URI: https://kantanbiz.cloud/
  * Description: WordPress と KantanBiz（KantanBiz Cloud）を API 連携する公式連携プラグインです。
- * Version: 1.4.13
+ * Version: 1.4.14
  * Author: KantanPro
  * Author URI: https://www.kantanpro.com/
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KANTANBOND_VERSION', '1.4.13' );
+define( 'KANTANBOND_VERSION', '1.4.14' );
 define( 'KANTANBOND_PLUGIN_FILE', __FILE__ );
 define( 'KANTANBOND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KANTANBOND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -47,10 +47,12 @@ require_once KANTANBOND_PLUGIN_DIR . 'includes/class-github-updater.php';
  * レート制限回避が必要な場合は wp-config.php 等で
  * define( 'KANTANBOND_GITHUB_TOKEN', 'ghp_xxx' ); を定義してください。
  *
- * KantanBiz 公式サイト向け料金プランショートコード
- * （[kantanbond_billing_plans]）を使う場合のみ:
+ * KantanBiz 公式サイト向け料金プランショートコード:
+ * [kantanbond_billing_plans unlock="kantanbiz-plans"]
+ * サイト全体で合言葉なしにする場合のみ:
  * define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );
- * 一般ユーザー配布ではデフォルト無効です。
+ * 合言葉を変える場合:
+ * define( 'KANTANBOND_BILLING_PLANS_UNLOCK', 'your-phrase' );
  *
  * @return void
  */

@@ -514,13 +514,11 @@ class KantanBond_Admin {
 						<td><?php echo esc_html__( '公開商品の一覧表示・Web お申込み', 'kantanbond' ); ?></td>
 						<td><?php echo esc_html__( 'ログイン不要。KantanBiz で「サイトに公開」ON の商品のみ。インバウンドトークンが必要（PAT は不要）。', 'kantanbond' ); ?></td>
 					</tr>
-					<?php if ( KantanBond_Billing_Plans::is_enabled() ) : ?>
 					<tr>
 						<td><code>[kantanbond_billing_plans]</code></td>
 						<td><?php echo esc_html__( 'KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( '公式サイト向け（オプトイン）。ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。フリーは機能制限つき永続無料。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '公式サイト向け。unlock 合言葉が必要（または wp-config で全体有効化）。ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。フリーは機能制限つき永続無料。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
 					</tr>
-					<?php endif; ?>
 					<tr>
 						<td><code>[kantanbond_version]</code></td>
 						<td><?php echo esc_html__( 'プラグインバージョン表示', 'kantanbond' ); ?></td>
@@ -529,7 +527,6 @@ class KantanBond_Admin {
 				</tbody>
 			</table>
 
-			<?php if ( KantanBond_Billing_Plans::is_enabled() ) : ?>
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] の属性', 'kantanbond' ); ?></h3>
 			<table class="widefat striped kantanbond-shortcodes-table">
 				<thead>
@@ -540,6 +537,18 @@ class KantanBond_Admin {
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td><code>unlock</code></td>
+						<td><?php echo esc_html__( '（空）', 'kantanbond' ); ?></td>
+						<td>
+							<?php
+							echo esc_html__(
+								'表示用の合言葉。既定は kantanbiz-plans。例: unlock="kantanbiz-plans"。wp-config で KANTANBOND_ENABLE_BILLING_PLANS を true にすると合言葉なしでも表示可。',
+								'kantanbond'
+							);
+							?>
+						</td>
+					</tr>
 					<tr>
 						<td><code>align</code></td>
 						<td><code>center</code></td>
@@ -595,14 +604,13 @@ class KantanBond_Admin {
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] 記述例', 'kantanbond' ); ?></h3>
 			<ul class="kantanbond-shortcodes-examples">
-				<li><code>[kantanbond_billing_plans]</code></li>
-				<li><code>[kantanbond_plans]</code></li>
-				<li><code>[kantanbond_billing_plans default_interval="year"]</code></li>
-				<li><code>[kantanbond_billing_plans show_common_features="yes"]</code></li>
-				<li><code>[kantanbond_billing_plans plans="フリー,ソロ,チーム,ビジネス"]</code></li>
-				<li><code>[kantanbond_billing_plans paid_cta_label="今すぐ契約"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans"]</code></li>
+				<li><code>[kantanbond_plans unlock="kantanbiz-plans"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" default_interval="year"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" show_common_features="yes"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" plans="フリー,ソロ,チーム,ビジネス"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" paid_cta_label="今すぐ契約"]</code></li>
 			</ul>
-			<?php endif; ?>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_version] の属性', 'kantanbond' ); ?></h3>
 			<table class="widefat striped kantanbond-shortcodes-table">

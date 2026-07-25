@@ -14,13 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KantanBiz 公式サイト向けの料金プラン選択 UI をショートコードで表示する。
  *
- * 一般配布の顧客サイトでは無効（デフォルト）。公式マーケ WP のみ
- * `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` で有効化する。
+ * 一般配布では誤用防止のため、合言葉（unlock）または wp-config のオプトインが必要。
+ * 例: [kantanbond_billing_plans unlock="kantanbiz-plans"]
+ * または `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );`
  *
  * プラン定義は KantanBiz（config/billing.php / lang/ja/billing.php）に合わせて静的に保持する。
  * 有料プランの CTA は /register?plan=&interval= 経由で Stripe Checkout へ誘導する。
  */
 class KantanBond_Billing_Plans {
+
+	/**
+	 * ショートコード属性 unlock の既定合言葉。
+	 */
+	public const DEFAULT_UNLOCK_PHRASE = 'kantanbiz-plans';
 
 	/**
 	 * @var KantanBond_Settings
@@ -40,11 +46,11 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * 公式サイト向け料金プラン機能が有効か。
+	 * サイト全体で料金プランショートコードを無条件有効にするか。
 	 *
-	 * 一般ユーザー配布では誤用・混乱を避けるためデフォルト無効。
-	 * wp-config.php 等で `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` を定義したときのみ有効。
+	 * wp-config.php 等で `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` を定義したとき。
 	 * フィルター `kantanbond_enable_billing_plans` でも上書きできる。
+	 * （合言葉 unlock なしでも表示可能）
 	 *
 	 * @return bool
 	 */
@@ -52,11 +58,59 @@ class KantanBond_Billing_Plans {
 		$enabled = defined( 'KANTANBOND_ENABLE_BILLING_PLANS' ) && KANTANBOND_ENABLE_BILLING_PLANS;
 
 		/**
-		 * 料金プランショートコードの有効/無効。
+		 * 料金プランショートコードのサイト全体有効/無効。
 		 *
 		 * @param bool $enabled 既定は定数 KANTANBOND_ENABLE_BILLING_PLANS。
 		 */
 		return (bool) apply_filters( 'kantanbond_enable_billing_plans', $enabled );
+	}
+
+	/**
+	 * unlock 属性で照合する合言葉。
+	 *
+	 * 定数 `KANTANBOND_BILLING_PLANS_UNLOCK` またはフィルターで変更可能。
+	 *
+	 * @return string
+	 */
+	public static function unlock_phrase(): string {
+		$phrase = self::DEFAULT_UNLOCK_PHRASE;
+
+		if ( defined( 'KANTANBOND_BILLING_PLANS_UNLOCK' ) && is_string( KANTANBOND_BILLING_PLANS_UNLOCK ) ) {
+			$custom = trim( KANTANBOND_BILLING_PLANS_UNLOCK );
+			if ( $custom !== '' ) {
+				$phrase = $custom;
+			}
+		}
+
+		/**
+		 * 料金プランショートコードの unlock 合言葉。
+		 *
+		 * @param string $phrase 既定は kantanbiz-plans（または定数）。
+		 */
+		$filtered = apply_filters( 'kantanbond_billing_plans_unlock_phrase', $phrase );
+
+		return is_string( $filtered ) && trim( $filtered ) !== ''
+			? trim( $filtered )
+			: self::DEFAULT_UNLOCK_PHRASE;
+	}
+
+	/**
+	 * 表示が許可されているか（サイト全体オプトイン、または合言葉一致）。
+	 *
+	 * @param string $unlock_attr ショートコード属性 unlock。
+	 * @return bool
+	 */
+	public static function is_unlocked( string $unlock_attr = '' ): bool {
+		if ( self::is_enabled() ) {
+			return true;
+		}
+
+		$provided = trim( $unlock_attr );
+		if ( $provided === '' ) {
+			return false;
+		}
+
+		return hash_equals( self::unlock_phrase(), $provided );
 	}
 
 	/**
@@ -65,10 +119,7 @@ class KantanBond_Billing_Plans {
 	 * @return void
 	 */
 	public function init(): void {
-		if ( ! self::is_enabled() ) {
-			return;
-		}
-
+		// 合言葉付きで個別有効化できるよう、ショートコード自体は常に登録する。
 		add_shortcode( 'kantanbond_billing_plans', array( $this, 'render_shortcode' ) );
 		add_shortcode( 'kantanbond_plans', array( $this, 'render_shortcode' ) );
 	}
@@ -96,10 +147,21 @@ class KantanBond_Billing_Plans {
 				'paid_cta_label'       => '',
 				'cta_url'              => '',
 				'select'               => 'yes',
+				'unlock'               => '',
 			),
 			$atts,
 			'kantanbond_billing_plans'
 		);
+
+		if ( ! self::is_unlocked( (string) $atts['unlock'] ) ) {
+			if ( current_user_can( 'manage_options' ) ) {
+				return '<p class="kantanbond-billing-plans kantanbond-billing-plans--locked" role="alert">'
+					. esc_html__( '料金プランを表示するには unlock 属性に合言葉が必要です。例: [kantanbond_billing_plans unlock="kantanbiz-plans"]', 'kantanbond' )
+					. '</p>';
+			}
+
+			return '';
+		}
 
 		$plan_ids = $this->parse_plan_ids( (string) $atts['plans'] );
 		if ( $plan_ids === array() ) {
