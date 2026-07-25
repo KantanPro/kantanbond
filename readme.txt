@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.14
+Stable tag: 1.4.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,9 +58,12 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 == Changelog ==
 
+= 1.4.15 =
+* 料金プランの unlock 合言葉を管理画面・readme・記述例から非表示に（実値の露出を防止）
+
 = 1.4.14 =
 * [kantanbond_billing_plans] を unlock 合言葉で個別有効化可能に（wp-config 不要）
-* 例: [kantanbond_billing_plans unlock="kantanbiz-plans"]
+* 例: [kantanbond_billing_plans unlock="…"]
 * 合言葉変更用定数 KANTANBOND_BILLING_PLANS_UNLOCK / フィルターにも対応
 * 管理画面のショートコード説明に unlock 属性と記述例を追加
 

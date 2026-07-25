@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * KantanBiz 公式サイト向けの料金プラン選択 UI をショートコードで表示する。
  *
  * 一般配布では誤用防止のため、合言葉（unlock）または wp-config のオプトインが必要。
- * 例: [kantanbond_billing_plans unlock="kantanbiz-plans"]
+ * 例: [kantanbond_billing_plans unlock="（合言葉）"]
  * または `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );`
  *
  * プラン定義は KantanBiz（config/billing.php / lang/ja/billing.php）に合わせて静的に保持する。
@@ -85,7 +85,7 @@ class KantanBond_Billing_Plans {
 		/**
 		 * 料金プランショートコードの unlock 合言葉。
 		 *
-		 * @param string $phrase 既定は kantanbiz-plans（または定数）。
+		 * @param string $phrase 既定合言葉（または定数 KANTANBOND_BILLING_PLANS_UNLOCK）。
 		 */
 		$filtered = apply_filters( 'kantanbond_billing_plans_unlock_phrase', $phrase );
 
@@ -156,7 +156,7 @@ class KantanBond_Billing_Plans {
 		if ( ! self::is_unlocked( (string) $atts['unlock'] ) ) {
 			if ( current_user_can( 'manage_options' ) ) {
 				return '<p class="kantanbond-billing-plans kantanbond-billing-plans--locked" role="alert">'
-					. esc_html__( '料金プランを表示するには unlock 属性に合言葉が必要です。例: [kantanbond_billing_plans unlock="kantanbiz-plans"]', 'kantanbond' )
+					. esc_html__( '料金プランを表示するには unlock 属性に合言葉が必要です（合言葉はソース上の定数、または運営からの案内を参照）。wp-config で全体有効化している場合は unlock 不要です。', 'kantanbond' )
 					. '</p>';
 			}
 

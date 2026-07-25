@@ -543,7 +543,7 @@ class KantanBond_Admin {
 						<td>
 							<?php
 							echo esc_html__(
-								'表示用の合言葉。既定は kantanbiz-plans。例: unlock="kantanbiz-plans"。wp-config で KANTANBOND_ENABLE_BILLING_PLANS を true にすると合言葉なしでも表示可。',
+								'表示用の合言葉（必須。実値は公開しません）。wp-config で KANTANBOND_ENABLE_BILLING_PLANS を true にすると合言葉なしでも表示可。合言葉変更は KANTANBOND_BILLING_PLANS_UNLOCK。',
 								'kantanbond'
 							);
 							?>
@@ -604,12 +604,12 @@ class KantanBond_Admin {
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] 記述例', 'kantanbond' ); ?></h3>
 			<ul class="kantanbond-shortcodes-examples">
-				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans"]</code></li>
-				<li><code>[kantanbond_plans unlock="kantanbiz-plans"]</code></li>
-				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" default_interval="year"]</code></li>
-				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" show_common_features="yes"]</code></li>
-				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" plans="フリー,ソロ,チーム,ビジネス"]</code></li>
-				<li><code>[kantanbond_billing_plans unlock="kantanbiz-plans" paid_cta_label="今すぐ契約"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="…"]</code></li>
+				<li><code>[kantanbond_plans unlock="…"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="…" default_interval="year"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="…" show_common_features="yes"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="…" plans="フリー,ソロ,チーム,ビジネス"]</code></li>
+				<li><code>[kantanbond_billing_plans unlock="…" paid_cta_label="今すぐ契約"]</code></li>
 			</ul>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_version] の属性', 'kantanbond' ); ?></h3>
