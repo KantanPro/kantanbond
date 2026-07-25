@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,6 @@ KantanBond は WordPress サイトと KantanBiz アプリ（https://kantanbiz.cl
 * API 設定（Base URL / API アクセストークン / API Secret）
 * 同期ログの記録・閲覧
 * ショートコードによる顧客・案件・商品・レポートデータの表示
-* ショートコードによる KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）の表示
 * ショートコードによるプラグインバージョン表示
 
 将来的な拡張予定:
@@ -53,13 +52,16 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
 
-KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）: `[kantanbond_billing_plans]`（別名 `[kantanbond_plans]`）。API トークンは不要です。フリーは機能制限つき永続無料、有料は年払｜月払を選んで「申し込む」→ 登録後 Stripe 決済へ進みます。
-
 バージョン表示: `[kantanbond_version]`
 
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.12 =
+* [kantanbond_billing_plans] を公式サイト向けオプトインに変更（一般配布ではデフォルト無効）
+* 有効化は wp-config.php の `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` のみ
+* 無効時はショートコード未登録・管理画面の料金プラン説明も非表示
 
 = 1.4.11 =
 * [kantanbond_billing_plans] フリーの上限表示を更新（顧客・案件は無制限、自社商品 10・協力会社 5）

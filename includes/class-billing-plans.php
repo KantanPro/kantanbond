@@ -12,7 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * KantanBiz の料金プラン選択 UI をショートコードで表示する。
+ * KantanBiz 公式サイト向けの料金プラン選択 UI をショートコードで表示する。
+ *
+ * 一般配布の顧客サイトでは無効（デフォルト）。公式マーケ WP のみ
+ * `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` で有効化する。
  *
  * プラン定義は KantanBiz（config/billing.php / lang/ja/billing.php）に合わせて静的に保持する。
  * 有料プランの CTA は /register?plan=&interval= 経由で Stripe Checkout へ誘導する。
@@ -37,11 +40,35 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
+	 * 公式サイト向け料金プラン機能が有効か。
+	 *
+	 * 一般ユーザー配布では誤用・混乱を避けるためデフォルト無効。
+	 * wp-config.php 等で `define( 'KANTANBOND_ENABLE_BILLING_PLANS', true );` を定義したときのみ有効。
+	 * フィルター `kantanbond_enable_billing_plans` でも上書きできる。
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled(): bool {
+		$enabled = defined( 'KANTANBOND_ENABLE_BILLING_PLANS' ) && KANTANBOND_ENABLE_BILLING_PLANS;
+
+		/**
+		 * 料金プランショートコードの有効/無効。
+		 *
+		 * @param bool $enabled 既定は定数 KANTANBOND_ENABLE_BILLING_PLANS。
+		 */
+		return (bool) apply_filters( 'kantanbond_enable_billing_plans', $enabled );
+	}
+
+	/**
 	 * フックを登録する。
 	 *
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! self::is_enabled() ) {
+			return;
+		}
+
 		add_shortcode( 'kantanbond_billing_plans', array( $this, 'render_shortcode' ) );
 		add_shortcode( 'kantanbond_plans', array( $this, 'render_shortcode' ) );
 	}
