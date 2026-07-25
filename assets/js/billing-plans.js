@@ -20,7 +20,7 @@
 				u.searchParams.set('plan', plan);
 				u.searchParams.set('interval', interval === 'year' ? 'year' : 'month');
 			} else {
-				u.searchParams.set('plan', 'trial30');
+				u.searchParams.set('plan', 'free');
 				u.searchParams.delete('interval');
 			}
 			return u.toString();
@@ -36,7 +36,7 @@
 					encodeURIComponent(interval === 'year' ? 'year' : 'month')
 				);
 			}
-			return url + sep + 'plan=trial30';
+			return url + sep + 'plan=free';
 		}
 	}
 

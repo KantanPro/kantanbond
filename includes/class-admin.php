@@ -517,7 +517,7 @@ class KantanBond_Admin {
 					<tr>
 						<td><code>[kantanbond_billing_plans]</code></td>
 						<td><?php echo esc_html__( 'KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( 'ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。フリーは機能制限つき永続無料。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>[kantanbond_version]</code></td>

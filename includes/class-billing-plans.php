@@ -147,7 +147,7 @@ class KantanBond_Billing_Plans {
 					$features       = $this->features_for_plan( $plan, $show_common_features );
 					$cta_label      = $is_free ? $free_cta_label : $paid_cta_label;
 					$cta_href       = $is_free
-						? add_query_arg( 'plan', 'trial30', $register_url )
+						? add_query_arg( 'plan', 'free', $register_url )
 						: add_query_arg(
 							array(
 								'plan'     => $plan_id,
@@ -208,9 +208,13 @@ class KantanBond_Billing_Plans {
 								<?php if ( $features !== array() ) : ?>
 									<ul class="kantanbond-billing-plans__features">
 										<?php foreach ( $features as $feature ) : ?>
-											<li>
-												<span class="kantanbond-billing-plans__check" aria-hidden="true">✔</span>
-												<span><?php echo esc_html( $feature ); ?></span>
+											<?php
+											$is_unavailable = str_starts_with( $feature, '× ' );
+											$feature_label  = $is_unavailable ? mb_substr( $feature, 2 ) : $feature;
+											?>
+											<li class="<?php echo $is_unavailable ? 'is-unavailable' : ''; ?>">
+												<span class="kantanbond-billing-plans__check" aria-hidden="true"><?php echo $is_unavailable ? '×' : '✔'; ?></span>
+												<span><?php echo esc_html( $feature_label ); ?></span>
 											</li>
 										<?php endforeach; ?>
 									</ul>
@@ -400,25 +404,56 @@ class KantanBond_Billing_Plans {
 	 * @return list<string>
 	 */
 	private function features_for_plan( array $plan, bool $show_common_features ): array {
-		$lines = array();
-		if ( ! empty( $plan['member_limit'] ) && is_string( $plan['member_limit'] ) ) {
-			$lines[] = $plan['member_limit'];
-		}
-		if ( ! empty( $plan['service_limit'] ) && is_string( $plan['service_limit'] ) ) {
-			$lines[] = $plan['service_limit'];
-		}
-		if ( ! empty( $plan['order_files_storage'] ) && is_string( $plan['order_files_storage'] ) ) {
-			$lines[] = $plan['order_files_storage'];
-		}
-		if ( ! empty( $plan['backup_upload'] ) && is_string( $plan['backup_upload'] ) ) {
-			$lines[] = $plan['backup_upload'];
+		$lines   = array();
+		$is_free = ! empty( $plan['is_free'] );
+
+		foreach ( array( 'member_limit', 'client_limit', 'order_limit', 'service_limit', 'supplier_limit', 'order_files_storage', 'backup_upload' ) as $key ) {
+			if ( ! empty( $plan[ $key ] ) && is_string( $plan[ $key ] ) ) {
+				$lines[] = $plan[ $key ];
+			}
 		}
 
 		if ( $show_common_features ) {
-			$lines = array_merge( $lines, $this->get_common_features() );
+			$lines = array_merge( $lines, $is_free ? $this->get_free_features() : $this->get_common_features() );
+		}
+
+		if ( $is_free ) {
+			foreach ( $this->get_free_unavailable_features() as $feature ) {
+				$lines[] = '× ' . $feature;
+			}
 		}
 
 		return $lines;
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function get_free_features(): array {
+		return array(
+			__( '案件の進捗管理（見積・受注・請求など）', 'kantanbond' ),
+			__( '案件進捗別メール送信', 'kantanbond' ),
+			__( '顧客・自社商品・協力会社の基本管理', 'kantanbond' ),
+			__( '帳票表示設定', 'kantanbond' ),
+			__( '消費税対応', 'kantanbond' ),
+			__( '各種レポート', 'kantanbond' ),
+			__( '紹介プログラム', 'kantanbond' ),
+		);
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function get_free_unavailable_features(): array {
+		return array(
+			__( 'スタッフ招待・複数人での同時利用', 'kantanbond' ),
+			__( 'スタッフルームでのチーム共有', 'kantanbond' ),
+			__( 'Webhook / REST API 連携', 'kantanbond' ),
+			__( 'Contact Form 7 からの問い合わせ受信', 'kantanbond' ),
+			__( '公開商品・公開サイト決済', 'kantanbond' ),
+			__( '追加ストレージの購入', 'kantanbond' ),
+			__( 'FileMaker Pro 版からの柔軟インポート', 'kantanbond' ),
+		);
 	}
 
 	/**
@@ -454,13 +489,16 @@ class KantanBond_Billing_Plans {
 			'free'     => array(
 				'name'                => __( 'フリー', 'kantanbond' ),
 				'price_label'         => '¥0',
-				'period'              => __( '30日間お試し', 'kantanbond' ),
-				'tagline'             => __( 'まずは無料で全機能をお試し。クレジットカード不要で今すぐ始められます。', 'kantanbond' ),
+				'period'              => __( '永続（機能制限あり）', 'kantanbond' ),
+				'tagline'             => __( 'ソロの劣化版イメージ。おひとり運用向けの無料プラン。基本の受発注は続けられ、本格利用時はソロ以上へ。', 'kantanbond' ),
 				'is_free'             => true,
-				'member_limit'        => __( 'スタッフ（ログインユーザー）15 名まで（オーナー含む）', 'kantanbond' ),
-				'service_limit'       => __( '自社商品 2,000 件まで', 'kantanbond' ),
-				'order_files_storage' => __( '案件ファイル 50 GB まで', 'kantanbond' ),
-				'backup_upload'       => __( 'バックアップ JSON 500 MB まで', 'kantanbond' ),
+				'member_limit'        => __( 'スタッフ（ログインユーザー）1 名まで（スタッフ招待不可）', 'kantanbond' ),
+				'client_limit'        => __( '顧客 30 件まで', 'kantanbond' ),
+				'order_limit'         => __( '案件 50 件まで', 'kantanbond' ),
+				'service_limit'       => __( '自社商品 20 件まで', 'kantanbond' ),
+				'supplier_limit'      => __( '協力会社 10 件まで', 'kantanbond' ),
+				'order_files_storage' => __( '案件ファイル 100 MB まで', 'kantanbond' ),
+				'backup_upload'       => __( 'バックアップ JSON 5 MB まで', 'kantanbond' ),
 			),
 			'starter'  => array(
 				'name'                => __( 'ソロ', 'kantanbond' ),

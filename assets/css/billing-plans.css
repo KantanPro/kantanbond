@@ -221,6 +221,14 @@
 	font-weight: 700;
 }
 
+.kantanbond-billing-plans__features li.is-unavailable {
+	color: #6b7280;
+}
+
+.kantanbond-billing-plans__features li.is-unavailable .kantanbond-billing-plans__check {
+	color: #9ca3af;
+}
+
 .kantanbond-billing-plans__cta-wrap {
 	border-top: 1px solid #e5e7eb;
 	padding: 1rem 1.25rem 1.25rem;

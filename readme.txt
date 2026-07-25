@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,13 +53,18 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
 
-KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）: `[kantanbond_billing_plans]`（別名 `[kantanbond_plans]`）。API トークンは不要です。フリーは無料登録、有料は年払｜月払を選んで「申し込む」→ 登録後 Stripe 決済へ進みます。
+KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）: `[kantanbond_billing_plans]`（別名 `[kantanbond_plans]`）。API トークンは不要です。フリーは機能制限つき永続無料、有料は年払｜月払を選んで「申し込む」→ 登録後 Stripe 決済へ進みます。
 
 バージョン表示: `[kantanbond_version]`
 
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.10 =
+* [kantanbond_billing_plans] フリーを機能制限つき永続プラン表示に更新（件数上限・スタッフ招待不可）
+* 使えない機能（スタッフ招待・複数人利用・API 等）を × 表示
+* フリーの CTA を /register?plan=free に変更
 
 = 1.4.9 =
 * [kantanbond_billing_plans] 左にフリー（30日お試し）を追加
