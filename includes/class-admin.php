@@ -514,8 +514,76 @@ class KantanBond_Admin {
 						<td><?php echo esc_html__( '公開商品の一覧表示・Web お申込み', 'kantanbond' ); ?></td>
 						<td><?php echo esc_html__( 'ログイン不要。KantanBiz で「サイトに公開」ON の商品のみ。インバウンドトークンが必要（PAT は不要）。', 'kantanbond' ); ?></td>
 					</tr>
+					<tr>
+						<td><code>[kantanbond_billing_plans]</code></td>
+						<td><?php echo esc_html__( 'KantanBiz 料金プラン選択（ソロ・チーム・ビジネス）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。CTA は KantanBiz の新規登録へ誘導します。', 'kantanbond' ); ?></td>
+					</tr>
 				</tbody>
 			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] の属性', 'kantanbond' ); ?></h3>
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( '属性', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '既定値', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '説明', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>align</code></td>
+						<td><code>center</code></td>
+						<td><?php echo esc_html__( 'ブロックの横寄せ: left / center / right（左寄せ・中央寄せ・右寄せ）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>plans</code></td>
+						<td><code>starter,standard,business</code></td>
+						<td><?php echo esc_html__( '表示するプラン（カンマ区切り）。starter=ソロ / standard=チーム / business=ビジネス。日本語（ソロ,チーム,ビジネス）や solo/team も可', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>highlight</code></td>
+						<td><code>standard</code></td>
+						<td><?php echo esc_html__( '初期選択・おすすめ強調するプラン ID', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>show_yearly</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( '年払い料金の表示 ON/OFF', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>show_common_features</code></td>
+						<td><code>no</code></td>
+						<td><?php echo esc_html__( '全プラン共通機能一覧の表示 ON/OFF（既定は人数・容量など差分のみ）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>select</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( 'カード選択（ラジオ）UI の ON/OFF', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>cta_label</code></td>
+						<td><?php echo esc_html__( '無料で始める', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '各カードのボタン文言', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>cta_url</code></td>
+						<td><?php echo esc_html__( '（API Base URL）/register', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ボタン遷移先。未指定時は KantanBiz の新規登録。各プランに ?plan= が付きます', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] 記述例', 'kantanbond' ); ?></h3>
+			<ul class="kantanbond-shortcodes-examples">
+				<li><code>[kantanbond_billing_plans]</code></li>
+				<li><code>[kantanbond_plans]</code></li>
+				<li><code>[kantanbond_billing_plans align="center" highlight="standard"]</code></li>
+				<li><code>[kantanbond_billing_plans show_common_features="yes"]</code></li>
+				<li><code>[kantanbond_billing_plans plans="ソロ,チーム,ビジネス" cta_label="お申し込み"]</code></li>
+				<li><code>[kantanbond_billing_plans show_yearly="no" select="no"]</code></li>
+			</ul>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_public_products] の属性', 'kantanbond' ); ?></h3>
 			<table class="widefat striped kantanbond-shortcodes-table">

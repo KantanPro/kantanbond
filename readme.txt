@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.7
+Stable tag: 1.4.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,7 @@ KantanBond は WordPress サイトと KantanBiz アプリ（https://kantanbiz.cl
 * API 設定（Base URL / API アクセストークン / API Secret）
 * 同期ログの記録・閲覧
 * ショートコードによる顧客・案件・商品・レポートデータの表示
+* ショートコードによる KantanBiz 料金プラン選択（ソロ・チーム・ビジネス）の表示
 
 将来的な拡張予定:
 
@@ -51,9 +52,15 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
 
+KantanBiz 料金プラン選択（ソロ・チーム・ビジネス）: `[kantanbond_billing_plans]`（別名 `[kantanbond_plans]`）。API トークンは不要です。各プランの CTA は KantanBiz の新規登録へ誘導します。
+
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.8 =
+* [kantanbond_billing_plans] KantanBiz 料金プラン選択（ソロ・チーム・ビジネス）ショートコードを追加
+* 別名 [kantanbond_plans]、管理画面のショートコード説明・記述例を追加
 
 = 1.4.7 =
 * [kantanbond_public_products] 公開用HTML内のリンク表示を改善（長いURLの省略表示・折り返し・画像リンクのレイアウト崩れ防止）

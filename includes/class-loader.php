@@ -45,21 +45,31 @@ class KantanBond_Loader {
 	private KantanBond_Public_Purchase_Thank_You $purchase_thank_you;
 
 	/**
-	 * @param KantanBond_Admin                    $admin              管理画面。
-	 * @param KantanBond_Shortcodes               $shortcodes         ショートコード。
-	 * @param KantanBond_Public_Products          $public_products    公開商品。
+	 * 料金プラン選択ショートコード。
+	 *
+	 * @var KantanBond_Billing_Plans
+	 */
+	private KantanBond_Billing_Plans $billing_plans;
+
+	/**
+	 * @param KantanBond_Admin                     $admin              管理画面。
+	 * @param KantanBond_Shortcodes                $shortcodes         ショートコード。
+	 * @param KantanBond_Public_Products           $public_products    公開商品。
 	 * @param KantanBond_Public_Purchase_Thank_You $purchase_thank_you 購入サンクス。
+	 * @param KantanBond_Billing_Plans             $billing_plans      料金プラン。
 	 */
 	public function __construct(
 		KantanBond_Admin $admin,
 		KantanBond_Shortcodes $shortcodes,
 		KantanBond_Public_Products $public_products,
-		KantanBond_Public_Purchase_Thank_You $purchase_thank_you
+		KantanBond_Public_Purchase_Thank_You $purchase_thank_you,
+		KantanBond_Billing_Plans $billing_plans
 	) {
 		$this->admin              = $admin;
 		$this->shortcodes         = $shortcodes;
 		$this->public_products    = $public_products;
 		$this->purchase_thank_you = $purchase_thank_you;
+		$this->billing_plans      = $billing_plans;
 	}
 
 	/**
@@ -77,6 +87,7 @@ class KantanBond_Loader {
 		$this->shortcodes->init();
 		$this->public_products->init();
 		$this->purchase_thank_you->init();
+		$this->billing_plans->init();
 	}
 
 	/**
