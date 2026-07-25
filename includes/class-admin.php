@@ -516,8 +516,13 @@ class KantanBond_Admin {
 					</tr>
 					<tr>
 						<td><code>[kantanbond_billing_plans]</code></td>
-						<td><?php echo esc_html__( 'KantanBiz 料金プラン選択（ソロ・チーム・ビジネス）', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( 'ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。CTA は KantanBiz の新規登録へ誘導します。', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'KantanBiz 料金プラン選択（フリー・ソロ・チーム・ビジネス）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>[kantanbond_version]</code></td>
+						<td><?php echo esc_html__( 'プラグインバージョン表示', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '例: 1.4.9。API 不要。', 'kantanbond' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -539,13 +544,18 @@ class KantanBond_Admin {
 					</tr>
 					<tr>
 						<td><code>plans</code></td>
-						<td><code>starter,standard,business</code></td>
-						<td><?php echo esc_html__( '表示するプラン（カンマ区切り）。starter=ソロ / standard=チーム / business=ビジネス。日本語（ソロ,チーム,ビジネス）や solo/team も可', 'kantanbond' ); ?></td>
+						<td><code>free,starter,standard,business</code></td>
+						<td><?php echo esc_html__( '表示するプラン（カンマ区切り）。free=フリー / starter=ソロ / standard=チーム / business=ビジネス。日本語（フリー,ソロ,チーム,ビジネス）も可', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>highlight</code></td>
 						<td><code>standard</code></td>
-						<td><?php echo esc_html__( '初期選択・おすすめ強調するプラン ID', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '初期選択するプラン ID（おすすめバッジはチーム固定）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>default_interval</code></td>
+						<td><code>month</code></td>
+						<td><?php echo esc_html__( '有料プランの初期支払い間隔: month（月払）/ year（年払）', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>show_yearly</code></td>
@@ -563,14 +573,19 @@ class KantanBond_Admin {
 						<td><?php echo esc_html__( 'カード選択（ラジオ）UI の ON/OFF', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
-						<td><code>cta_label</code></td>
+						<td><code>free_cta_label</code></td>
 						<td><?php echo esc_html__( '無料で始める', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( '各カードのボタン文言', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'フリー（お試し）カードのボタン文言', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>paid_cta_label</code></td>
+						<td><?php echo esc_html__( '申し込む', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ソロ・チーム・ビジネスのボタン文言（Stripe 決済導線）', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>cta_url</code></td>
 						<td><?php echo esc_html__( '（API Base URL）/register', 'kantanbond' ); ?></td>
-						<td><?php echo esc_html__( 'ボタン遷移先。未指定時は KantanBiz の新規登録。各プランに ?plan= が付きます', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '登録ページ URL。有料は ?plan=&interval= 付きで Stripe Checkout へ進みます', 'kantanbond' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -579,10 +594,40 @@ class KantanBond_Admin {
 			<ul class="kantanbond-shortcodes-examples">
 				<li><code>[kantanbond_billing_plans]</code></li>
 				<li><code>[kantanbond_plans]</code></li>
-				<li><code>[kantanbond_billing_plans align="center" highlight="standard"]</code></li>
+				<li><code>[kantanbond_billing_plans default_interval="year"]</code></li>
 				<li><code>[kantanbond_billing_plans show_common_features="yes"]</code></li>
-				<li><code>[kantanbond_billing_plans plans="ソロ,チーム,ビジネス" cta_label="お申し込み"]</code></li>
-				<li><code>[kantanbond_billing_plans show_yearly="no" select="no"]</code></li>
+				<li><code>[kantanbond_billing_plans plans="フリー,ソロ,チーム,ビジネス"]</code></li>
+				<li><code>[kantanbond_billing_plans paid_cta_label="今すぐ契約"]</code></li>
+			</ul>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_version] の属性', 'kantanbond' ); ?></h3>
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( '属性', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '既定値', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '説明', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>prefix</code></td>
+						<td><?php echo esc_html__( '（空）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'バージョン番号の前に付ける文字列（例: v）', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>label</code></td>
+						<td><code>no</code></td>
+						<td><?php echo esc_html__( 'yes のとき「KantanBond 1.4.9」形式で表示', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_version] 記述例', 'kantanbond' ); ?></h3>
+			<ul class="kantanbond-shortcodes-examples">
+				<li><code>[kantanbond_version]</code></li>
+				<li><code>[kantanbond_version prefix="v"]</code></li>
+				<li><code>[kantanbond_version label="yes"]</code></li>
 			</ul>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_public_products] の属性', 'kantanbond' ); ?></h3>

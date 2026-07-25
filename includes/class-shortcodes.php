@@ -70,7 +70,44 @@ class KantanBond_Shortcodes {
 		add_shortcode( 'kantanbond_products', array( $this, 'render_products' ) );
 		add_shortcode( 'kantanbond_services', array( $this, 'render_products' ) );
 		add_shortcode( 'kantanbond_reports', array( $this, 'render_reports' ) );
+		add_shortcode( 'kantanbond_version', array( $this, 'render_version' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+	}
+
+	/**
+	 * プラグインバージョンを表示する。
+	 *
+	 * @param array<string, string> $atts 属性。
+	 * @return string
+	 */
+	public function render_version( array $atts = array() ): string {
+		$atts = shortcode_atts(
+			array(
+				'prefix' => '',
+				'label'  => 'no',
+			),
+			$atts,
+			'kantanbond_version'
+		);
+
+		$version = defined( 'KANTANBOND_VERSION' ) ? (string) KANTANBOND_VERSION : '';
+		if ( $version === '' ) {
+			return '';
+		}
+
+		$prefix = trim( (string) $atts['prefix'] );
+		$show_label = in_array( strtolower( trim( (string) $atts['label'] ) ), array( 'yes', '1', 'true', 'on' ), true );
+
+		$text = $prefix !== '' ? $prefix . $version : $version;
+		if ( $show_label ) {
+			$text = sprintf(
+				/* translators: %s: plugin version */
+				__( 'KantanBond %s', 'kantanbond' ),
+				$version
+			);
+		}
+
+		return '<span class="kantanbond-version">' . esc_html( $text ) . '</span>';
 	}
 
 	/**

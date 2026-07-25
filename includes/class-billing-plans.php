@@ -1,6 +1,6 @@
 <?php
 /**
- * [kantanbond_billing_plans] KantanBiz 料金プラン（ソロ・チーム・ビジネス）表示。
+ * [kantanbond_billing_plans] KantanBiz 料金プラン（フリー・ソロ・チーム・ビジネス）表示。
  *
  * @package KantanBond
  */
@@ -12,10 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * KantanBiz の有料プラン選択 UI をショートコードで表示する。
+ * KantanBiz の料金プラン選択 UI をショートコードで表示する。
  *
  * プラン定義は KantanBiz（config/billing.php / lang/ja/billing.php）に合わせて静的に保持する。
- * 公開 API が無いため、API トークンは不要。
+ * 有料プランの CTA は /register?plan=&interval= 経由で Stripe Checkout へ誘導する。
  */
 class KantanBond_Billing_Plans {
 
@@ -60,11 +60,13 @@ class KantanBond_Billing_Plans {
 		$atts = shortcode_atts(
 			array(
 				'align'                => 'center',
-				'plans'                => 'starter,standard,business',
+				'plans'                => 'free,starter,standard,business',
 				'highlight'            => 'standard',
 				'show_yearly'          => 'yes',
 				'show_common_features' => 'no',
-				'cta_label'            => '',
+				'default_interval'     => 'month',
+				'free_cta_label'       => '',
+				'paid_cta_label'       => '',
 				'cta_url'              => '',
 				'select'               => 'yes',
 			),
@@ -103,11 +105,19 @@ class KantanBond_Billing_Plans {
 		$show_yearly          = $this->is_yes( (string) $atts['show_yearly'] );
 		$show_common_features = $this->is_yes( (string) $atts['show_common_features'] );
 		$interactive          = $this->is_yes( (string) $atts['select'] );
-		$cta_label            = trim( (string) $atts['cta_label'] );
-		if ( $cta_label === '' ) {
-			$cta_label = __( '無料で始める', 'kantanbond' );
+		$default_interval     = $this->normalize_interval( (string) $atts['default_interval'] );
+
+		$free_cta_label = trim( (string) $atts['free_cta_label'] );
+		if ( $free_cta_label === '' ) {
+			$free_cta_label = __( '無料で始める', 'kantanbond' );
 		}
-		$cta_url = $this->resolve_cta_url( (string) $atts['cta_url'] );
+		$paid_cta_label = trim( (string) $atts['paid_cta_label'] );
+		if ( $paid_cta_label === '' ) {
+			$paid_cta_label = __( '申し込む', 'kantanbond' );
+		}
+
+		$register_url = $this->resolve_register_url( (string) $atts['cta_url'] );
+		$columns      = min( 4, max( 1, count( $plans ) ) );
 
 		$this->enqueue_assets();
 
@@ -124,18 +134,33 @@ class KantanBond_Billing_Plans {
 			class="<?php echo esc_attr( $classes ); ?>"
 			data-kantanbond-billing-plans
 			data-interactive="<?php echo $interactive ? '1' : '0'; ?>"
+			data-register-url="<?php echo esc_url( $register_url ); ?>"
+			data-default-interval="<?php echo esc_attr( $default_interval ); ?>"
+			style="--kantanbond-plans-columns: <?php echo esc_attr( (string) $columns ); ?>"
 		>
 			<div class="kantanbond-billing-plans__grid" role="list">
 				<?php foreach ( $plans as $plan_id => $plan ) : ?>
 					<?php
+					$is_free        = ! empty( $plan['is_free'] );
 					$is_recommended = ! empty( $plan['recommended'] );
 					$radio_id       = $uid . '-' . $plan_id;
 					$features       = $this->features_for_plan( $plan, $show_common_features );
-					$plan_cta       = add_query_arg( 'plan', $plan_id, $cta_url );
+					$cta_label      = $is_free ? $free_cta_label : $paid_cta_label;
+					$cta_href       = $is_free
+						? add_query_arg( 'plan', 'trial30', $register_url )
+						: add_query_arg(
+							array(
+								'plan'     => $plan_id,
+								'interval' => $default_interval,
+							),
+							$register_url
+						);
 					?>
 					<div
-						class="kantanbond-billing-plans__item<?php echo $is_recommended ? ' kantanbond-billing-plans__item--recommended' : ''; ?>"
+						class="kantanbond-billing-plans__item<?php echo $is_recommended ? ' kantanbond-billing-plans__item--recommended' : ''; ?><?php echo $is_free ? ' kantanbond-billing-plans__item--free' : ''; ?>"
 						role="listitem"
+						data-plan="<?php echo esc_attr( $plan_id ); ?>"
+						data-paid="<?php echo $is_free ? '0' : '1'; ?>"
 					>
 						<?php if ( $is_recommended ) : ?>
 							<span class="kantanbond-billing-plans__badge"><?php echo esc_html__( 'おすすめ', 'kantanbond' ); ?></span>
@@ -164,8 +189,8 @@ class KantanBond_Billing_Plans {
 									<?php echo esc_html( $plan['price_label'] ); ?>
 									<span class="kantanbond-billing-plans__period"> / <?php echo esc_html( $plan['period'] ); ?></span>
 								</span>
-								<?php if ( $show_yearly && ! empty( $plan['price_yearly_label'] ) ) : ?>
-									<span class="kantanbond-billing-plans__yearly">
+								<?php if ( ! $is_free && $show_yearly && ! empty( $plan['price_yearly_label'] ) ) : ?>
+									<span class="kantanbond-billing-plans__yearly" data-yearly-price>
 										<?php
 										echo esc_html(
 											sprintf(
@@ -198,10 +223,45 @@ class KantanBond_Billing_Plans {
 							<?php endif; ?>
 
 							<div class="kantanbond-billing-plans__cta-wrap">
+								<?php if ( ! $is_free ) : ?>
+									<fieldset class="kantanbond-billing-plans__interval">
+										<legend class="kantanbond-billing-plans__interval-legend"><?php echo esc_html__( '支払い間隔', 'kantanbond' ); ?></legend>
+										<div class="kantanbond-billing-plans__interval-toggle" role="group" aria-label="<?php echo esc_attr__( '年払または月払', 'kantanbond' ); ?>">
+											<label class="kantanbond-billing-plans__interval-option">
+												<input
+													type="radio"
+													class="kantanbond-billing-plans__interval-input"
+													name="<?php echo esc_attr( $uid . '-interval-' . $plan_id ); ?>"
+													value="year"
+													data-plan="<?php echo esc_attr( $plan_id ); ?>"
+													<?php checked( $default_interval, 'year' ); ?>
+												/>
+												<span><?php echo esc_html__( '年払', 'kantanbond' ); ?></span>
+											</label>
+											<span class="kantanbond-billing-plans__interval-sep" aria-hidden="true">｜</span>
+											<label class="kantanbond-billing-plans__interval-option">
+												<input
+													type="radio"
+													class="kantanbond-billing-plans__interval-input"
+													name="<?php echo esc_attr( $uid . '-interval-' . $plan_id ); ?>"
+													value="month"
+													data-plan="<?php echo esc_attr( $plan_id ); ?>"
+													<?php checked( $default_interval, 'month' ); ?>
+												/>
+												<span><?php echo esc_html__( '月払', 'kantanbond' ); ?></span>
+											</label>
+										</div>
+									</fieldset>
+									<p class="kantanbond-billing-plans__stripe-note">
+										<?php echo esc_html__( '申し込み後、Stripe の決済画面へ進みます。', 'kantanbond' ); ?>
+									</p>
+								<?php endif; ?>
+
 								<a
 									class="kantanbond-billing-plans__cta"
-									href="<?php echo esc_url( $plan_cta ); ?>"
+									href="<?php echo esc_url( $cta_href ); ?>"
 									data-plan="<?php echo esc_attr( $plan_id ); ?>"
+									data-paid="<?php echo $is_free ? '0' : '1'; ?>"
 								><?php echo esc_html( $cta_label ); ?></a>
 							</div>
 						</div>
@@ -243,12 +303,12 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * CTA URL を解決する（空なら KantanBiz の /register）。
+	 * 登録 URL を解決する（空なら KantanBiz の /register）。
 	 *
 	 * @param string $raw 属性値。
 	 * @return string
 	 */
-	private function resolve_cta_url( string $raw ): string {
+	private function resolve_register_url( string $raw ): string {
 		$raw = trim( $raw );
 		if ( $raw !== '' ) {
 			return esc_url_raw( $raw );
@@ -263,8 +323,6 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * yes / 1 / true を真とみなす。
-	 *
 	 * @param string $value 属性値。
 	 * @return bool
 	 */
@@ -275,8 +333,28 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * plans 属性をパースする。
-	 *
+	 * @param string $raw month / year。
+	 * @return string
+	 */
+	private function normalize_interval( string $raw ): string {
+		$key = strtolower( trim( $raw ) );
+		$aliases = array(
+			'year'    => 'year',
+			'yearly'  => 'year',
+			'年'      => 'year',
+			'年払'    => 'year',
+			'年払い'  => 'year',
+			'month'   => 'month',
+			'monthly' => 'month',
+			'月'      => 'month',
+			'月払'    => 'month',
+			'月払い'  => 'month',
+		);
+
+		return $aliases[ $key ] ?? 'month';
+	}
+
+	/**
 	 * @param string $raw カンマ区切り。
 	 * @return list<string>
 	 */
@@ -287,6 +365,10 @@ class KantanBond_Billing_Plans {
 		}
 
 		$aliases = array(
+			'free'     => 'free',
+			'フリー'   => 'free',
+			'trial'    => 'free',
+			'trial30'  => 'free',
 			'solo'     => 'starter',
 			'ソロ'     => 'starter',
 			'team'     => 'standard',
@@ -313,8 +395,6 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * プラン別の表示機能一覧を返す。
-	 *
 	 * @param array<string, mixed> $plan                 プラン定義。
 	 * @param bool                 $show_common_features 共通機能も出すか。
 	 * @return list<string>
@@ -342,8 +422,6 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * 有料プラン共通機能。
-	 *
 	 * @return list<string>
 	 */
 	private function get_common_features(): array {
@@ -369,12 +447,21 @@ class KantanBond_Billing_Plans {
 	}
 
 	/**
-	 * KantanBiz 有料プラン定義（表示用）。
-	 *
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_plans(): array {
 		return array(
+			'free'     => array(
+				'name'                => __( 'フリー', 'kantanbond' ),
+				'price_label'         => '¥0',
+				'period'              => __( '30日間お試し', 'kantanbond' ),
+				'tagline'             => __( 'まずは無料で全機能をお試し。クレジットカード不要で今すぐ始められます。', 'kantanbond' ),
+				'is_free'             => true,
+				'member_limit'        => __( 'スタッフ（ログインユーザー）15 名まで（オーナー含む）', 'kantanbond' ),
+				'service_limit'       => __( '自社商品 2,000 件まで', 'kantanbond' ),
+				'order_files_storage' => __( '案件ファイル 50 GB まで', 'kantanbond' ),
+				'backup_upload'       => __( 'バックアップ JSON 500 MB まで', 'kantanbond' ),
+			),
 			'starter'  => array(
 				'name'                => __( 'ソロ', 'kantanbond' ),
 				'price_label'         => '¥980',
