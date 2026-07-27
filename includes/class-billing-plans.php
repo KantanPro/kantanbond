@@ -526,6 +526,8 @@ class KantanBond_Billing_Plans {
 			__( '消費税対応', 'kantanbond' ),
 			__( '各種レポート', 'kantanbond' ),
 			__( '紹介プログラム', 'kantanbond' ),
+			__( '見積・請求・発注メール末尾に広告（有料プランで解除）', 'kantanbond' ),
+			__( 'データのバックアップ・インポートは利用不可（有料プランで利用可）', 'kantanbond' ),
 		);
 	}
 
@@ -569,7 +571,6 @@ class KantanBond_Billing_Plans {
 				'service_limit'       => __( '自社商品 10 件まで', 'kantanbond' ),
 				'supplier_limit'      => __( '協力会社 5 件まで', 'kantanbond' ),
 				'order_files_storage' => __( '案件ファイル 100 MB まで', 'kantanbond' ),
-				'backup_upload'       => __( 'バックアップ JSON 5 MB まで', 'kantanbond' ),
 			),
 			'starter'  => array(
 				'name'                => __( 'ソロ', 'kantanbond' ),
@@ -581,7 +582,7 @@ class KantanBond_Billing_Plans {
 				'member_limit'        => __( 'スタッフ（ログインユーザー）1 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 100 件まで', 'kantanbond' ),
 				'order_files_storage' => __( '案件ファイル 1 GB まで', 'kantanbond' ),
-				'backup_upload'       => __( 'バックアップ JSON 50 MB まで', 'kantanbond' ),
+				'backup_upload'       => __( 'バックアップ JSON 50 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 			'standard' => array(
 				'name'                => __( 'チーム', 'kantanbond' ),
@@ -594,7 +595,7 @@ class KantanBond_Billing_Plans {
 				'member_limit'        => __( 'スタッフ（ログインユーザー）5 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 500 件まで', 'kantanbond' ),
 				'order_files_storage' => __( '案件ファイル 10 GB まで', 'kantanbond' ),
-				'backup_upload'       => __( 'バックアップ JSON 200 MB まで', 'kantanbond' ),
+				'backup_upload'       => __( 'バックアップ JSON 200 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 			'business' => array(
 				'name'                => __( 'ビジネス', 'kantanbond' ),
@@ -606,7 +607,7 @@ class KantanBond_Billing_Plans {
 				'member_limit'        => __( 'スタッフ（ログインユーザー）15 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 2,000 件まで', 'kantanbond' ),
 				'order_files_storage' => __( '案件ファイル 50 GB まで', 'kantanbond' ),
-				'backup_upload'       => __( 'バックアップ JSON 500 MB まで', 'kantanbond' ),
+				'backup_upload'       => __( 'バックアップ JSON 500 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 		);
 	}
