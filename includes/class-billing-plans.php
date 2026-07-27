@@ -581,7 +581,7 @@ class KantanBond_Billing_Plans {
 				'tagline'             => __( 'ひとりで完結する最小プラン。フリーランス、一人親方、個人の副業など、おひとり運用に。', 'kantanbond' ),
 				'member_limit'        => __( 'スタッフ（ログインユーザー）1 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 100 件まで', 'kantanbond' ),
-				'order_files_storage' => __( '案件ファイル 1 GB まで', 'kantanbond' ),
+				'order_files_storage' => __( '案件ファイル 1 GB まで（追加購入可能）', 'kantanbond' ),
 				'backup_upload'       => __( 'バックアップ JSON 50 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 			'standard' => array(
@@ -594,7 +594,7 @@ class KantanBond_Billing_Plans {
 				'recommended'         => true,
 				'member_limit'        => __( 'スタッフ（ログインユーザー）5 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 500 件まで', 'kantanbond' ),
-				'order_files_storage' => __( '案件ファイル 10 GB まで', 'kantanbond' ),
+				'order_files_storage' => __( '案件ファイル 10 GB まで（追加購入可能）', 'kantanbond' ),
 				'backup_upload'       => __( 'バックアップ JSON 200 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 			'business' => array(
@@ -606,7 +606,7 @@ class KantanBond_Billing_Plans {
 				'tagline'             => __( '大所帯・複数現場のまとめ役向け。スタッフ枠最大で、担当分けや部門運用にも向きます。', 'kantanbond' ),
 				'member_limit'        => __( 'スタッフ（ログインユーザー）15 名まで（オーナー含む）', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 2,000 件まで', 'kantanbond' ),
-				'order_files_storage' => __( '案件ファイル 50 GB まで', 'kantanbond' ),
+				'order_files_storage' => __( '案件ファイル 50 GB まで（追加購入可能）', 'kantanbond' ),
 				'backup_upload'       => __( 'バックアップ JSON 500 MB まで（追加購入可能）', 'kantanbond' ),
 			),
 		);
