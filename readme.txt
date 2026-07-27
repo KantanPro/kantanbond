@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.16
+Stable tag: 1.4.17
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.17 =
+* 料金プラン：フリーにメール末尾広告・バックアップ不可の説明を追加
+* 料金プラン：有料プランのバックアップ JSON に「追加購入可能」を明記
+* 料金プラン：フリーからバックアップ JSON 容量行を削除
 
 = 1.4.16 =
 * 料金プラン選択カードの半透明表示を修正（選択中を不透明、非選択を半透明に）
