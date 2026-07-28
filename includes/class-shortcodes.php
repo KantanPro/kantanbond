@@ -135,6 +135,12 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_customers( array $atts = array() ): string {
+		if ( KantanBond_Frontend_Assets::is_elementor_edit_context() ) {
+			return KantanBond_Frontend_Assets::render_editor_placeholder(
+				__( 'KantanBond 顧客一覧（編集画面ではプレースホルダー表示）', 'kantanbond' )
+			);
+		}
+
 		KantanBond_Frontend_Assets::enqueue_public_style();
 
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_customers' );
@@ -203,6 +209,12 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_projects( array $atts = array() ): string {
+		if ( KantanBond_Frontend_Assets::is_elementor_edit_context() ) {
+			return KantanBond_Frontend_Assets::render_editor_placeholder(
+				__( 'KantanBond 案件一覧（編集画面ではプレースホルダー表示）', 'kantanbond' )
+			);
+		}
+
 		KantanBond_Frontend_Assets::enqueue_public_style();
 
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_projects' );
@@ -288,6 +300,12 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_products( array $atts = array() ): string {
+		if ( KantanBond_Frontend_Assets::is_elementor_edit_context() ) {
+			return KantanBond_Frontend_Assets::render_editor_placeholder(
+				__( 'KantanBond 商品一覧（編集画面ではプレースホルダー表示）', 'kantanbond' )
+			);
+		}
+
 		KantanBond_Frontend_Assets::enqueue_public_style();
 
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_products' );
@@ -388,6 +406,12 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_reports( array $atts = array() ): string {
+		if ( KantanBond_Frontend_Assets::is_elementor_edit_context() ) {
+			return KantanBond_Frontend_Assets::render_editor_placeholder(
+				__( 'KantanBond レポート（編集画面ではプレースホルダー表示）', 'kantanbond' )
+			);
+		}
+
 		KantanBond_Frontend_Assets::enqueue_public_style();
 
 		$atts = shortcode_atts(

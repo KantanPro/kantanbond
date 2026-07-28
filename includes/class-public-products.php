@@ -71,6 +71,12 @@ class KantanBond_Public_Products {
 	 * @return string
 	 */
 	public function render_shortcode( array $atts = array() ): string {
+		if ( KantanBond_Frontend_Assets::is_elementor_edit_context() ) {
+			return KantanBond_Frontend_Assets::render_editor_placeholder(
+				__( 'KantanBond 公開商品一覧（編集画面ではプレースホルダー表示。公開ページで実データを確認してください）', 'kantanbond' )
+			);
+		}
+
 		if ( KantanBond_Frontend_Assets::should_skip_shortcode_during_ajax() ) {
 			return '';
 		}

@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.19
+Stable tag: 1.4.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,10 +58,15 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 == Changelog ==
 
+= 1.4.20 =
+* Elementor 編集画面で公開商品ショートコードが API 呼び出しで固まる問題を修正
+* 編集／プレビュー時は API 依存ショートコードをプレースホルダー表示に切替（公開ページは従来どおり）
+
 = 1.4.19 =
 * Elementor との干渉を修正（未使用ページへの CSS 全読み込みを停止）
 * Elementor Shortcode ウィジェット内でレイアウトが崩れないよう CSS を隔離
 * Elementor エディタ／プレビューではショートコード描画を許可
+* フロント用アセットの条件付き読込ヘルパー（`KantanBond_Frontend_Assets`）を追加
 
 = 1.4.18 =
 * 料金プラン：有料プランの案件ファイル容量に「追加購入可能」を明記
