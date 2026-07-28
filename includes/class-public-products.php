@@ -71,7 +71,7 @@ class KantanBond_Public_Products {
 	 * @return string
 	 */
 	public function render_shortcode( array $atts = array() ): string {
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		if ( KantanBond_Frontend_Assets::should_skip_shortcode_during_ajax() ) {
 			return '';
 		}
 
@@ -176,6 +176,7 @@ class KantanBond_Public_Products {
 			? $this->render_category_filter( $filter_categories, $filter_initial )
 			: '';
 
+		KantanBond_Frontend_Assets::enqueue_public_style();
 		$this->enqueue_assets();
 
 		$wrapper_class = KantanBond_Shortcode_Align::merge_classes(
@@ -357,7 +358,7 @@ class KantanBond_Public_Products {
 		wp_enqueue_style(
 			'kantanbond-public-products',
 			KANTANBOND_PLUGIN_URL . 'assets/css/public-products.css',
-			array(),
+			array( 'kantanbond-public' ),
 			KANTANBOND_VERSION
 		);
 

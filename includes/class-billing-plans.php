@@ -131,7 +131,7 @@ class KantanBond_Billing_Plans {
 	 * @return string
 	 */
 	public function render_shortcode( array $atts = array() ): string {
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		if ( KantanBond_Frontend_Assets::should_skip_shortcode_during_ajax() ) {
 			return '';
 		}
 
@@ -208,6 +208,7 @@ class KantanBond_Billing_Plans {
 		$register_url = $this->resolve_register_url( (string) $atts['cta_url'] );
 		$columns      = min( 4, max( 1, count( $plans ) ) );
 
+		KantanBond_Frontend_Assets::enqueue_public_style();
 		$this->enqueue_assets();
 
 		$classes = KantanBond_Shortcode_Align::merge_classes(
@@ -385,7 +386,7 @@ class KantanBond_Billing_Plans {
 		wp_enqueue_style(
 			'kantanbond-billing-plans',
 			KANTANBOND_PLUGIN_URL . 'assets/css/billing-plans.css',
-			array(),
+			array( 'kantanbond-public' ),
 			$css_ver
 		);
 

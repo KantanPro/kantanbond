@@ -81,6 +81,8 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_version( array $atts = array() ): string {
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$atts = shortcode_atts(
 			array(
 				'prefix' => '',
@@ -111,17 +113,19 @@ class KantanBond_Shortcodes {
 	}
 
 	/**
-	 * フロントエンド用アセットを読み込む。
+	 * フロントエンド用アセットを登録／条件付きで読み込む。
+	 *
+	 * 全ページへの unconditional enqueue は Elementor 等と干渉するため、
+	 * ショートコード利用ページ（Elementor データ含む）または描画時のみ読む。
 	 *
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		wp_enqueue_style(
-			'kantanbond-public',
-			KANTANBOND_PLUGIN_URL . 'assets/css/public.css',
-			array(),
-			KANTANBOND_VERSION
-		);
+		KantanBond_Frontend_Assets::register_public_style();
+
+		if ( KantanBond_Frontend_Assets::current_view_needs_public_style() ) {
+			KantanBond_Frontend_Assets::enqueue_public_style();
+		}
 	}
 
 	/**
@@ -131,6 +135,8 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_customers( array $atts = array() ): string {
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_customers' );
 		$customers = $this->api->get_customers();
 
@@ -197,6 +203,8 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_projects( array $atts = array() ): string {
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_projects' );
 		$projects = $this->api->get_projects();
 
@@ -280,6 +288,8 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_products( array $atts = array() ): string {
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$align = $this->parse_align_attribute( $atts, 'kantanbond_products' );
 		$products = $this->api->get_products();
 
@@ -378,6 +388,8 @@ class KantanBond_Shortcodes {
 	 * @return string
 	 */
 	public function render_reports( array $atts = array() ): string {
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$atts = shortcode_atts(
 			array(
 				'type'      => 'sales',

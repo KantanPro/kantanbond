@@ -139,6 +139,8 @@ class KantanBond_Public_Purchase_Thank_You {
 	public function render_shortcode( array $atts = array() ): string {
 		unset( $atts );
 
+		KantanBond_Frontend_Assets::enqueue_public_style();
+
 		$checkout_flag = isset( $_GET['kb_checkout'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['kb_checkout'] ) ) : '';
 		$return_url    = isset( $_GET['return_url'] ) ? esc_url_raw( wp_unslash( (string) $_GET['return_url'] ) ) : '';
 

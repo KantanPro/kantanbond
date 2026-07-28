@@ -4,6 +4,16 @@
  * @package KantanBond
  */
 
+/* 共通ラッパー：Elementor 等の flex/grid 子要素でカラム崩れしないよう拘束 */
+.kantanbond-shortcode,
+.kantanbond-reports,
+.kantanbond-purchase-thank-you {
+	box-sizing: border-box;
+	isolation: isolate;
+	max-width: 100%;
+	min-width: 0;
+}
+
 .kantanbond-shortcode {
 	margin: 1.5em 0;
 	overflow-x: auto;
@@ -23,6 +33,44 @@
 	margin-right: 0;
 	max-width: 100%;
 	width: fit-content;
+}
+
+/* Elementor Shortcode ウィジェット内では fit-content が flex カラムを崩すため 100% に固定 */
+.elementor-widget-shortcode .kantanbond-shortcode,
+.elementor-widget-shortcode .kantanbond-public-products,
+.elementor-widget-shortcode .kantanbond-billing-plans,
+.elementor-widget-shortcode .kantanbond-reports,
+.elementor-widget-shortcode .kantanbond-purchase-thank-you,
+.elementor-shortcode .kantanbond-shortcode,
+.elementor-shortcode .kantanbond-public-products,
+.elementor-shortcode .kantanbond-billing-plans,
+.elementor-shortcode .kantanbond-reports,
+.elementor-shortcode .kantanbond-purchase-thank-you {
+	box-sizing: border-box;
+	isolation: isolate;
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	min-width: 0;
+	width: 100%;
+}
+
+.elementor-widget-shortcode .kantanbond-shortcode--align-center,
+.elementor-widget-shortcode .kantanbond-shortcode--align-right,
+.elementor-widget-shortcode .kantanbond-public-products--align-center,
+.elementor-widget-shortcode .kantanbond-public-products--align-right,
+.elementor-widget-shortcode .kantanbond-billing-plans--align-center,
+.elementor-widget-shortcode .kantanbond-billing-plans--align-right,
+.elementor-shortcode .kantanbond-shortcode--align-center,
+.elementor-shortcode .kantanbond-shortcode--align-right,
+.elementor-shortcode .kantanbond-public-products--align-center,
+.elementor-shortcode .kantanbond-public-products--align-right,
+.elementor-shortcode .kantanbond-billing-plans--align-center,
+.elementor-shortcode .kantanbond-billing-plans--align-right {
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	width: 100%;
 }
 
 .kantanbond-shortcode.kantanbond-shortcode--align-left,

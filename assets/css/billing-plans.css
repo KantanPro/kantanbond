@@ -6,7 +6,10 @@
 
 .kantanbond-billing-plans {
 	box-sizing: border-box;
+	isolation: isolate;
 	margin: 1.5em 0;
+	max-width: 100%;
+	min-width: 0;
 	width: 100%;
 }
 
@@ -335,5 +338,27 @@
 .kantanbond-billing-plans__cta:focus-visible {
 	outline: 2px solid #818cf8;
 	outline-offset: 2px;
+}
+
+/* Elementor: flex/grid 子要素のはみ出し・カラム崩れを防止 */
+.elementor-widget-shortcode .kantanbond-billing-plans,
+.elementor-shortcode .kantanbond-billing-plans {
+	box-sizing: border-box;
+	isolation: isolate;
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	min-width: 0;
+	width: 100%;
+}
+
+.elementor-widget-shortcode .kantanbond-billing-plans--align-center,
+.elementor-widget-shortcode .kantanbond-billing-plans--align-right,
+.elementor-shortcode .kantanbond-billing-plans--align-center,
+.elementor-shortcode .kantanbond-billing-plans--align-right {
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	width: 100%;
 }
 

@@ -3,7 +3,7 @@
  * Plugin Name: KantanBond
  * Plugin URI: https://kantanbiz.cloud/
  * Description: WordPress と KantanBiz（KantanBiz Cloud）を API 連携する公式連携プラグインです。
- * Version: 1.4.18
+ * Version: 1.4.19
  * Author: KantanPro
  * Author URI: https://www.kantanpro.com/
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KANTANBOND_VERSION', '1.4.18' );
+define( 'KANTANBOND_VERSION', '1.4.19' );
 define( 'KANTANBOND_PLUGIN_FILE', __FILE__ );
 define( 'KANTANBOND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KANTANBOND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -33,6 +33,7 @@ require_once KANTANBOND_PLUGIN_DIR . 'includes/class-logger.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-settings.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-api.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-shortcode-align.php';
+require_once KANTANBOND_PLUGIN_DIR . 'includes/class-frontend-assets.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-shortcodes.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-public-products.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-public-purchase-thank-you.php';

@@ -5,7 +5,11 @@
  */
 
 .kantanbond-public-products {
+	box-sizing: border-box;
+	isolation: isolate;
 	margin: 1.5em 0;
+	max-width: 100%;
+	min-width: 0;
 }
 
 .kantanbond-public-products--align-center,
@@ -1294,4 +1298,28 @@ html.kantanbond-public-product-modal-open body {
 .kantanbond-purchase-thank-you__back {
 	color: #0f766e;
 	text-decoration: underline;
+}
+
+/* Elementor: flex/grid 子要素のはみ出し・fit-content によるカラム崩れを防止 */
+.elementor-widget-shortcode .kantanbond-public-products,
+.elementor-widget-shortcode .kantanbond-purchase-thank-you,
+.elementor-shortcode .kantanbond-public-products,
+.elementor-shortcode .kantanbond-purchase-thank-you {
+	box-sizing: border-box;
+	isolation: isolate;
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	min-width: 0;
+	width: 100%;
+}
+
+.elementor-widget-shortcode .kantanbond-public-products--align-center,
+.elementor-widget-shortcode .kantanbond-public-products--align-right,
+.elementor-shortcode .kantanbond-public-products--align-center,
+.elementor-shortcode .kantanbond-public-products--align-right {
+	margin-left: 0;
+	margin-right: 0;
+	max-width: 100%;
+	width: 100%;
 }
