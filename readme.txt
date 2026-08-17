@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.21
+Stable tag: 1.4.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,17 +53,27 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
 
-リファレンス（KantanBiz の使い方ガイド全文）: `[kantanbond_reference]`。KantanBiz の公開 API から取得するため、API アクセストークンの設定がないサイトでも表示できます。章ごとに折りたためるアコーディオン形式で、目次から各節へジャンプできます。
+リファレンス（KantanBiz の使い方ガイド全文）: `[kantanbond_reference]`。KantanBiz の公開 API から取得するため、API アクセストークンの設定がないサイトでも表示できます。左サイドバー（目次・登場人物、PC では追従表示／狭い画面は折りたたみ）と、章ごとに折りたためる本文の 2 カラム構成です。
 
-属性: `align`（left/center/right）、`toc`（目次の表示 yes/no）、`characters`（登場人物の表示 yes/no）、`open`（最初から開く章 first/all/none）、`chapters`（章番号の絞り込み 例: 1,2）、`slugs`（節の絞り込み 例: welcome,screen）、`cache`（取得結果のキャッシュ分数。既定 720、`cache="no"` で無効）
+読み上げ（TTS）にも対応しています。「読み上げ」はいまの節を、「通し読み」は最後の節まで自動で読み進め（閉じている章は自動で開きます）、「最初から」は先頭から通しで読み上げます。速さは 4 段階、文字サイズは小・中・大・特大から選べ、行ごとの ▶ ボタンでその発言から読み始められます。ブラウザ内蔵の音声合成（Web Speech API）だけを使うため、本文が外部サービスへ送信されることはありません。非対応ブラウザでは読み上げ UI を表示しません。
 
-例: `[kantanbond_reference open="all" characters="no"]`、`[kantanbond_reference chapters="1" toc="no"]`
+属性: `align`（left/center/right）、`toc`（目次サイドバーの表示 yes/no）、`characters`（登場人物の表示 yes/no）、`open`（最初から開く章 first/all/none）、`chapters`（章番号の絞り込み 例: 1,2）、`slugs`（節の絞り込み 例: welcome,screen）、`cache`（取得結果のキャッシュ分数。既定 720、`cache="no"` で無効）、`tts`（読み上げ UI の表示 yes/no）、`font`（初期の文字サイズ sm/md/lg/xl）
+
+例: `[kantanbond_reference open="all" characters="no"]`、`[kantanbond_reference chapters="1" toc="no"]`、`[kantanbond_reference tts="no" font="lg"]`
 
 バージョン表示: `[kantanbond_version]`
 
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.22 =
+* [kantanbond_reference] 左サイドバー（目次・登場人物）を追加し 2 カラム構成に変更（PC は追従表示、狭い画面は折りたたみ）
+* [kantanbond_reference] 読み上げ（TTS）に対応。「読み上げ」（節単位）・「通し読み」（最後まで自動送り）・「最初から」・一時停止・停止・速さ 4 段階
+* [kantanbond_reference] 行ごとの再生ボタン、読み上げ中の行のハイライトと自動スクロール、閉じた章の自動展開
+* [kantanbond_reference] 文字サイズ切替（小・中・大・特大）を追加。速さとあわせてブラウザに記憶
+* [kantanbond_reference] 属性 tts（読み上げ UI の表示）と font（初期文字サイズ）を追加
+* 読み上げはブラウザ内蔵の音声合成（Web Speech API）のみを使用し、本文を外部へ送信しません（非対応ブラウザでは UI 非表示）
 
 = 1.4.21 =
 * [kantanbond_reference] KantanBiz リファレンス（使い方ガイド）の全文表示ショートコードを追加

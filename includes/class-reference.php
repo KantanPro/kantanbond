@@ -111,6 +111,8 @@ class KantanBond_Reference {
 				'chapters'   => '',
 				'slugs'      => '',
 				'cache'      => (string) self::DEFAULT_CACHE_MINUTES,
+				'tts'        => 'yes',
+				'font'       => 'md',
 			),
 			$atts,
 			self::SHORTCODE
@@ -144,19 +146,33 @@ class KantanBond_Reference {
 		$open_mode  = $this->normalize_open_mode( (string) $atts['open'] );
 		$show_toc   = $this->is_yes( (string) $atts['toc'] );
 		$show_chars = $this->is_yes( (string) $atts['characters'] ) && $characters !== array();
+		$use_tts    = $this->is_yes( (string) $atts['tts'] );
+		$font       = $this->normalize_font_size( (string) $atts['font'] );
 
 		// アイコンは発言ごとに使い回すため、SVG の実体は 1 回だけ置いて <use> で参照する。
 		$html = $this->render_avatar_sprite( $id_prefix );
 
+		// 左サイドバー（PC は追従表示、狭い画面は折りたたみ）。
+		$sidebar = '';
 		if ( $show_toc ) {
-			$html .= $this->render_toc( $chapters, $id_prefix );
+			$sidebar .= $this->render_toc( $chapters, $id_prefix );
 		}
-
 		if ( $show_chars ) {
-			$html .= $this->render_characters( $characters, $id_prefix );
+			$sidebar .= $this->render_characters( $characters, $id_prefix );
 		}
 
-		$html .= $this->render_chapters( $chapters, $characters, $id_prefix, $open_mode );
+		$main = $use_tts ? $this->render_toolbar( $font ) : '';
+		$main .= $this->render_chapters( $chapters, $characters, $id_prefix, $open_mode, $use_tts );
+
+		$layout_class = 'kantanbond-reference__layout';
+		if ( $sidebar === '' ) {
+			$layout_class .= ' kantanbond-reference__layout--no-sidebar';
+		}
+
+		$html .= '<div class="' . esc_attr( $layout_class ) . '">'
+			. ( '' !== $sidebar ? '<aside class="kantanbond-reference__sidebar">' . $sidebar . '</aside>' : '' )
+			. '<div class="kantanbond-reference__main kantanbond-reference__main--font-' . esc_attr( $font ) . '" data-kantanbond-reference-main>' . $main . '</div>'
+			. '</div>';
 
 		$wrapper_class = KantanBond_Shortcode_Align::merge_classes(
 			'kantanbond-reference',
@@ -240,15 +256,92 @@ class KantanBond_Reference {
 				. '</li>';
 		}
 
-		return '<nav class="kantanbond-reference__toc" aria-label="' . esc_attr__( 'リファレンス目次', 'kantanbond' ) . '">'
+		/*
+		 * PC は常時開いた追従サイドバー、狭い画面は折りたたみ。
+		 * JS が無い環境でも読めるよう、既定は開いた <details> にしておく。
+		 */
+		return '<details class="kantanbond-reference__toc" open data-kantanbond-reference-toc>'
+			. '<summary class="kantanbond-reference__toc-summary">' . esc_html__( '目次', 'kantanbond' ) . '</summary>'
 			. '<div class="kantanbond-reference__toc-head">'
 			. '<p class="kantanbond-reference__toc-title">' . esc_html__( '目次', 'kantanbond' ) . '</p>'
 			. '<button type="button" class="kantanbond-reference__toggle-all" data-kantanbond-reference-toggle-all data-label-open="' . esc_attr__( 'すべて開く', 'kantanbond' ) . '" data-label-close="' . esc_attr__( 'すべて閉じる', 'kantanbond' ) . '">'
 			. esc_html__( 'すべて開く', 'kantanbond' )
 			. '</button>'
 			. '</div>'
+			. '<nav class="kantanbond-reference__toc-nav" aria-label="' . esc_attr__( 'リファレンス目次', 'kantanbond' ) . '">'
 			. '<ul class="kantanbond-reference__toc-list">' . $items . '</ul>'
-			. '</nav>';
+			. '</nav>'
+			. '</details>';
+	}
+
+	/**
+	 * 本文上のツールバー（文字サイズ・読み上げ）を描画する。
+	 *
+	 * 読み上げ UI は非対応ブラウザで無意味なので hidden で出し、JS が対応を確認してから見せる。
+	 *
+	 * @param string $font 初期の文字サイズ（sm/md/lg/xl）。
+	 * @return string
+	 */
+	private function render_toolbar( string $font ): string {
+		$sizes = array(
+			'sm' => __( '小', 'kantanbond' ),
+			'md' => __( '中', 'kantanbond' ),
+			'lg' => __( '大', 'kantanbond' ),
+			'xl' => __( '特大', 'kantanbond' ),
+		);
+
+		$size_buttons = '';
+		foreach ( $sizes as $key => $label ) {
+			$is_current    = $key === $font;
+			$size_buttons .= '<button type="button" class="kantanbond-reference__size-button' . ( $is_current ? ' is-active' : '' ) . '"'
+				. ' data-kantanbond-reference-size="' . esc_attr( $key ) . '"'
+				. ' aria-pressed="' . ( $is_current ? 'true' : 'false' ) . '">'
+				. esc_html( $label )
+				. '</button>';
+		}
+
+		$rates = array(
+			'0.75' => __( 'ゆっくり', 'kantanbond' ),
+			'1'    => __( 'ふつう', 'kantanbond' ),
+			'1.25' => __( 'やや速い', 'kantanbond' ),
+			'1.5'  => __( '速い', 'kantanbond' ),
+		);
+
+		$rate_options = '';
+		foreach ( $rates as $value => $label ) {
+			$rate_options .= '<option value="' . esc_attr( $value ) . '">' . esc_html( $label ) . '</option>';
+		}
+
+		$buttons = '<button type="button" class="kantanbond-reference__button kantanbond-reference__button--primary" data-tts-play>' . esc_html__( '読み上げ', 'kantanbond' ) . '</button>'
+			. '<button type="button" class="kantanbond-reference__button" data-tts-pause>' . esc_html__( '一時停止', 'kantanbond' ) . '</button>'
+			. '<button type="button" class="kantanbond-reference__button" data-tts-stop>' . esc_html__( '停止', 'kantanbond' ) . '</button>'
+			. '<button type="button" class="kantanbond-reference__button kantanbond-reference__button--autopilot" data-tts-autopilot aria-pressed="false" title="' . esc_attr__( 'いまの節から最後の節まで、続けて読み上げます', 'kantanbond' ) . '">' . esc_html__( '通し読み', 'kantanbond' ) . '</button>'
+			. '<button type="button" class="kantanbond-reference__button" data-tts-restart title="' . esc_attr__( '第1章の最初の節から最後まで通しで読み上げます', 'kantanbond' ) . '">' . esc_html__( '最初から', 'kantanbond' ) . '</button>';
+
+		return '<div class="kantanbond-reference__toolbar">'
+			. '<div class="kantanbond-reference__size">'
+			. '<span class="kantanbond-reference__toolbar-label">' . esc_html__( '文字サイズ', 'kantanbond' ) . '</span>'
+			. '<div class="kantanbond-reference__size-group" role="group" aria-label="' . esc_attr__( '文字サイズ', 'kantanbond' ) . '">' . $size_buttons . '</div>'
+			. '</div>'
+			. '<div class="kantanbond-reference__tts" data-tts-controls hidden role="group" aria-label="' . esc_attr__( 'このページの読み上げ', 'kantanbond' ) . '">'
+			. '<span class="kantanbond-reference__toolbar-label kantanbond-reference__toolbar-label--tts">'
+			. '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" focusable="false">'
+			. '<path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" />'
+			. '<path d="M13.293 6.293a1 1 0 011.414 0A5.983 5.983 0 0116.5 10a5.983 5.983 0 01-1.793 3.707 1 1 0 01-1.414-1.414A3.987 3.987 0 0014.5 10a3.987 3.987 0 00-1.207-2.293 1 1 0 010-1.414z" />'
+			. '</svg>'
+			. esc_html__( '読み上げ', 'kantanbond' )
+			. '</span>'
+			. '<div class="kantanbond-reference__tts-buttons">' . $buttons . '</div>'
+			. '<div class="kantanbond-reference__tts-rate">'
+			. '<span class="kantanbond-reference__toolbar-label">' . esc_html__( '速さ', 'kantanbond' ) . '</span>'
+			. '<select class="kantanbond-reference__select" data-tts-rate aria-label="' . esc_attr__( '読み上げの速さ', 'kantanbond' ) . '">' . $rate_options . '</select>'
+			. '</div>'
+			. '<span class="kantanbond-reference__tts-status" data-tts-status role="status" aria-live="polite">' . esc_html__( '停止中', 'kantanbond' ) . '</span>'
+			. '</div>'
+			. '<p class="kantanbond-reference__tts-unsupported" data-tts-unsupported hidden>'
+			. esc_html__( 'このブラウザは読み上げに対応していません。Chrome・Safari・Edge の最新版か、端末の音声読み上げ機能をご利用ください。', 'kantanbond' )
+			. '</p>'
+			. '</div>';
 	}
 
 	/**
@@ -297,9 +390,10 @@ class KantanBond_Reference {
 	 * @param array<string, mixed>             $characters 登場人物。
 	 * @param string                           $id_prefix  節 id の接頭辞。
 	 * @param string                           $open_mode  first / all / none。
+	 * @param bool                             $use_tts    読み上げ用の属性を出力するか。
 	 * @return string
 	 */
-	private function render_chapters( array $chapters, array $characters, string $id_prefix, string $open_mode ): string {
+	private function render_chapters( array $chapters, array $characters, string $id_prefix, string $open_mode, bool $use_tts ): string {
 		$html  = '';
 		$index = 0;
 
@@ -310,11 +404,12 @@ class KantanBond_Reference {
 				continue;
 			}
 
-			$is_open = 'all' === $open_mode || ( 'first' === $open_mode && 0 === $index );
-			$body    = '';
+			$is_open      = 'all' === $open_mode || ( 'first' === $open_mode && 0 === $index );
+			$body         = '';
+			$chapter_title = (string) ( $chapter['title'] ?? '' );
 
 			foreach ( $sections as $section ) {
-				$body .= $this->render_section( $section, $characters, $id_prefix );
+				$body .= $this->render_section( $section, $characters, $id_prefix, $use_tts, $chapter_title );
 			}
 
 			$subtitle = (string) ( $chapter['subtitle'] ?? '' );
@@ -336,30 +431,58 @@ class KantanBond_Reference {
 	/**
 	 * 節ひとつを描画する。
 	 *
-	 * @param array<string, mixed> $section    節。
-	 * @param array<string, mixed> $characters 登場人物。
-	 * @param string               $id_prefix  節 id の接頭辞。
+	 * @param array<string, mixed> $section       節。
+	 * @param array<string, mixed> $characters    登場人物。
+	 * @param string               $id_prefix     節 id の接頭辞。
+	 * @param bool                 $use_tts       読み上げ用の属性を出力するか。
+	 * @param string               $chapter_title 章タイトル（通し読みの節見出し読み上げ用）。
 	 * @return string
 	 */
-	private function render_section( array $section, array $characters, string $id_prefix ): string {
+	private function render_section( array $section, array $characters, string $id_prefix, bool $use_tts, string $chapter_title ): string {
 		$slug  = $this->section_slug( $section );
+		$title = (string) ( $section['title'] ?? '' );
 		$lead  = (string) ( $section['lead'] ?? '' );
 		$lines = isset( $section['lines'] ) && is_array( $section['lines'] ) ? $section['lines'] : array();
 
 		$body = '';
 		foreach ( $lines as $line ) {
 			if ( is_array( $line ) ) {
-				$body .= $this->render_line( $line, $characters, $id_prefix );
+				$body .= $this->render_line( $line, $characters, $id_prefix, $use_tts );
 			}
+		}
+
+		$tts_attrs = '';
+		if ( $use_tts ) {
+			$intro     = trim( $chapter_title . '。' . $title, '。' );
+			$tts_attrs = ' data-tts-section data-tts-section-intro="' . esc_attr( $intro ) . '"';
 		}
 
 		return '<section class="kantanbond-reference__section"'
 			. ( '' !== $slug ? ' id="' . esc_attr( $id_prefix . $slug ) . '"' : '' )
+			. $tts_attrs
 			. '>'
-			. '<h3 class="kantanbond-reference__section-title">' . esc_html( (string) ( $section['title'] ?? '' ) ) . '</h3>'
+			. '<h3 class="kantanbond-reference__section-title">'
+			. esc_html( $title )
+			. ( $use_tts ? $this->play_button( sprintf( /* translators: 1: section title */ __( '「%s」からこの節を読み上げ', 'kantanbond' ), $title ) ) : '' )
+			. '</h3>'
 			. ( '' !== $lead ? '<p class="kantanbond-reference__section-lead">' . esc_html( $lead ) . '</p>' : '' )
 			. '<div class="kantanbond-reference__lines">' . $body . '</div>'
 			. '</section>';
+	}
+
+	/**
+	 * 行単位の読み上げ開始ボタン（非対応ブラウザでは JS が表示しないので hidden のまま）。
+	 *
+	 * @param string $label 読み上げ用ラベル。
+	 * @return string
+	 */
+	private function play_button( string $label ): string {
+		return '<button type="button" class="kantanbond-reference__play" data-tts-item-play hidden'
+			. ' aria-label="' . esc_attr( $label ) . '" title="' . esc_attr( $label ) . '">'
+			. '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" focusable="false">'
+			. '<path d="M6.3 3.8a1 1 0 011.02.05l8 5.2a1 1 0 010 1.68l-8 5.2A1 1 0 015.8 15V4.7a1 1 0 01.5-.9z" />'
+			. '</svg>'
+			. '</button>';
 	}
 
 	/**
@@ -368,18 +491,26 @@ class KantanBond_Reference {
 	 * @param array<string, mixed> $line       行データ。
 	 * @param array<string, mixed> $characters 登場人物。
 	 * @param string               $id_prefix  id の接頭辞。
+	 * @param bool                 $use_tts    読み上げ用の属性を出力するか。
 	 * @return string
 	 */
-	private function render_line( array $line, array $characters, string $id_prefix ): string {
+	private function render_line( array $line, array $characters, string $id_prefix, bool $use_tts ): string {
 		$speaker = isset( $line['s'] ) ? (string) $line['s'] : self::SPEAKER_BIZ;
 		$text    = (string) ( $line['text'] ?? '' );
 
 		if ( self::BLOCK_TIP === $speaker ) {
 			$title = (string) ( $line['title'] ?? __( 'ヒント', 'kantanbond' ) );
 
-			return '<div class="kantanbond-reference__tip">'
-				. '<p class="kantanbond-reference__tip-title">' . esc_html( $title ) . '</p>'
-				. '<p class="kantanbond-reference__tip-text">' . esc_html( $text ) . '</p>'
+			$tip_attrs = $use_tts
+				? ' data-tts-item data-tts-voice="note" data-tts-prefix="' . esc_attr( sprintf( /* translators: 1: tip title */ __( 'ヒント。%s', 'kantanbond' ), $title ) ) . '"'
+				: '';
+
+			return '<div class="kantanbond-reference__tip"' . $tip_attrs . '>'
+				. '<p class="kantanbond-reference__tip-title">'
+				. esc_html( $title )
+				. ( $use_tts ? $this->play_button( sprintf( /* translators: 1: tip title */ __( 'ヒント「%s」から読み上げ', 'kantanbond' ), $title ) ) : '' )
+				. '</p>'
+				. '<p class="kantanbond-reference__tip-text"' . ( $use_tts ? ' data-tts-text' : '' ) . '>' . esc_html( $text ) . '</p>'
 				. '</div>';
 		}
 
@@ -389,12 +520,24 @@ class KantanBond_Reference {
 
 		$name = isset( $characters[ $speaker ]['name'] ) ? (string) $characters[ $speaker ]['name'] : '';
 
+		$line_attrs = $use_tts
+			? ' data-tts-item data-tts-voice="' . esc_attr( $speaker ) . '" data-tts-prefix="' . esc_attr( $name ) . '"'
+			: '';
+
+		$speaker_line = '';
+		if ( '' !== $name ) {
+			$speaker_line = '<p class="kantanbond-reference__speaker">'
+				. esc_html( $name )
+				. ( $use_tts ? $this->play_button( sprintf( /* translators: 1: speaker name */ __( '%sのこの発言から読み上げ', 'kantanbond' ), $name ) ) : '' )
+				. '</p>';
+		}
+
 		// 話者名は直後のテキストにも出るので、アイコンは装飾（aria-hidden）扱いにする。
-		return '<div class="kantanbond-reference__line kantanbond-reference__line--' . esc_attr( $speaker ) . '">'
+		return '<div class="kantanbond-reference__line kantanbond-reference__line--' . esc_attr( $speaker ) . '"' . $line_attrs . '>'
 			. $this->avatar_svg( $speaker, $id_prefix )
 			. '<div class="kantanbond-reference__line-body">'
-			. ( '' !== $name ? '<p class="kantanbond-reference__speaker">' . esc_html( $name ) . '</p>' : '' )
-			. '<div class="kantanbond-reference__bubble"><p>' . esc_html( $text ) . '</p></div>'
+			. $speaker_line
+			. '<div class="kantanbond-reference__bubble"><p' . ( $use_tts ? ' data-tts-text' : '' ) . '>' . esc_html( $text ) . '</p></div>'
 			. '</div>'
 			. '</div>';
 	}
@@ -602,6 +745,30 @@ class KantanBond_Reference {
 		$value = sanitize_key( trim( $raw ) );
 
 		return in_array( $value, array( 'first', 'all', 'none' ), true ) ? $value : 'first';
+	}
+
+	/**
+	 * 文字サイズ属性を正規化する。
+	 *
+	 * @param string $raw 生値。
+	 * @return string sm / md / lg / xl。
+	 */
+	private function normalize_font_size( string $raw ): string {
+		$value = sanitize_key( trim( $raw ) );
+
+		$aliases = array(
+			'小'   => 'sm',
+			'中'   => 'md',
+			'大'   => 'lg',
+			'特大' => 'xl',
+		);
+
+		$trimmed = trim( $raw );
+		if ( isset( $aliases[ $trimmed ] ) ) {
+			return $aliases[ $trimmed ];
+		}
+
+		return in_array( $value, array( 'sm', 'md', 'lg', 'xl' ), true ) ? $value : 'md';
 	}
 
 	/**

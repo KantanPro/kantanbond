@@ -550,7 +550,17 @@ class KantanBond_Admin {
 					<tr>
 						<td><code>toc</code></td>
 						<td><code>yes</code></td>
-						<td><?php echo esc_html__( '先頭に目次（章・節へのリンク）を表示。', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '左サイドバーに目次（章・節へのリンク）を表示。PC は追従表示、狭い画面は折りたたみ。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>tts</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( '読み上げ（読み上げ／通し読み／最初から／速さ）と行ごとの再生ボタンを表示。ブラウザ内蔵の音声合成のみ使用。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>font</code></td>
+						<td><code>md</code></td>
+						<td><?php echo esc_html__( '本文の初期文字サイズ（sm/md/lg/xl、小・中・大・特大）。閲覧者が切り替えるとブラウザに記憶されます。', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
 						<td><code>characters</code></td>
@@ -586,6 +596,7 @@ class KantanBond_Admin {
 				<li><code>[kantanbond_reference open="all" characters="no"]</code></li>
 				<li><code>[kantanbond_reference chapters="1,2" align="center"]</code></li>
 				<li><code>[kantanbond_reference slugs="welcome,screen" toc="no"]</code></li>
+				<li><code>[kantanbond_reference tts="no" font="lg"]</code></li>
 			</ul>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] の属性', 'kantanbond' ); ?></h3>

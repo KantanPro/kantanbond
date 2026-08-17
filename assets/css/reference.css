@@ -8,7 +8,7 @@
 	box-sizing: border-box;
 	isolation: isolate;
 	margin: 1.5em 0;
-	max-width: 60rem;
+	max-width: 76rem;
 	min-width: 0;
 	width: 100%;
 }
@@ -38,7 +38,33 @@
 	display: none;
 }
 
-/* 目次 */
+/* 2 カラム（左サイドバー＋本文） */
+
+.kantanbond-reference__layout {
+	display: block;
+}
+
+@media (min-width: 1024px) {
+	.kantanbond-reference__layout {
+		align-items: flex-start;
+		display: flex;
+		gap: 1.5rem;
+	}
+
+	.kantanbond-reference__sidebar {
+		flex: 0 0 18rem;
+		position: sticky;
+		top: 1.5rem;
+		width: 18rem;
+	}
+}
+
+.kantanbond-reference__main {
+	min-width: 0;
+	width: 100%;
+}
+
+/* 目次（PC は常時展開・狭い画面は折りたたみ） */
 
 .kantanbond-reference__toc {
 	background: #f8fafc;
@@ -46,6 +72,45 @@
 	border-radius: 0.75rem;
 	margin-bottom: 1.25rem;
 	padding: 1rem 1.25rem;
+}
+
+.kantanbond-reference__toc-summary {
+	cursor: pointer;
+	font-size: 0.9375rem;
+	font-weight: 700;
+	list-style: none;
+}
+
+.kantanbond-reference__toc-summary::-webkit-details-marker {
+	display: none;
+}
+
+.kantanbond-reference__toc-summary::before {
+	color: #94a3b8;
+	content: "\25b6";
+	display: inline-block;
+	font-size: 0.7rem;
+	margin-right: 0.4rem;
+	transition: transform 0.15s ease;
+}
+
+.kantanbond-reference__toc[open] > .kantanbond-reference__toc-summary::before {
+	transform: rotate(90deg);
+}
+
+@media (min-width: 1024px) {
+	.kantanbond-reference__toc {
+		max-height: calc(100vh - 3rem);
+		overflow-y: auto;
+	}
+
+	.kantanbond-reference__toc-summary {
+		display: none;
+	}
+}
+
+.kantanbond-reference__toc-nav {
+	min-width: 0;
 }
 
 .kantanbond-reference__toc-head {
@@ -101,22 +166,23 @@
 }
 
 .kantanbond-reference__toc-sections {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.25rem 1rem;
 	margin-top: 0.25rem;
 }
 
 .kantanbond-reference__toc-section a {
+	border-radius: 0.375rem;
 	color: #334155;
-	font-size: 0.9375rem;
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	padding: 0.3rem 0.5rem;
 	text-decoration: none;
 }
 
 .kantanbond-reference__toc-section a:hover,
 .kantanbond-reference__toc-section a:focus-visible {
-	color: #4338ca;
-	text-decoration: underline;
+	background: #eef2ff;
+	color: #3730a3;
 }
 
 /* 登場人物 */
@@ -144,7 +210,7 @@
 	padding: 0;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 640px) and (max-width: 1023px) {
 	.kantanbond-reference__characters-list {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -179,6 +245,7 @@
 	font-size: 0.8125rem;
 	line-height: 1.7;
 	margin: 0.2rem 0 0;
+	overflow-wrap: anywhere;
 }
 
 /* 章（アコーディオン） */
@@ -332,6 +399,239 @@
 	background: #fff1f2;
 	border-color: #fecdd3;
 	color: #881337;
+}
+
+/* ツールバー（文字サイズ・読み上げ） */
+
+.kantanbond-reference__toolbar {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	margin-bottom: 0.75rem;
+	padding: 0.75rem 1rem;
+}
+
+.kantanbond-reference__toolbar-label {
+	color: #475569;
+	font-size: 0.75rem;
+	white-space: nowrap;
+}
+
+.kantanbond-reference__toolbar-label--tts {
+	align-items: center;
+	color: #3730a3;
+	display: inline-flex;
+	font-weight: 700;
+	gap: 0.25rem;
+}
+
+.kantanbond-reference__toolbar-label--tts svg {
+	height: 0.9rem;
+	width: 0.9rem;
+}
+
+.kantanbond-reference__size {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.kantanbond-reference__size-group {
+	border: 1px solid #cbd5e1;
+	border-radius: 0.375rem;
+	display: inline-flex;
+	overflow: hidden;
+}
+
+.kantanbond-reference__size-button {
+	background: #ffffff;
+	border: 0;
+	color: #334155;
+	cursor: pointer;
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 0.3rem 0.7rem;
+}
+
+.kantanbond-reference__size-button + .kantanbond-reference__size-button {
+	border-left: 1px solid #cbd5e1;
+}
+
+.kantanbond-reference__size-button:hover {
+	background: #f1f5f9;
+}
+
+.kantanbond-reference__size-button.is-active {
+	background: #4f46e5;
+	color: #ffffff;
+}
+
+.kantanbond-reference__tts {
+	align-items: center;
+	background: #eef2ff;
+	border: 1px solid #c7d2fe;
+	border-radius: 0.5rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 0.75rem;
+	padding: 0.5rem 0.75rem;
+}
+
+.kantanbond-reference__tts[hidden] {
+	display: none;
+}
+
+.kantanbond-reference__tts-buttons,
+.kantanbond-reference__tts-rate {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	/* 狭い画面でボタン列が縮まずに横スクロールを生まないようにする */
+	min-width: 0;
+}
+
+.kantanbond-reference__button {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	border-radius: 0.375rem;
+	color: #334155;
+	cursor: pointer;
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1.4;
+	min-height: 2rem;
+	padding: 0.35rem 0.8rem;
+}
+
+.kantanbond-reference__button:hover:not(:disabled) {
+	background: #f8fafc;
+}
+
+.kantanbond-reference__button:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.kantanbond-reference__button--primary {
+	background: #4f46e5;
+	border-color: #4338ca;
+	color: #ffffff;
+}
+
+.kantanbond-reference__button--primary:hover:not(:disabled) {
+	background: #4338ca;
+}
+
+.kantanbond-reference__button--autopilot {
+	border-color: #a5b4fc;
+	color: #3730a3;
+}
+
+.kantanbond-reference__button--autopilot.is-on {
+	background: #4f46e5;
+	border-color: #4338ca;
+	color: #ffffff;
+}
+
+.kantanbond-reference__select {
+	border: 1px solid #cbd5e1;
+	border-radius: 0.375rem;
+	font-size: 0.75rem;
+	min-height: 2rem;
+	padding: 0.2rem 0.4rem;
+}
+
+.kantanbond-reference__tts-status {
+	color: #334155;
+	font-size: 0.75rem;
+}
+
+.kantanbond-reference__tts-unsupported {
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 0.375rem;
+	color: #475569;
+	font-size: 0.75rem;
+	line-height: 1.7;
+	margin: 0;
+	padding: 0.5rem 0.75rem;
+}
+
+.kantanbond-reference__tts-unsupported[hidden] {
+	display: none;
+}
+
+/* 行単位の再生ボタン */
+
+.kantanbond-reference__play {
+	align-items: center;
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	border-radius: 9999px;
+	color: #64748b;
+	cursor: pointer;
+	display: inline-flex;
+	height: 1.4rem;
+	justify-content: center;
+	margin-left: 0.4rem;
+	opacity: 0.7;
+	padding: 0;
+	vertical-align: middle;
+	width: 1.4rem;
+}
+
+.kantanbond-reference__play[hidden] {
+	display: none;
+}
+
+.kantanbond-reference__play:hover,
+.kantanbond-reference__play:focus-visible {
+	background: #eef2ff;
+	color: #3730a3;
+	opacity: 1;
+}
+
+.kantanbond-reference__play svg {
+	height: 0.75rem;
+	width: 0.75rem;
+}
+
+/* 読み上げ中の行（色だけでなく太い枠でも示す） */
+
+.kantanbond-reference__line--reading,
+.kantanbond-reference__tip.kantanbond-reference__line--reading {
+	border-radius: 0.875rem;
+	outline: 3px solid #4f46e5;
+	outline-offset: 5px;
+}
+
+/* 文字サイズ */
+
+.kantanbond-reference__main--font-sm .kantanbond-reference__lines {
+	font-size: 0.875rem;
+}
+
+.kantanbond-reference__main--font-md .kantanbond-reference__lines {
+	font-size: 1rem;
+}
+
+.kantanbond-reference__main--font-lg .kantanbond-reference__lines {
+	font-size: 1.125rem;
+}
+
+.kantanbond-reference__main--font-xl .kantanbond-reference__lines {
+	font-size: 1.25rem;
+}
+
+.kantanbond-reference__main--font-lg .kantanbond-reference__tip-text,
+.kantanbond-reference__main--font-xl .kantanbond-reference__tip-text {
+	font-size: 1rem;
 }
 
 /* ヒント */
