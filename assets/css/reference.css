@@ -45,17 +45,31 @@
 }
 
 @media (min-width: 1024px) {
+	/*
+	 * ビューポートが広くても、置かれた枠（ページビルダーの狭いカラム等）が狭いことはある。
+	 * 2 カラムに足りない幅では折り返して縦積みになるよう、flex-wrap で組む。
+	 */
 	.kantanbond-reference__layout {
 		align-items: flex-start;
 		display: flex;
+		flex-wrap: wrap;
 		gap: 1.5rem;
 	}
 
 	.kantanbond-reference__sidebar {
-		flex: 0 0 18rem;
+		/* 2 カラムのときは本文（grow 999）に押されて 17rem 前後、縦積みのときは全幅 */
+		flex: 1 1 17rem;
 		position: sticky;
 		top: 1.5rem;
-		width: 18rem;
+	}
+
+	.kantanbond-reference__main {
+		/* 本文を優先して広げる（縦積みになったときは 100% 幅） */
+		flex: 999 1 22rem;
+	}
+
+	.kantanbond-reference__layout--no-sidebar .kantanbond-reference__main {
+		flex-basis: 100%;
 	}
 }
 
@@ -490,10 +504,18 @@
 .kantanbond-reference__tts-rate {
 	align-items: center;
 	display: flex;
-	flex-wrap: wrap;
 	gap: 0.4rem;
 	/* 狭い画面でボタン列が縮まずに横スクロールを生まないようにする */
 	min-width: 0;
+}
+
+.kantanbond-reference__tts-buttons {
+	flex-wrap: wrap;
+}
+
+/* 「速さ」ラベルとプルダウンは必ず同じ行に並べる（折り返すと 2 行に割れて見える） */
+.kantanbond-reference__tts-rate {
+	flex-wrap: nowrap;
 }
 
 .kantanbond-reference__button {
@@ -539,12 +561,24 @@
 	color: #ffffff;
 }
 
+/*
+ * テーマ側の `select { width: 100% }`（Cocoon 等で多い）を打ち消す。
+ * 効かせないと速さのプルダウンが 1 行を占有し、ラベルと 2 行に割れて見える。
+ */
 .kantanbond-reference__select {
+	background-color: #ffffff;
 	border: 1px solid #cbd5e1;
 	border-radius: 0.375rem;
+	box-sizing: border-box;
+	display: inline-block;
+	flex: 0 0 auto;
 	font-size: 0.75rem;
+	height: auto;
+	margin: 0;
+	max-width: 100%;
 	min-height: 2rem;
-	padding: 0.2rem 0.4rem;
+	padding: 0.2rem 1.4rem 0.2rem 0.4rem;
+	width: auto;
 }
 
 .kantanbond-reference__tts-status {

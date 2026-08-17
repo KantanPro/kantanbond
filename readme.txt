@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.22
+Stable tag: 1.4.23
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.23 =
+* [kantanbond_reference] 読み上げの「速さ」ラベルとプルダウンが 2 行に割れる問題を修正（同じ行に固定）
+* [kantanbond_reference] テーマの `select { width: 100% }` に上書きされてプルダウンが 1 行を占有する問題を修正
+* [kantanbond_reference] ページビルダーの狭いカラムに置いたとき本文が極端に細くなる問題を修正（幅が足りなければサイドバーと本文を縦積みに）
 
 = 1.4.22 =
 * [kantanbond_reference] 左サイドバー（目次・登場人物）を追加し 2 カラム構成に変更（PC は追従表示、狭い画面は折りたたみ）
