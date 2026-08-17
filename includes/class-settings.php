@@ -74,6 +74,11 @@ class KantanBond_Settings {
 		delete_option( self::OPTION_API_KEY );
 		delete_option( self::OPTION_TENANT_ID );
 
+		// Base URL が変われば取得先も変わるため、リファレンスのキャッシュは捨てる。
+		if ( class_exists( 'KantanBond_Reference' ) ) {
+			KantanBond_Reference::flush_cache();
+		}
+
 		return true;
 	}
 

@@ -3,7 +3,7 @@
  * Plugin Name: KantanBond
  * Plugin URI: https://kantanbiz.cloud/
  * Description: WordPress と KantanBiz（KantanBiz Cloud）を API 連携する公式連携プラグインです。
- * Version: 1.4.20
+ * Version: 1.4.21
  * Author: KantanPro
  * Author URI: https://www.kantanpro.com/
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KANTANBOND_VERSION', '1.4.20' );
+define( 'KANTANBOND_VERSION', '1.4.21' );
 define( 'KANTANBOND_PLUGIN_FILE', __FILE__ );
 define( 'KANTANBOND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KANTANBOND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -38,6 +38,7 @@ require_once KANTANBOND_PLUGIN_DIR . 'includes/class-shortcodes.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-public-products.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-public-purchase-thank-you.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-billing-plans.php';
+require_once KANTANBOND_PLUGIN_DIR . 'includes/class-reference.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-admin.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-loader.php';
 require_once KANTANBOND_PLUGIN_DIR . 'includes/class-github-updater.php';
@@ -111,8 +112,9 @@ function kantanbond_run(): void {
 	$public_products = new KantanBond_Public_Products( $api, $settings );
 	$purchase_thank_you = new KantanBond_Public_Purchase_Thank_You();
 	$billing_plans   = new KantanBond_Billing_Plans( $settings );
+	$reference       = new KantanBond_Reference( $api );
 	$admin           = new KantanBond_Admin( $settings, $logger, $api );
-	$loader          = new KantanBond_Loader( $admin, $shortcodes, $public_products, $purchase_thank_you, $billing_plans );
+	$loader          = new KantanBond_Loader( $admin, $shortcodes, $public_products, $purchase_thank_you, $billing_plans, $reference );
 
 	$loader->init();
 }

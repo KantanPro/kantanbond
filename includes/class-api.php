@@ -226,6 +226,129 @@ class KantanBond_API {
 	}
 
 	/**
+	 * リファレンス本文（章・節の全文）を取得する。
+	 *
+	 * テナントのデータを含まないヘルプ文書のため、KantanBiz 側は認証不要の公開 API。
+	 * Base URL 未設定のサイト（マーケティングサイト等）でも読めるよう、
+	 * 設定が無ければ公式 URL（KANTANBIZ_APP_URL）へ問い合わせる。
+	 *
+	 * @param string $slug 節を 1 つだけ取る場合の slug（空なら全文）。
+	 * @return array<string, mixed>|WP_Error data 配列（全文なら characters/chapters）。
+	 */
+	public function get_reference( string $slug = '' ) {
+		$endpoint = '/api/v1/reference';
+
+		if ( $slug !== '' ) {
+			if ( ! preg_match( '/\A[a-z0-9-]+\z/', $slug ) ) {
+				return new WP_Error(
+					'kantanbond_invalid_reference_slug',
+					__( 'リファレンスの slug が不正です。', 'kantanbond' )
+				);
+			}
+
+			$endpoint .= '/' . $slug;
+		}
+
+		$response = $this->public_request( 'GET', $endpoint );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+			return new WP_Error(
+				'kantanbond_invalid_reference_response',
+				__( 'リファレンス API の応答形式が不正です。', 'kantanbond' )
+			);
+		}
+
+		return $response['data'];
+	}
+
+	/**
+	 * 認証不要の公開 API へリクエストする（トークンは一切送らない）。
+	 *
+	 * @param string $method   HTTP メソッド。
+	 * @param string $endpoint エンドポイント（/api/v1/reference 等）。
+	 * @return array<string, mixed>|WP_Error
+	 */
+	private function public_request( string $method, string $endpoint ) {
+		$base_url = $this->settings->get_normalized_base_url();
+
+		if ( $base_url === '' ) {
+			$base_url = KantanBond_Settings::KANTANBIZ_APP_URL;
+		}
+
+		$endpoint = '/' . ltrim( $endpoint, '/' );
+		$url      = $base_url . $endpoint;
+
+		$args = array(
+			'method'  => strtoupper( $method ),
+			'headers' => array(
+				'Accept' => 'application/json',
+			),
+			'timeout' => 20,
+		);
+
+		if ( 'GET' === $args['method'] ) {
+			unset( $args['method'] );
+			$response = wp_remote_get( $url, $args );
+		} else {
+			$response = wp_remote_post( $url, $args );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			$this->logger->log(
+				KantanBond_Logger::TYPE_ERROR,
+				sprintf(
+					/* translators: 1: endpoint, 2: error message */
+					__( '公開 API 通信エラー [%1$s]: %2$s', 'kantanbond' ),
+					$endpoint,
+					$response->get_error_message()
+				)
+			);
+
+			return $response;
+		}
+
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		$decoded     = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( ! is_array( $decoded ) ) {
+			$decoded = array();
+		}
+
+		if ( $status_code >= 400 ) {
+			$error_message = isset( $decoded['message'] ) && is_string( $decoded['message'] )
+				? $decoded['message']
+				: sprintf(
+					/* translators: 1: HTTP status code */
+					__( '公開 API がエラーを返しました（HTTP %d）。', 'kantanbond' ),
+					$status_code
+				);
+
+			$this->logger->log(
+				KantanBond_Logger::TYPE_ERROR,
+				sprintf(
+					/* translators: 1: endpoint, 2: status code, 3: message */
+					__( '公開 API エラー [%1$s] HTTP %2$d: %3$s', 'kantanbond' ),
+					$endpoint,
+					$status_code,
+					$error_message
+				)
+			);
+
+			return new WP_Error(
+				'kantanbond_public_api_error',
+				$error_message,
+				array( 'status' => $status_code )
+			);
+		}
+
+		return $decoded;
+	}
+
+	/**
 	 * 問い合わせ受信・公開商品用インバウンド API リクエスト（サーバー側のみ。PAT は使わない）。
 	 *
 	 * @param string               $method   HTTP メソッド。

@@ -73,6 +73,9 @@ class KantanBond_Installer {
 		delete_option( KantanBond_Settings::OPTION_INBOUND_TOKEN );
 		delete_option( KantanBond_Settings::OPTION_PUBLIC_PRODUCT_CARD_BG_COLOR );
 		delete_option( 'kantanbond_version' );
+
+		// [kantanbond_reference] の取得結果キャッシュ。
+		delete_transient( 'kantanbond_reference_v1' );
 	}
 
 	/**

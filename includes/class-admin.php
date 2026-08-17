@@ -520,12 +520,73 @@ class KantanBond_Admin {
 						<td><?php echo esc_html__( '公式サイト向け。unlock 合言葉が必要（または wp-config で全体有効化）。ログイン不要。API トークン不要。[kantanbond_plans] でも同じ。フリーは機能制限つき永続無料。有料は年払｜月払を選び「申し込む」→ 登録後 Stripe 決済へ。', 'kantanbond' ); ?></td>
 					</tr>
 					<tr>
+						<td><code>[kantanbond_reference]</code></td>
+						<td><?php echo esc_html__( 'KantanBiz リファレンス（使い方ガイド）の全文', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( 'ログイン不要・API トークン不要（KantanBiz の公開 API から取得）。目次＋章ごとの折りたたみ表示。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
 						<td><code>[kantanbond_version]</code></td>
 						<td><?php echo esc_html__( 'プラグインバージョン表示', 'kantanbond' ); ?></td>
 						<td><?php echo esc_html__( '例: 1.4.9。API 不要。', 'kantanbond' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_reference] の属性', 'kantanbond' ); ?></h3>
+			<table class="widefat striped kantanbond-shortcodes-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html__( '属性', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '既定値', 'kantanbond' ); ?></th>
+						<th scope="col"><?php echo esc_html__( '説明', 'kantanbond' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>align</code></td>
+						<td><code>left</code></td>
+						<td><?php echo esc_html__( '横寄せ（left / center / right、左寄せ・中央寄せ・右寄せ）。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>toc</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( '先頭に目次（章・節へのリンク）を表示。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>characters</code></td>
+						<td><code>yes</code></td>
+						<td><?php echo esc_html__( '登場人物（ビズちゃん・ビズ博士）の紹介を表示。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>open</code></td>
+						<td><code>first</code></td>
+						<td><?php echo esc_html__( '最初から開いておく章（first: 第1章のみ / all: 全章 / none: すべて閉じる）。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>chapters</code></td>
+						<td><?php echo esc_html__( '（空＝全章）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '表示する章番号をカンマ区切りで指定（例: 1,2）。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>slugs</code></td>
+						<td><?php echo esc_html__( '（空＝全節）', 'kantanbond' ); ?></td>
+						<td><?php echo esc_html__( '表示する節の slug をカンマ区切りで指定（例: welcome,screen）。', 'kantanbond' ); ?></td>
+					</tr>
+					<tr>
+						<td><code>cache</code></td>
+						<td><code>720</code></td>
+						<td><?php echo esc_html__( '取得結果を保持する分数（既定 12 時間）。cache="no" で毎回取得。', 'kantanbond' ); ?></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_reference] 記述例', 'kantanbond' ); ?></h3>
+			<ul class="kantanbond-shortcodes-examples">
+				<li><code>[kantanbond_reference]</code></li>
+				<li><code>[kantanbond_reference open="all" characters="no"]</code></li>
+				<li><code>[kantanbond_reference chapters="1,2" align="center"]</code></li>
+				<li><code>[kantanbond_reference slugs="welcome,screen" toc="no"]</code></li>
+			</ul>
 
 			<h3 class="kantanbond-shortcodes-subheading"><?php echo esc_html__( '[kantanbond_billing_plans] の属性', 'kantanbond' ); ?></h3>
 			<table class="widefat striped kantanbond-shortcodes-table">

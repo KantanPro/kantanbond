@@ -28,6 +28,7 @@ class KantanBond_Frontend_Assets {
 		'kantanbond_public_purchase_thank_you',
 		'kantanbond_billing_plans',
 		'kantanbond_plans',
+		'kantanbond_reference',
 	);
 
 	/**

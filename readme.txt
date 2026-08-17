@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.20
+Stable tag: 1.4.21
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,7 @@ KantanBond は WordPress サイトと KantanBiz アプリ（https://kantanbiz.cl
 * API 設定（Base URL / API アクセストークン / API Secret）
 * 同期ログの記録・閲覧
 * ショートコードによる顧客・案件・商品・レポートデータの表示
+* ショートコードによる KantanBiz リファレンス（使い方ガイド）の全文表示
 * ショートコードによるプラグインバージョン表示
 
 将来的な拡張予定:
@@ -52,11 +53,23 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 
 公開商品（サイト公開フラグ ON のみ・お申込みフォーム付き）: `[kantanbond_public_products]`。API 設定の「インバウンドトークン」が必要です（KantanBiz の問い合わせ受信設定で発行）。
 
+リファレンス（KantanBiz の使い方ガイド全文）: `[kantanbond_reference]`。KantanBiz の公開 API から取得するため、API アクセストークンの設定がないサイトでも表示できます。章ごとに折りたためるアコーディオン形式で、目次から各節へジャンプできます。
+
+属性: `align`（left/center/right）、`toc`（目次の表示 yes/no）、`characters`（登場人物の表示 yes/no）、`open`（最初から開く章 first/all/none）、`chapters`（章番号の絞り込み 例: 1,2）、`slugs`（節の絞り込み 例: welcome,screen）、`cache`（取得結果のキャッシュ分数。既定 720、`cache="no"` で無効）
+
+例: `[kantanbond_reference open="all" characters="no"]`、`[kantanbond_reference chapters="1" toc="no"]`
+
 バージョン表示: `[kantanbond_version]`
 
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.21 =
+* [kantanbond_reference] KantanBiz リファレンス（使い方ガイド）の全文表示ショートコードを追加
+* 目次・登場人物・章ごとのアコーディオン表示に対応（align / toc / characters / open / chapters / slugs / cache 属性）
+* KantanBiz の公開 API（GET /api/v1/reference）から取得するため API アクセストークン不要
+* 取得結果はトランジェントにキャッシュ（既定 12 時間、API 設定の保存時に破棄）
 
 = 1.4.20 =
 * Elementor 編集画面で公開商品ショートコードが API 呼び出しで固まる問題を修正
