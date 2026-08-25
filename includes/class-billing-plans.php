@@ -569,6 +569,8 @@ class KantanBond_Billing_Plans {
 				'tagline'             => __( 'おひとり運用向けの無料プラン。基本の受発注は続けられ、本格利用時はソロ以上へ。', 'kantanbond' ),
 				'is_free'             => true,
 				'member_limit'        => __( 'スタッフ（ログインユーザー）1 名まで（スタッフ招待不可）', 'kantanbond' ),
+				'client_limit'        => __( '顧客 10 件まで', 'kantanbond' ),
+				'order_limit'         => __( '案件 30 件まで', 'kantanbond' ),
 				'service_limit'       => __( '自社商品 10 件まで', 'kantanbond' ),
 				'supplier_limit'      => __( '協力会社 5 件まで', 'kantanbond' ),
 				'order_files_storage' => __( '案件ファイル 100 MB まで', 'kantanbond' ),
