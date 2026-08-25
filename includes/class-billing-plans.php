@@ -347,7 +347,7 @@ class KantanBond_Billing_Plans {
 									</p>
 								<?php else : ?>
 									<p class="kantanbond-billing-plans__stripe-note">
-										<?php echo esc_html__( '開始時に Stripe でクレジットカード登録が必要です（この時点では課金されません）。', 'kantanbond' ); ?>
+										<?php echo esc_html__( 'クレジットカードの登録は不要です。メールアドレスだけですぐ始められます。', 'kantanbond' ); ?>
 									</p>
 								<?php endif; ?>
 
