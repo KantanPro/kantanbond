@@ -266,6 +266,31 @@ class KantanBond_API {
 	}
 
 	/**
+	 * 公開料金表を取得する（認証不要）。
+	 *
+	 * 料金表はこれまでプラグイン側にハードコードされていて、本体の上限を変えるたびに
+	 * 表示とのズレが起きていた。本体を唯一の情報源にするための取得口。
+	 *
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public function get_billing_plans() {
+		$response = $this->public_request( 'GET', '/api/v1/billing-plans' );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		if ( ! isset( $response['data']['plans'] ) || ! is_array( $response['data']['plans'] ) ) {
+			return new WP_Error(
+				'kantanbond_invalid_billing_plans_response',
+				__( '料金プラン API の応答形式が不正です。', 'kantanbond' )
+			);
+		}
+
+		return $response['data'];
+	}
+
+	/**
 	 * 認証不要の公開 API へリクエストする（トークンは一切送らない）。
 	 *
 	 * @param string $method   HTTP メソッド。

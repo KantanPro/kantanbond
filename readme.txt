@@ -4,7 +4,7 @@ Tags: kantanbiz, api, integration, crm
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 1.4.25
+Stable tag: 1.4.26
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,11 @@ KantanBiz のプロフィール画面（/profile）から取得できます。AP
 レポート例: `[kantanbond_reports type="sales" period="this_year"]`、`[kantanbond_reports type="tax_return" tax_year="2025"]`
 
 == Changelog ==
+
+= 1.4.26 =
+* [kantanbond_billing_plans] 料金プランを KantanBiz 本体の公開 API（/api/v1/billing-plans）から取得するように変更。プラン内容の二重管理をやめ、本体の設定を唯一の情報源にした
+* 取得結果は 60 分キャッシュ。本体に届かないときは従来どおりプラグイン内蔵の既定値で表示する
+* API Base URL を変更するとキャッシュを破棄する
 
 = 1.4.25 =
 * [kantanbond_billing_plans] フリープランに「顧客 10 件まで」「案件 30 件まで」を表示（KantanBiz 本体で上限を設けたため）

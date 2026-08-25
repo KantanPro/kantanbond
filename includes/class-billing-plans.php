@@ -29,9 +29,24 @@ class KantanBond_Billing_Plans {
 	public const DEFAULT_UNLOCK_PHRASE = 'kantanbiz-plans';
 
 	/**
+	 * 本体から取得した料金表のキャッシュキー。
+	 */
+	private const TRANSIENT_KEY = 'kantanbond_billing_plans';
+
+	/**
+	 * キャッシュ時間（分）。本体 API の Cache-Control と揃えている。
+	 */
+	private const CACHE_MINUTES = 60;
+
+	/**
 	 * @var KantanBond_Settings
 	 */
 	private KantanBond_Settings $settings;
+
+	/**
+	 * @var KantanBond_API|null
+	 */
+	private ?KantanBond_API $api;
 
 	/**
 	 * @var bool
@@ -39,10 +54,21 @@ class KantanBond_Billing_Plans {
 	private static bool $assets_enqueued = false;
 
 	/**
-	 * @param KantanBond_Settings $settings 設定。
+	 * @param KantanBond_Settings  $settings 設定。
+	 * @param KantanBond_API|null  $api      本体 API クライアント。null なら内蔵の既定値のみで描画する。
 	 */
-	public function __construct( KantanBond_Settings $settings ) {
+	public function __construct( KantanBond_Settings $settings, ?KantanBond_API $api = null ) {
 		$this->settings = $settings;
+		$this->api      = $api;
+	}
+
+	/**
+	 * キャッシュを破棄する（Base URL 変更時など）。
+	 *
+	 * @return void
+	 */
+	public static function flush_cache(): void {
+		delete_transient( self::TRANSIENT_KEY );
 	}
 
 	/**
@@ -499,6 +525,17 @@ class KantanBond_Billing_Plans {
 	 * @return list<string>
 	 */
 	private function features_for_plan( array $plan, bool $show_common_features ): array {
+		// 本体 API から来た行を優先する。共通機能を出すかどうかは掲載側の指定に従う。
+		if ( isset( $plan['limit_lines'] ) && is_array( $plan['limit_lines'] ) ) {
+			$lines = array_values( $plan['limit_lines'] );
+
+			if ( $show_common_features && ! empty( $plan['common_lines'] ) && is_array( $plan['common_lines'] ) ) {
+				$lines = array_merge( $lines, array_values( $plan['common_lines'] ) );
+			}
+
+			return $lines;
+		}
+
 		$lines   = array();
 		$is_free = ! empty( $plan['is_free'] );
 
@@ -561,6 +598,99 @@ class KantanBond_Billing_Plans {
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_plans(): array {
+		$remote = $this->fetch_remote_plans();
+
+		return $remote !== array() ? $remote : $this->get_fallback_plans();
+	}
+
+	/**
+	 * 本体 API から料金表を取得する。
+	 *
+	 * 取得できなければ空配列を返し、呼び出し側が内蔵の既定値へ退避する。
+	 * 本体が落ちていても料金表が消えないようにするため、ここでは例外を投げない。
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private function fetch_remote_plans(): array {
+		$cached = get_transient( self::TRANSIENT_KEY );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		if ( ! $this->api instanceof KantanBond_API ) {
+			return array();
+		}
+
+		$data = $this->api->get_billing_plans();
+
+		if ( is_wp_error( $data ) || ! isset( $data['plans'] ) || ! is_array( $data['plans'] ) ) {
+			// 失敗を短時間だけ覚えて、表示のたびに毎回叩きにいかないようにする
+			set_transient( self::TRANSIENT_KEY, array(), 5 * MINUTE_IN_SECONDS );
+
+			return array();
+		}
+
+		$plans = array();
+
+		foreach ( $data['plans'] as $plan ) {
+			if ( ! is_array( $plan ) || ! isset( $plan['id'] ) ) {
+				continue;
+			}
+
+			$id = (string) $plan['id'];
+
+			$plans[ $id ] = array(
+				'name'               => (string) ( $plan['name'] ?? $id ),
+				'price_label'        => (string) ( $plan['price_label'] ?? '' ),
+				'period'             => (string) ( $plan['period'] ?? '' ),
+				'price_yearly_label' => isset( $plan['price_yearly_label'] ) ? (string) $plan['price_yearly_label'] : '',
+				'period_yearly'      => isset( $plan['period_yearly'] ) ? (string) $plan['period_yearly'] : '',
+				'tagline'            => (string) ( $plan['tagline'] ?? '' ),
+				'is_free'            => ! empty( $plan['is_free'] ),
+				'recommended'        => ! empty( $plan['recommended'] ),
+				// 本体が組み立て済みの行。上限と共通機能は分けて持つ（掲載側で共通機能を省けるようにするため）
+				'limit_lines'        => self::string_list( $plan['limits'] ?? array() ),
+				'common_lines'       => self::string_list( $plan['common_features'] ?? array() ),
+			);
+		}
+
+		if ( $plans === array() ) {
+			return array();
+		}
+
+		set_transient( self::TRANSIENT_KEY, $plans, self::CACHE_MINUTES * MINUTE_IN_SECONDS );
+
+		return $plans;
+	}
+
+	/**
+	 * API 由来の配列を、空要素を除いた文字列リストに整える。
+	 *
+	 * @param mixed $value 生の値。
+	 * @return list<string>
+	 */
+	private static function string_list( $value ): array {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		return array_values(
+			array_filter(
+				$value,
+				static fn ( $line ): bool => is_string( $line ) && '' !== $line
+			)
+		);
+	}
+
+	/**
+	 * 本体 API に届かないときに使う内蔵の既定値。
+	 *
+	 * 本体側の config/billing.php が正であり、こちらは非常用の写し。
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private function get_fallback_plans(): array {
 		return array(
 			'free'     => array(
 				'name'                => __( 'フリー', 'kantanbond' ),
