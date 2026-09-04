@@ -106,7 +106,7 @@
 	overflow: hidden;
 	position: relative;
 	text-align: left;
-	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 /* おすすめ以外: JS の min-height 揃え時に内部を伸ばして CTA を下端へ */
@@ -120,18 +120,13 @@
 	box-shadow: 0 14px 32px rgba(99, 102, 241, 0.28);
 }
 
-/* 選択中は不透明で強調、非選択は半透明で後ろに下げる */
-.kantanbond-billing-plans[data-interactive="1"] .kantanbond-billing-plans__radio:not(:checked) + .kantanbond-billing-plans__card,
-.kantanbond-billing-plans[data-interactive="1"] .kantanbond-billing-plans__item:not(.is-selected) .kantanbond-billing-plans__card {
-	opacity: 0.55;
-}
-
+/* 非選択カードは半透明にしない。背景画像のあるページ（www.kantanbiz.cloud のトップなど）で
+   カードの下の画像が透けて本文が読めなくなるため。選択中の強調は背景色・枠線・影で行う。 */
 .kantanbond-billing-plans__radio:checked + .kantanbond-billing-plans__card,
 .kantanbond-billing-plans__item.is-selected .kantanbond-billing-plans__card {
 	background: #eef2ff;
 	border-color: #4f46e5;
 	box-shadow: 0 10px 24px rgba(79, 70, 229, 0.2);
-	opacity: 1;
 }
 
 .kantanbond-billing-plans__radio:focus-visible + .kantanbond-billing-plans__card {
